@@ -41,6 +41,7 @@ func (g *gameRenderer) ApplyTheme() {
 }
 
 func (g *gameRenderer) Refresh() {
+	g.ApplyTheme()
 	canvas.Refresh(g.render)
 }
 
@@ -116,8 +117,10 @@ func (g *game) animate() {
 			}
 
 			g.board.nextGen()
-			g.updateGeneration()
-			g.Refresh()
+			fyne.Do(func() {
+				g.updateGeneration()
+				g.Refresh()
+			})
 		}
 	}()
 }

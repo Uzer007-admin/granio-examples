@@ -26,6 +26,7 @@ func show(app fyne.App) {
 	// start the board animation before we show the window - it will block
 	game.animate()
 
+	window.Resize(fyne.NewSize(200, 220))
 	window.Show()
 }
 
