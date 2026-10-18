@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // XKCD is an app to get xkcd images and display them
@@ -42,7 +42,7 @@ type XKCD struct {
 func (x *XKCD) newLabel(name string) *widget.Label {
 	w := widget.NewLabel("")
 	if name == "alt" || name == "transcript" {
-		w.Wrapping = fyne.TextWrapWord
+		w.Wrapping = granio.TextWrapWord
 	}
 	x.labels[name] = w
 	return w
@@ -96,7 +96,7 @@ func (x *XKCD) downloadImage(url string) {
 		log.Fatal(err)
 	}
 
-	fyne.Do(func() {
+	granio.Do(func() {
 		x.image.Image = nil
 		x.image.File = file.Name()
 		canvas.Refresh(x.image)
@@ -129,7 +129,7 @@ func (x *XKCD) DataToScreen() {
 }
 
 // NewForm generates a new XKCD form
-func (x *XKCD) NewForm(w fyne.Window) fyne.Widget {
+func (x *XKCD) NewForm(w granio.Window) granio.Widget {
 	form := &widget.Form{}
 	tt := reflect.TypeOf(x).Elem()
 	for i := 0; i < tt.NumField(); i++ {
@@ -151,7 +151,7 @@ func (x *XKCD) NewForm(w fyne.Window) fyne.Widget {
 }
 
 // Show starts a new xkcd widget
-func Show(win fyne.Window) fyne.CanvasObject {
+func Show(win granio.Window) granio.CanvasObject {
 	x := NewXKCD()
 
 	form := x.NewForm(win)

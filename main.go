@@ -3,26 +3,26 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/examples/bugs"
-	"github.com/fyne-io/examples/clock"
-	"github.com/fyne-io/examples/fractal"
-	"github.com/fyne-io/examples/img/icon"
-	"github.com/fyne-io/examples/tictactoe"
-	"github.com/fyne-io/examples/xkcd"
+	"github.com/Uzer007-admin/granio-examples/bugs"
+	"github.com/Uzer007-admin/granio-examples/clock"
+	"github.com/Uzer007-admin/granio-examples/fractal"
+	"github.com/Uzer007-admin/granio-examples/img/icon"
+	"github.com/Uzer007-admin/granio-examples/tictactoe"
+	"github.com/Uzer007-admin/granio-examples/xkcd"
 )
 
 type appInfo struct {
 	name string
-	icon fyne.Resource
+	icon granio.Resource
 	canv bool
-	run  func(fyne.Window) fyne.CanvasObject
+	run  func(granio.Window) granio.CanvasObject
 }
 
 var apps = []appInfo{
@@ -45,28 +45,28 @@ func main() {
 		func() int {
 			return len(apps)
 		},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			icon := &canvas.Image{}
 			label := widget.NewLabel("Text Editor")
 			labelHeight := label.MinSize().Height
-			icon.SetMinSize(fyne.NewSize(labelHeight, labelHeight))
+			icon.SetMinSize(granio.NewSize(labelHeight, labelHeight))
 			return container.NewBorder(nil, nil, icon, nil,
 				label)
 		},
-		func(id widget.ListItemID, obj fyne.CanvasObject) {
-			img := obj.(*fyne.Container).Objects[1].(*canvas.Image)
-			text := obj.(*fyne.Container).Objects[0].(*widget.Label)
+		func(id widget.ListItemID, obj granio.CanvasObject) {
+			img := obj.(*granio.Container).Objects[1].(*canvas.Image)
+			text := obj.(*granio.Container).Objects[0].(*widget.Label)
 			img.Resource = apps[id].icon
 			img.Refresh()
 			text.SetText(apps[id].name)
 		})
 	appList.OnSelected = func(id widget.ListItemID) {
-		content.Objects = []fyne.CanvasObject{apps[id].run(w)}
+		content.Objects = []granio.CanvasObject{apps[id].run(w)}
 	}
 
 	split := container.NewHSplit(appList, content)
 	split.Offset = 0.1
 	w.SetContent(split)
-	w.Resize(fyne.NewSize(480, 360))
+	w.Resize(granio.NewSize(480, 360))
 	w.ShowAndRun()
 }

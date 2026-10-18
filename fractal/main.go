@@ -4,26 +4,26 @@ import (
 	"image/color"
 	"math"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 type fractal struct {
 	currIterations          uint
 	currScale, currX, currY float64
 
-	window fyne.Window
-	canvas fyne.CanvasObject
+	window granio.Window
+	canvas granio.CanvasObject
 }
 
-func (f *fractal) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+func (f *fractal) Layout(objects []granio.CanvasObject, size granio.Size) {
 	f.canvas.Resize(size)
 }
 
-func (f *fractal) MinSize(objects []fyne.CanvasObject) fyne.Size {
-	return fyne.NewSize(320, 240)
+func (f *fractal) MinSize(objects []granio.CanvasObject) granio.Size {
+	return granio.NewSize(320, 240)
 }
 
 //lint:ignore U1000  See TODO inside the .Show() method.
@@ -91,15 +91,15 @@ func (f *fractal) fractalRune(r rune) {
 }
 
 //lint:ignore U1000 See TODO inside the .Show() method.
-func (f *fractal) fractalKey(ev *fyne.KeyEvent) {
+func (f *fractal) fractalKey(ev *granio.KeyEvent) {
 	delta := f.currScale * 0.2
-	if ev.Name == fyne.KeyUp {
+	if ev.Name == granio.KeyUp {
 		f.currY -= delta
-	} else if ev.Name == fyne.KeyDown {
+	} else if ev.Name == granio.KeyDown {
 		f.currY += delta
-	} else if ev.Name == fyne.KeyLeft {
+	} else if ev.Name == granio.KeyLeft {
 		f.currX += delta
-	} else if ev.Name == fyne.KeyRight {
+	} else if ev.Name == granio.KeyRight {
 		f.currX -= delta
 	}
 
@@ -107,7 +107,7 @@ func (f *fractal) fractalKey(ev *fyne.KeyEvent) {
 }
 
 // Show loads a Mandelbrot fractal example window for the specified app context
-func Show(win fyne.Window) fyne.CanvasObject {
+func Show(win granio.Window) granio.CanvasObject {
 	fractal := &fractal{window: win}
 	fractal.canvas = canvas.NewRasterWithPixels(fractal.mandelbrot)
 

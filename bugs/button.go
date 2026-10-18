@@ -3,39 +3,39 @@ package bugs
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type bugRenderer struct {
 	icon  *canvas.Image
 	label *canvas.Text
 
-	objects []fyne.CanvasObject
+	objects []granio.CanvasObject
 	button  *bugButton
 }
 
 const bugSize = 18
 
 // MinSize calculates the minimum size of a bug button. A fixed amount.
-func (b *bugRenderer) MinSize() fyne.Size {
-	return fyne.NewSize(bugSize+theme.Padding()*2, bugSize+theme.Padding()*2)
+func (b *bugRenderer) MinSize() granio.Size {
+	return granio.NewSize(bugSize+theme.Padding()*2, bugSize+theme.Padding()*2)
 }
 
 // Layout the components of the widget
-func (b *bugRenderer) Layout(size fyne.Size) {
-	inner := size.Subtract(fyne.NewSize(theme.Padding()*2, theme.Padding()*2))
+func (b *bugRenderer) Layout(size granio.Size) {
+	inner := size.Subtract(granio.NewSize(theme.Padding()*2, theme.Padding()*2))
 	b.icon.Resize(inner)
-	b.icon.Move(fyne.NewPos(theme.Padding(), theme.Padding()))
+	b.icon.Move(granio.NewPos(theme.Padding(), theme.Padding()))
 
 	textSize := size.Height * .67
-	textMin := fyne.MeasureText(b.label.Text, textSize, fyne.TextStyle{Bold: true})
+	textMin := granio.MeasureText(b.label.Text, textSize, granio.TextStyle{Bold: true})
 
 	b.label.TextSize = textSize
-	b.label.Resize(fyne.NewSize(size.Width, textMin.Height))
-	b.label.Move(fyne.NewPos(0, (size.Height-textMin.Height)/2))
+	b.label.Resize(granio.NewSize(size.Width, textMin.Height))
+	b.label.Move(granio.NewPos(0, (size.Height-textMin.Height)/2))
 }
 
 // ApplyTheme is called when the bugButton may need to update it's look
@@ -61,7 +61,7 @@ func (b *bugRenderer) Refresh() {
 	canvas.Refresh(b.button)
 }
 
-func (b *bugRenderer) Objects() []fyne.CanvasObject {
+func (b *bugRenderer) Objects() []granio.CanvasObject {
 	return b.objects
 }
 
@@ -72,30 +72,30 @@ func (b *bugRenderer) Destroy() {
 type bugButton struct {
 	widget.BaseWidget
 	text string
-	icon fyne.Resource
+	icon granio.Resource
 
 	tap func(bool)
 }
 
 // Tapped is called when a regular tap is reported
-func (b *bugButton) Tapped(ev *fyne.PointEvent) {
+func (b *bugButton) Tapped(ev *granio.PointEvent) {
 	b.tap(true)
 }
 
 // TappedSecondary is called when an alternative tap is reported
-func (b *bugButton) TappedSecondary(ev *fyne.PointEvent) {
+func (b *bugButton) TappedSecondary(ev *granio.PointEvent) {
 	b.tap(false)
 }
 
-func (b *bugButton) CreateRenderer() fyne.WidgetRenderer {
+func (b *bugButton) CreateRenderer() granio.WidgetRenderer {
 	text := canvas.NewText(b.text, theme.Color(theme.ColorNameForeground))
-	text.Alignment = fyne.TextAlignCenter
+	text.Alignment = granio.TextAlignCenter
 	text.TextStyle.Bold = true
 
 	icon := canvas.NewImageFromResource(b.icon)
 	icon.FillMode = canvas.ImageFillContain
 
-	objects := []fyne.CanvasObject{
+	objects := []granio.CanvasObject{
 		text,
 		icon,
 	}
@@ -111,14 +111,14 @@ func (b *bugButton) SetText(text string) {
 }
 
 // SetIcon updates the icon on a label - pass nil to hide an icon
-func (b *bugButton) SetIcon(icon fyne.Resource) {
+func (b *bugButton) SetIcon(icon granio.Resource) {
 	b.icon = icon
 
 	b.Refresh()
 }
 
 // newButton creates a new button widget with the specified label, themed icon and tap handler
-func newButton(label string, icon fyne.Resource, tap func(bool)) *bugButton {
+func newButton(label string, icon granio.Resource, tap func(bool)) *bugButton {
 	button := &bugButton{text: label, icon: icon, tap: tap}
 	button.ExtendBaseWidget(button)
 	return button

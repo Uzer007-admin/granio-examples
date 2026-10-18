@@ -6,26 +6,26 @@ package bugs
 import (
 	_ "embed"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 //go:embed code.svg
 var codeIconData []byte
-var codeIcon = &fyne.StaticResource{
+var codeIcon = &granio.StaticResource{
 	StaticName:    "code.svg",
 	StaticContent: codeIconData,
 }
 
 //go:embed bug.svg
 var bugIconData []byte
-var bugIcon = &fyne.StaticResource{
+var bugIcon = &granio.StaticResource{
 	StaticName:    "bug.svg",
 	StaticContent: bugIconData,
 }
 
 //go:embed flag.svg
 var flagIconData []byte
-var flagIcon = &fyne.StaticResource{
+var flagIcon = &granio.StaticResource{
 	StaticName:    "flag.svg",
 	StaticContent: flagIconData,
 }

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 var bug, code, flag *theme.ThemedResource
@@ -21,21 +21,21 @@ func init() {
 }
 
 type gameRenderer struct {
-	grid   *fyne.Container
-	header fyne.CanvasObject
+	grid   *granio.Container
+	header granio.CanvasObject
 
 	game *game
 }
 
-func (g *gameRenderer) MinSize() fyne.Size {
-	return g.grid.MinSize().Add(fyne.NewSize(0, g.header.MinSize().Height))
+func (g *gameRenderer) MinSize() granio.Size {
+	return g.grid.MinSize().Add(granio.NewSize(0, g.header.MinSize().Height))
 }
 
-func (g *gameRenderer) Layout(size fyne.Size) {
+func (g *gameRenderer) Layout(size granio.Size) {
 	headerHeight := g.header.MinSize().Height
-	g.header.Resize(fyne.NewSize(size.Width, headerHeight))
-	g.grid.Move(fyne.NewPos(0, headerHeight)) // TODO why ignored?
-	gridSize := size.Subtract(fyne.NewSize(0, headerHeight))
+	g.header.Resize(granio.NewSize(size.Width, headerHeight))
+	g.grid.Move(granio.NewPos(0, headerHeight)) // TODO why ignored?
+	gridSize := size.Subtract(granio.NewSize(0, headerHeight))
 	g.grid.Layout.Layout(g.grid.Objects, gridSize)
 }
 
@@ -50,8 +50,8 @@ func (g *gameRenderer) Refresh() {
 	canvas.Refresh(g.grid)
 }
 
-func (g *gameRenderer) Objects() []fyne.CanvasObject {
-	return []fyne.CanvasObject{g.grid, g.header}
+func (g *gameRenderer) Objects() []granio.CanvasObject {
+	return []granio.CanvasObject{g.grid, g.header}
 }
 
 func (g *gameRenderer) Destroy() {
@@ -62,8 +62,8 @@ type game struct {
 	board  *board
 	remain *widget.Label
 
-	grid   *fyne.Container
-	window fyne.Window
+	grid   *granio.Container
+	window granio.Window
 }
 
 func (g *game) refreshSquare(x, y int) {
@@ -122,19 +122,19 @@ func (g *game) refreshAround(xp, yp, d int) {
 func (g *game) refreshFrom(x, y int) {
 	g.refreshSquare(x, y)
 
-	for i := 1; i < int(fyne.Max(float32(g.board.width), float32(g.board.height))); i++ {
+	for i := 1; i < int(granio.Max(float32(g.board.width), float32(g.board.height))); i++ {
 		g.refreshAround(x, y, i)
 	}
 }
 
-func (g *game) CreateRenderer() fyne.WidgetRenderer {
+func (g *game) CreateRenderer() granio.WidgetRenderer {
 	renderer := &gameRenderer{game: g}
 	title := widget.NewLabel("Hunt bugs!")
 	g.remain = widget.NewLabel("")
 	g.updateRemain()
 	renderer.header = container.NewBorder(nil, nil, title, g.remain)
 
-	var buttons []fyne.CanvasObject
+	var buttons []granio.CanvasObject
 	for y := 0; y < g.board.height; y++ {
 		for x := 0; x < g.board.width; x++ {
 			xx, yy := x, y
@@ -200,7 +200,7 @@ func newGame(f *board) *game {
 }
 
 // Show starts a new bugs game
-func Show(win fyne.Window) fyne.CanvasObject {
+func Show(win granio.Window) granio.CanvasObject {
 	b := newBoard(20, 14)
 	game := newGame(b)
 

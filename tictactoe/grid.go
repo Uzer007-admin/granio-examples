@@ -1,14 +1,14 @@
 package tictactoe
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // Show loads a tic-tac-toe example window for the specified app context
-func Show(win fyne.Window) fyne.CanvasObject {
+func Show(win granio.Window) granio.CanvasObject {
 	board := &board{}
 
 	grid := container.NewGridWithColumns(3)

@@ -1,10 +1,10 @@
 package tictactoe
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type board struct {
@@ -46,14 +46,14 @@ func (b *board) newClick(row, column int) {
 		winner := b.result()
 		if winner == 0 {
 			if b.turn == 8 {
-				dialog.ShowInformation("It is a tie!", "Nobody has won. Better luck next time.", fyne.CurrentApp().Driver().AllWindows()[0])
+				dialog.ShowInformation("It is a tie!", "Nobody has won. Better luck next time.", granio.CurrentApp().Driver().AllWindows()[0])
 				b.finished = true
 			}
 			return
 		}
 
 		number := string(winner + 48) // Number 1 is ascii #49 and 2 is ascii #50.
-		dialog.ShowInformation("Player "+number+" has won!", "Congratulations to player "+number+" for winning.", fyne.CurrentApp().Driver().AllWindows()[0])
+		dialog.ShowInformation("Player "+number+" has won!", "Congratulations to player "+number+" for winning.", granio.CurrentApp().Driver().AllWindows()[0])
 		b.finished = true
 	}
 }
@@ -75,7 +75,7 @@ type boardIcon struct {
 	row, column int
 }
 
-func (i *boardIcon) Tapped(ev *fyne.PointEvent) {
+func (i *boardIcon) Tapped(ev *granio.PointEvent) {
 	if i.board.pieces[i.row][i.column] != 0 || i.board.finished {
 		return
 	}
