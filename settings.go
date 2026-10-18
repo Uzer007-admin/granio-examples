@@ -3,14 +3,14 @@ package cloud
 import (
 	"fmt"
 
-	"fyne.io/cloud/internal/settings"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio-cloud/internal/settings"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func ShowSettings(a fyne.App, w fyne.Window) {
+func ShowSettings(a granio.App, w granio.Window) {
 	prov := a.CloudProvider()
 	if prov == nil {
 		showChoice(a, w)
@@ -37,7 +37,7 @@ func ShowSettings(a fyne.App, w fyne.Window) {
 		config.Hide()
 	}
 	current := widget.NewLabel(cloudText(prov))
-	ch := make(chan fyne.Settings)
+	ch := make(chan granio.Settings)
 	a.Settings().AddChangeListener(ch)
 	go func() {
 		for range ch {
@@ -59,20 +59,20 @@ func ShowSettings(a fyne.App, w fyne.Window) {
 	d.Show()
 }
 
-func showChoice(a fyne.App, w fyne.Window) {
-	var selected fyne.CloudProvider
+func showChoice(a granio.App, w granio.Window) {
+	var selected granio.CloudProvider
 	ui := widget.NewList(func() int {
 		return len(providers)
 	},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return container.NewHBox(
 				widget.NewIcon(nil),
 				widget.NewLabel(""))
 		},
-		func(id widget.ListItemID, o fyne.CanvasObject) {
+		func(id widget.ListItemID, o granio.CanvasObject) {
 			p := providers[id]
-			o.(*fyne.Container).Objects[0].(*widget.Icon).SetResource(p.ProviderIcon())
-			o.(*fyne.Container).Objects[1].(*widget.Label).SetText(p.ProviderName())
+			o.(*granio.Container).Objects[0].(*widget.Icon).SetResource(p.ProviderIcon())
+			o.(*granio.Container).Objects[1].(*widget.Label).SetText(p.ProviderName())
 		})
 	ui.OnSelected = func(id widget.ListItemID) {
 		selected = providers[id]
@@ -89,12 +89,12 @@ func showChoice(a fyne.App, w fyne.Window) {
 		}, w)
 }
 
-func chooseProvider(a fyne.App, p fyne.CloudProvider) {
+func chooseProvider(a granio.App, p granio.CloudProvider) {
 	settings.SetCurrentProviderName(p.ProviderName())
 	setCloud(p, a)
 }
 
-func cloudText(p fyne.CloudProvider) string {
+func cloudText(p granio.CloudProvider) string {
 	if p == nil {
 		return "No Cloud configured"
 	}

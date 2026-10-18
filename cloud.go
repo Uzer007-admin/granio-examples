@@ -7,9 +7,9 @@
 //   package main
 //
 //   import (
-//   	"fyne.io/cloud/provider/aws"
-//   	"fyne.io/fyne/v2/app"
-//   	"fyne.io/fyne/v2/widget"
+//   	"github.com/Uzer007-admin/granio-cloud/provider/aws"
+//   	"github.com/Uzer007-admin/granio/v2/app"
+//   	"github.com/Uzer007-admin/granio/v2/widget"
 //   )
 //
 //   func main() {
@@ -26,9 +26,9 @@
 //   package main
 //
 //   import (
-//   	"fyne.io/cloud"
-//   	"fyne.io/fyne/v2/app"
-//   	"fyne.io/fyne/v2/widget"
+//   	"github.com/Uzer007-admin/granio-cloud"
+//   	"github.com/Uzer007-admin/granio/v2/app"
+//   	"github.com/Uzer007-admin/granio/v2/widget"
 //   )
 //
 //   func main() {
@@ -41,12 +41,12 @@
 //   	}))
 //   	w.ShowAndRun()
 //   }
-package cloud // import "fyne.io/cloud"
+package cloud // import "github.com/Uzer007-admin/granio-cloud"
 
 import (
-	"fyne.io/cloud/internal/settings"
-	"fyne.io/cloud/provider/dropbox"
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio-cloud/internal/settings"
+	"github.com/Uzer007-admin/granio-cloud/provider/dropbox"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 // Disconnectable interface describes a cloud provider that can respond to being disconnected.
@@ -56,13 +56,13 @@ type Disconnectable interface {
 	Disconnect()
 }
 
-var providers []fyne.CloudProvider
+var providers []granio.CloudProvider
 
-func Enable(a fyne.App) {
+func Enable(a granio.App) {
 	setCloud(lookupConfiguredProvider(), a)
 }
 
-func Register(p fyne.CloudProvider) {
+func Register(p granio.CloudProvider) {
 	providers = append(providers, p)
 }
 
@@ -70,7 +70,7 @@ func init() {
 	Register(dropbox.NewProvider())
 }
 
-func lookupConfiguredProvider() fyne.CloudProvider {
+func lookupConfiguredProvider() granio.CloudProvider {
 	name := currentProviderName()
 
 	for _, p := range providers {
@@ -81,7 +81,7 @@ func lookupConfiguredProvider() fyne.CloudProvider {
 	return nil
 }
 
-func setCloud(p fyne.CloudProvider, a fyne.App) {
+func setCloud(p granio.CloudProvider, a granio.App) {
 	if dis, ok := a.CloudProvider().(Disconnectable); ok {
 		dis.Disconnect()
 	}

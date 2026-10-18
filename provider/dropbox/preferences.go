@@ -4,13 +4,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"fyne.io/cloud/internal"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
+	"github.com/Uzer007-admin/granio-cloud/internal"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
 )
 
-func (d *dropbox) CloudPreferences(a fyne.App) fyne.Preferences {
-	var p fyne.Preferences
+func (d *dropbox) CloudPreferences(a granio.App) granio.Preferences {
+	var p granio.Preferences
 	if d.store != nil {
 		p = internal.NewPreferences(a, d.store)
 	} else {

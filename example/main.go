@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"fyne.io/cloud"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio-cloud"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	w := a.NewWindow("Cloud")
 
 	current := widget.NewLabel("No configured provider")
-	ch := make(chan fyne.Settings)
+	ch := make(chan granio.Settings)
 	a.Settings().AddChangeListener(ch)
 	cloud.Enable(a)
 

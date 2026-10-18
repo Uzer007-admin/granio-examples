@@ -5,10 +5,10 @@ import (
 	"reflect"
 	"sync"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
-// InMemoryPreferences provides an implementation of the fyne.Preferences API that is stored in memory.
+// InMemoryPreferences provides an implementation of the granio.Preferences API that is stored in memory.
 type InMemoryPreferences struct {
 	values          map[string]interface{}
 	lock            sync.RWMutex
@@ -16,7 +16,7 @@ type InMemoryPreferences struct {
 }
 
 // Declare conformity with Preferences interface
-var _ fyne.Preferences = (*InMemoryPreferences)(nil)
+var _ granio.Preferences = (*InMemoryPreferences)(nil)
 
 // AddChangeListener allows code to be notified when some preferences change. This will fire on any update.
 // The passed 'listener' should not try to write values.

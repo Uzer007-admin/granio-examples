@@ -8,28 +8,28 @@ import (
 	"strings"
 	"time"
 
-	"fyne.io/cloud/internal/settings"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio-cloud/internal/settings"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 type dropbox struct {
-	store  fyne.URI
+	store  granio.URI
 	config string
-	prefs  fyne.Preferences
+	prefs  granio.Preferences
 }
 
 func (d *dropbox) SetConfig(str string) {
 	d.config = str
 }
 
-func (d *dropbox) Cleanup(a fyne.App) {
+func (d *dropbox) Cleanup(a granio.App) {
 }
 
-func (d *dropbox) Configure(a fyne.App, w fyne.Window) (data string, err error) {
-	if fyne.CurrentDevice().IsMobile() {
+func (d *dropbox) Configure(a granio.App, w granio.Window) (data string, err error) {
+	if granio.CurrentDevice().IsMobile() {
 		data, err = d.mobileConfig(a)
 	} else {
 		data, err = d.desktopConfig(w)
@@ -50,7 +50,7 @@ func (d *dropbox) ProviderDescription() string {
 		"You need to have Dropbox installed and running for this provider to work."
 }
 
-func (d *dropbox) ProviderIcon() fyne.Resource {
+func (d *dropbox) ProviderIcon() granio.Resource {
 	return theme.NewThemedResource(resourceDropboxSvg)
 }
 
@@ -58,8 +58,8 @@ func (d *dropbox) ProviderName() string {
 	return "Dropbox"
 }
 
-func (d *dropbox) Setup(a fyne.App) error {
-	if !fyne.CurrentDevice().IsMobile() {
+func (d *dropbox) Setup(a granio.App) error {
+	if !granio.CurrentDevice().IsMobile() {
 		return nil
 	}
 	if d.config != "" {
@@ -73,7 +73,7 @@ func (d *dropbox) Setup(a fyne.App) error {
 	return err
 }
 
-func (d *dropbox) desktopConfig(w fyne.Window) (string, error) {
+func (d *dropbox) desktopConfig(w granio.Window) (string, error) {
 	err := make(chan error)
 	data := ""
 
@@ -85,7 +85,7 @@ func (d *dropbox) desktopConfig(w fyne.Window) (string, error) {
 				return
 			}
 
-			dialog.ShowFolderOpen(func(list fyne.ListableURI, e2 error) {
+			dialog.ShowFolderOpen(func(list granio.ListableURI, e2 error) {
 				if e2 != nil {
 					err <- e2
 					return
@@ -114,7 +114,7 @@ func (d *dropbox) desktopConfig(w fyne.Window) (string, error) {
 	return data, <-err
 }
 
-func (d *dropbox) mobileConfig(a fyne.App) (string, error) {
+func (d *dropbox) mobileConfig(a granio.App) (string, error) {
 	err := make(chan error)
 	data := ""
 	for len(a.Driver().AllWindows()) == 0 {
@@ -130,7 +130,7 @@ func (d *dropbox) mobileConfig(a fyne.App) (string, error) {
 				return
 			}
 
-			dialog.ShowFileOpen(func(read fyne.URIReadCloser, e2 error) {
+			dialog.ShowFileOpen(func(read granio.URIReadCloser, e2 error) {
 				if e2 != nil {
 					err <- e2
 					return
@@ -154,6 +154,6 @@ func (d *dropbox) mobileConfig(a fyne.App) (string, error) {
 	return data, <-err
 }
 
-func NewProvider() fyne.CloudProvider {
+func NewProvider() granio.CloudProvider {
 	return &dropbox{}
 }

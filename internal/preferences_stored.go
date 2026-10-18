@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
 )
 
 type preferences struct {
@@ -20,13 +20,13 @@ type preferences struct {
 	savedRecently       bool
 	changedDuringSaving bool
 
-	app                 fyne.App
+	app                 granio.App
 	needsSaveBeforeExit bool
-	file                fyne.URI
+	file                granio.URI
 }
 
 // Declare conformity with Preferences interface
-var _ fyne.Preferences = (*preferences)(nil)
+var _ granio.Preferences = (*preferences)(nil)
 
 func (p *preferences) Disconnect() {
 	p.prefLock.Lock()
@@ -42,7 +42,7 @@ func (p *preferences) forceImmediateSave() {
 	}
 	err := p.save()
 	if err != nil {
-		fyne.LogError("Failed on force saving preferences", err)
+		granio.LogError("Failed on force saving preferences", err)
 	}
 }
 
@@ -65,7 +65,7 @@ func (p *preferences) save() error {
 	return p.saveToFile(p.file)
 }
 
-func (p *preferences) saveToFile(file fyne.URI) error {
+func (p *preferences) saveToFile(file granio.URI) error {
 	p.prefLock.Lock()
 	p.savedRecently = true
 	p.prefLock.Unlock()
@@ -95,11 +95,11 @@ func (p *preferences) saveToFile(file fyne.URI) error {
 func (p *preferences) load() {
 	err := p.loadFromFile(p.file)
 	if err != nil {
-		fyne.LogError("Preferences load error:", err)
+		granio.LogError("Preferences load error:", err)
 	}
 }
 
-func (p *preferences) loadFromFile(path fyne.URI) (err error) {
+func (p *preferences) loadFromFile(path granio.URI) (err error) {
 	read, err := storage.Reader(path)
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func (p *preferences) loadFromFile(path fyne.URI) (err error) {
 	return err
 }
 
-func NewPreferences(a fyne.App, file fyne.URI) *preferences {
+func NewPreferences(a granio.App, file granio.URI) *preferences {
 	p := &preferences{app: a, file: file}
 	p.InMemoryPreferences = NewInMemoryPreferences()
 
@@ -155,7 +155,7 @@ func NewPreferences(a fyne.App, file fyne.URI) *preferences {
 
 		err := p.save()
 		if err != nil {
-			fyne.LogError("Failed on saving preferences", err)
+			granio.LogError("Failed on saving preferences", err)
 		}
 	})
 	p.watch()

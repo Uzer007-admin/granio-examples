@@ -1,4 +1,6 @@
+//go:build !android && !ios && !mobile && !nacl
 // +build !android,!ios,!mobile,!nacl
+
 // This file is copied from fyne.io/fyne/app/settings_desktop.go to avoid an import loop
 
 package internal
@@ -7,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -17,7 +19,7 @@ func watchFileAddTarget(watcher *fsnotify.Watcher, path string) {
 
 	err := watcher.Add(dir)
 	if err != nil {
-		fyne.LogError("Settings watch error:", err)
+		granio.LogError("Settings watch error:", err)
 	}
 }
 
@@ -28,14 +30,14 @@ func ensureDirExists(dir string) {
 
 	err := os.MkdirAll(dir, 0700)
 	if err != nil {
-		fyne.LogError("Unable to create settings storage:", err)
+		granio.LogError("Unable to create settings storage:", err)
 	}
 }
 
 func watchFile(path string, callback func()) *fsnotify.Watcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		fyne.LogError("Failed to watch settings file:", err)
+		granio.LogError("Failed to watch settings file:", err)
 		return nil
 	}
 
@@ -52,7 +54,7 @@ func watchFile(path string, callback func()) *fsnotify.Watcher {
 
 		err = watcher.Close()
 		if err != nil {
-			fyne.LogError("Settings un-watch error:", err)
+			granio.LogError("Settings un-watch error:", err)
 		}
 	}()
 
