@@ -1,0 +1,22 @@
+package api
+
+import (
+	"image/color"
+
+	"github.com/Uzer007-admin/granio/v2"
+)
+
+// Editor describes the editing capabilities of a pixel editor
+type Editor interface {
+	BuildUI(granio.Window)         // BuildUI Loads the main editor GUI
+	LoadFile(granio.URIReadCloser) // LoadFile specifies a data stream to load from
+	Reload()                       // Reload will reset the image to its original state
+	Save()                         // Save writes the image back to its source location
+	SaveAs(granio.URIWriteCloser)  // SaveAs specifies a data stream to save to
+
+	PixelColor(x, y int) color.Color         // Get the color of a pixel in our image
+	SetPixelColor(x, y int, col color.Color) // Set the color of the indicated pixel
+
+	FGColor() color.Color
+	SetFGColor(color.Color)
+}
