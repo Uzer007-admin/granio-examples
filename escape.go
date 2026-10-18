@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 var escapes = map[rune]func(*Terminal, string){
@@ -309,14 +309,14 @@ func escapeWindowOps(t *Terminal, msg string) {
 	case "14": // report text area size in pixels
 		size := t.Size()
 		scale := float32(1)
-		if c := fyne.CurrentApp().Driver().CanvasForObject(t); c != nil {
+		if c := granio.CurrentApp().Driver().CanvasForObject(t); c != nil {
 			scale = c.Scale()
 		}
 		t.reply(fmt.Sprintf("[4;%d;%dt", int(size.Height*scale), int(size.Width*scale)))
 	case "16": // report cell size in pixels
 		cell := t.guessCellSize()
 		scale := float32(1)
-		if c := fyne.CurrentApp().Driver().CanvasForObject(t); c != nil {
+		if c := granio.CurrentApp().Driver().CanvasForObject(t); c != nil {
 			scale = c.Scale()
 		}
 		t.reply(fmt.Sprintf("[6;%d;%dt", int(cell.Height*scale), int(cell.Width*scale)))
@@ -454,7 +454,7 @@ func escapeInsertChars(t *Terminal, msg string) {
 	}
 
 	newCells := make([]widget.TextGridCell, chars)
-	cellStyle := &widget.CustomTextGridStyle{FGColor: t.currentFG, BGColor: t.currentBG, TextStyle: fyne.TextStyle{Monospace: true}}
+	cellStyle := &widget.CustomTextGridStyle{FGColor: t.currentFG, BGColor: t.currentBG, TextStyle: granio.TextStyle{Monospace: true}}
 	for i := range newCells {
 		newCells[i] = widget.TextGridCell{
 			Rune:  ' ',

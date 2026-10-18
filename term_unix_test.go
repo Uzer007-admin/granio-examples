@@ -14,14 +14,14 @@ import (
 	"testing"
 	"time"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRunLocalShell_MissingStartDir(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	term.SetStartDir(filepath.Join(t.TempDir(), "missing"))
 
 	lastKeyTime = time.Now() // the working directory is only checked after recent key presses
@@ -59,7 +59,7 @@ func TestProcessDir_MissingProcess(t *testing.T) {
 
 func TestTerminal_Close(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	done := make(chan error)
 	go func() {
 		done <- term.RunLocalShell()

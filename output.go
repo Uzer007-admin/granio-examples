@@ -6,9 +6,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
-	widget2 "github.com/fyne-io/terminal/internal/widget"
+	widget2 "github.com/Uzer007-admin/granio-terminal/internal/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 const (
@@ -168,19 +168,19 @@ func (t *Terminal) handleOutput(buf []byte) []byte {
 			if out == nil {
 				continue
 			}
-			fyne.Do(func() {
+			granio.Do(func() {
 				out(t)
 			})
 		} else {
 			// check to see which charset to use
 			if t.useG1CharSet {
 				chr := charSetMap[t.g1Charset](r)
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.handleOutputChar(chr)
 				})
 			} else {
 				chr := charSetMap[t.g0Charset](r)
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.handleOutputChar(chr)
 				})
 			}
@@ -198,15 +198,15 @@ func (t *Terminal) parseEscState(r rune) (shouldContinue bool) {
 		if code, ok := t.state.takeCode(); ok {
 			switch {
 			case t.state.osc:
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.handleOSCTerm(code, oscTerminatorST)
 				})
 			case t.state.apc:
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.handleAPC(code)
 				})
 			case t.state.dcs:
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.handleDCS(code)
 				})
 			}
@@ -243,7 +243,7 @@ func (t *Terminal) parseEscape(r rune) {
 	// are collected, anything else (normally a final byte 0x40-0x7E) dispatches.
 	if r < 0x20 || r > 0x3f {
 		if code, ok := t.state.takeCode(); ok {
-			fyne.Do(func() {
+			granio.Do(func() {
 				t.handleEscape(code)
 			})
 		}
@@ -283,7 +283,7 @@ func (t *Terminal) parsePrinting(buf []byte, size int) {
 func (t *Terminal) parseAPC(r rune) {
 	if r == 0 {
 		if code, ok := t.state.takeCode(); ok {
-			fyne.Do(func() {
+			granio.Do(func() {
 				t.handleAPC(code)
 			})
 		}
@@ -296,7 +296,7 @@ func (t *Terminal) parseAPC(r rune) {
 func (t *Terminal) parseOSC(r rune) {
 	if r == asciiBell || r == 0 {
 		if code, ok := t.state.takeCode(); ok {
-			fyne.Do(func() {
+			granio.Do(func() {
 				t.handleOSCTerm(code, oscTerminatorBell)
 			})
 		}
@@ -322,7 +322,7 @@ func (t *Terminal) handleOutputChar(r rune) {
 	}
 
 	var cellStyle widget.TextGridStyle
-	textStyle := fyne.TextStyle{
+	textStyle := granio.TextStyle{
 		Monospace: true,
 
 		Bold:          t.bold,
@@ -362,7 +362,7 @@ func (t *Terminal) ringBell() {
 	go func() {
 		time.Sleep(time.Millisecond * 300)
 		t.bell = false
-		fyne.Do(t.Refresh)
+		granio.Do(t.Refresh)
 	}()
 }
 

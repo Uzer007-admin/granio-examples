@@ -3,9 +3,9 @@ package terminal
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
-	widget2 "github.com/fyne-io/terminal/internal/widget"
+	widget2 "github.com/Uzer007-admin/granio-terminal/internal/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -147,10 +147,10 @@ func TestDoubleTapped(t *testing.T) {
 	term := &Terminal{
 		content: grid,
 	}
-	term.Resize(fyne.NewSize(500, 500))
+	term.Resize(granio.NewSize(500, 500))
 
 	tests := map[string]struct {
-		clickPosition fyne.Position
+		clickPosition granio.Position
 		expectedWord  string
 	}{
 		"Double tap on 'Hello'": {
@@ -182,7 +182,7 @@ func TestDoubleTapped(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			term.clearSelectedText()
-			term.DoubleTapped(&fyne.PointEvent{
+			term.DoubleTapped(&granio.PointEvent{
 				Position: tc.clickPosition,
 			})
 
@@ -202,7 +202,7 @@ func TestDragged(t *testing.T) {
 		grid.SetText("Hello World!\nTesting 123.\nThird row...")
 
 		term := &Terminal{content: grid}
-		term.Resize(fyne.NewSize(500, 500))
+		term.Resize(granio.NewSize(500, 500))
 		return term
 	}
 
@@ -239,9 +239,9 @@ func TestDragged(t *testing.T) {
 			prev := term.getTextPosition(tc.path[0])
 			for _, step := range tc.path[1:] {
 				pos := term.getTextPosition(step)
-				term.Dragged(&fyne.DragEvent{
-					PointEvent: fyne.PointEvent{Position: pos},
-					Dragged:    fyne.NewDelta(pos.X-prev.X, pos.Y-prev.Y),
+				term.Dragged(&granio.DragEvent{
+					PointEvent: granio.PointEvent{Position: pos},
+					Dragged:    granio.NewDelta(pos.X-prev.X, pos.Y-prev.Y),
 				})
 				prev = pos
 			}

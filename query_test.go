@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +12,7 @@ func newQueryTerminal() (*Terminal, *bytes.Buffer) {
 	buf := &bytes.Buffer{}
 	term := New()
 	term.in = NopCloser(buf)
-	term.Resize(fyne.NewSize(400, 200))
+	term.Resize(granio.NewSize(400, 200))
 	return term, buf
 }
 

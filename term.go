@@ -11,14 +11,14 @@ import (
 	"time"
 	"unicode"
 
-	widget2 "github.com/fyne-io/terminal/internal/widget"
+	widget2 "github.com/Uzer007-admin/granio-terminal/internal/widget"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/driver/mobile"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 const (
@@ -46,7 +46,7 @@ const (
 // Terminal is a terminal widget that loads a shell and handles input/output.
 type Terminal struct {
 	widget.BaseWidget
-	fyne.ShortcutHandler
+	granio.ShortcutHandler
 	content      *widget2.TermGrid
 	config       Config
 	listenerLock sync.Mutex
@@ -74,7 +74,7 @@ type Terminal struct {
 	altSavedCol     int                  // saved cursor col
 	altBufferActive bool                 // true when alternate buffer is in use
 
-	onMouseDown, onMouseUp func(int, fyne.KeyModifier, fyne.Position)
+	onMouseDown, onMouseUp func(int, granio.KeyModifier, granio.Position)
 	g0Charset              charSet
 	g1Charset              charSet
 	useG1CharSet           bool
@@ -141,14 +141,14 @@ func (t *Terminal) AddListener(listener chan Config) {
 }
 
 // MinSize provides a size large enough that a terminal could technically funcion.
-func (t *Terminal) MinSize() fyne.Size {
+func (t *Terminal) MinSize() granio.Size {
 	s := t.guessCellSize()
-	return fyne.NewSize(s.Width*2.5, s.Height*1.2) // just enough to get a terminal init
+	return granio.NewSize(s.Width*2.5, s.Height*1.2) // just enough to get a terminal init
 }
 
 // MouseDown handles the down action for desktop mouse events.
 func (t *Terminal) MouseDown(ev *desktop.MouseEvent) {
-	if c := fyne.CurrentApp().Driver().CanvasForObject(t); c != nil {
+	if c := granio.CurrentApp().Driver().CanvasForObject(t); c != nil {
 		c.Focus(t)
 	}
 
@@ -186,7 +186,7 @@ func (t *Terminal) MouseUp(ev *desktop.MouseEvent) {
 }
 
 // DoubleTapped handles the double tapped event.
-func (t *Terminal) DoubleTapped(pe *fyne.PointEvent) {
+func (t *Terminal) DoubleTapped(pe *granio.PointEvent) {
 	pos := t.sanitizePosition(pe.Position)
 	termPos := t.getTermPosition(*pos)
 	row, col := termPos.Row, termPos.Col
@@ -251,7 +251,7 @@ func (t *Terminal) RemoveListener(listener chan Config) {
 
 // Resize is called when this terminal widget has been resized.
 // It ensures that the virtual terminal is within the bounds of the widget.
-func (t *Terminal) Resize(s fyne.Size) {
+func (t *Terminal) Resize(s granio.Size) {
 	cellSize := t.guessCellSize()
 	cols := uint(math.Floor(float64(s.Width) / float64(cellSize.Width)))
 	rows := uint(math.Floor(float64(s.Height) / float64(cellSize.Height)))
@@ -261,7 +261,7 @@ func (t *Terminal) Resize(s fyne.Size) {
 
 	t.BaseWidget.Resize(s)
 	if t.content != nil {
-		t.content.Resize(fyne.NewSize(float32(cols)*cellSize.Width, float32(rows)*cellSize.Height))
+		t.content.Resize(granio.NewSize(float32(cols)*cellSize.Width, float32(rows)*cellSize.Height))
 	}
 
 	oldRows := int(t.config.Rows)
@@ -289,8 +289,8 @@ func (t *Terminal) SetStartDir(path string) {
 }
 
 // Tapped makes sure we ask for focus if user taps us.
-func (t *Terminal) Tapped(ev *fyne.PointEvent) {
-	if c := fyne.CurrentApp().Driver().CanvasForObject(t); c != nil {
+func (t *Terminal) Tapped(ev *granio.PointEvent) {
+	if c := granio.CurrentApp().Driver().CanvasForObject(t); c != nil {
 		c.Focus(t)
 	}
 }
@@ -319,7 +319,7 @@ func (t *Terminal) TouchCancel(ev *mobile.TouchEvent) {
 
 // TouchDown handles the down action for mobile touch events.
 func (t *Terminal) TouchDown(ev *mobile.TouchEvent) {
-	if c := fyne.CurrentApp().Driver().CanvasForObject(t); c != nil {
+	if c := granio.CurrentApp().Driver().CanvasForObject(t); c != nil {
 		c.Focus(t)
 	}
 
@@ -429,13 +429,13 @@ func (t *Terminal) setConnected() {
 }
 
 // don't call often - should we cache?
-func (t *Terminal) guessCellSize() fyne.Size {
+func (t *Terminal) guessCellSize() granio.Size {
 	cell := canvas.NewText("M", color.White)
 	cell.TextStyle.Monospace = true
 
 	scale := t.Theme().Size(theme.SizeNameText) / theme.TextSize()
 	min := cell.MinSize()
-	return fyne.NewSize(float32(math.Round(float64(min.Width*scale))), float32(math.Round(float64(min.Height*scale))))
+	return granio.NewSize(float32(math.Round(float64(min.Width*scale))), float32(math.Round(float64(min.Height*scale))))
 }
 
 func (t *Terminal) run() {
@@ -455,7 +455,7 @@ func (t *Terminal) run() {
 				break // broken pipe, terminal exit
 			}
 
-			fyne.LogError("pty read error", err)
+			granio.LogError("pty read error", err)
 		}
 
 		lenLeftOver := len(leftOver)
@@ -472,7 +472,7 @@ func (t *Terminal) run() {
 		leftOver = t.handleOutput(fullBuf[:num])
 		if len(leftOver) == 0 || time.Since(t.lastRefresh) > maxRefreshInterval {
 			t.lastRefresh = time.Now()
-			fyne.DoAndWait(t.Refresh)
+			granio.DoAndWait(t.Refresh)
 		}
 	}
 }
@@ -537,28 +537,28 @@ func (t *Terminal) Write(b []byte) (int, error) {
 }
 
 func (t *Terminal) setupShortcuts() {
-	var paste fyne.Shortcut
-	paste = &desktop.CustomShortcut{KeyName: fyne.KeyV, Modifier: fyne.KeyModifierShift | fyne.KeyModifierShortcutDefault}
+	var paste granio.Shortcut
+	paste = &desktop.CustomShortcut{KeyName: granio.KeyV, Modifier: granio.KeyModifierShift | granio.KeyModifierShortcutDefault}
 	if runtime.GOOS == "darwin" {
-		paste = &fyne.ShortcutPaste{} // we look up clipboard later
+		paste = &granio.ShortcutPaste{} // we look up clipboard later
 	}
 	t.AddShortcut(paste,
-		func(sh fyne.Shortcut) {
-			clip := fyne.CurrentApp().Clipboard()
-			if ps, ok := sh.(*fyne.ShortcutPaste); ok && ps.Secondary {
+		func(sh granio.Shortcut) {
+			clip := granio.CurrentApp().Clipboard()
+			if ps, ok := sh.(*granio.ShortcutPaste); ok && ps.Secondary {
 				clip = t.selectClipboard()
 			}
 			t.pasteText(clip)
 		})
-	var shortcutCopy fyne.Shortcut
-	shortcutCopy = &desktop.CustomShortcut{KeyName: fyne.KeyC, Modifier: fyne.KeyModifierShift | fyne.KeyModifierShortcutDefault}
+	var shortcutCopy granio.Shortcut
+	shortcutCopy = &desktop.CustomShortcut{KeyName: granio.KeyC, Modifier: granio.KeyModifierShift | granio.KeyModifierShortcutDefault}
 	if runtime.GOOS == "darwin" {
-		shortcutCopy = &fyne.ShortcutCopy{} // we look up clipboard later
+		shortcutCopy = &granio.ShortcutCopy{} // we look up clipboard later
 	}
 
 	t.AddShortcut(shortcutCopy,
-		func(_ fyne.Shortcut) {
-			t.copySelectedText(fyne.CurrentApp().Clipboard())
+		func(_ granio.Shortcut) {
+			t.copySelectedText(granio.CurrentApp().Clipboard())
 		})
 }
 
@@ -587,7 +587,7 @@ func New() *Terminal {
 // sanitizePosition ensures that the given position p is within the bounds of the terminal.
 // If the position is outside the bounds, it adjusts the coordinates to the nearest valid values.
 // The adjusted position is then returned.
-func (t *Terminal) sanitizePosition(p fyne.Position) *fyne.Position {
+func (t *Terminal) sanitizePosition(p granio.Position) *granio.Position {
 	size := t.Size()
 	width, height := size.Width, size.Height
 	if p.X < 0 {
@@ -606,7 +606,7 @@ func (t *Terminal) sanitizePosition(p fyne.Position) *fyne.Position {
 }
 
 // Dragged is called by fyne when the left mouse is down and moved whilst over the widget.
-func (t *Terminal) Dragged(d *fyne.DragEvent) {
+func (t *Terminal) Dragged(d *granio.DragEvent) {
 	if t.selecting {
 		// clear the highlight applied by the previous drag event
 		sr, sc, er, ec := t.getSelectedRange()

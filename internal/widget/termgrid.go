@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 const blinkingInterval = 500 * time.Millisecond
@@ -21,7 +21,7 @@ type TermGrid struct {
 }
 
 // CreateRenderer is a private method to Fyne which links this widget to it's renderer
-func (t *TermGrid) CreateRenderer() fyne.WidgetRenderer {
+func (t *TermGrid) CreateRenderer() granio.WidgetRenderer {
 	t.ExtendBaseWidget(t)
 
 	return t.TextGrid.CreateRenderer()
@@ -55,7 +55,7 @@ func (t *TermGrid) refreshBlink(blink bool) {
 			}
 		}
 	}
-	fyne.Do(t.TextGrid.Refresh) // TODO fix root cause in refresh on wrong thread
+	granio.Do(t.TextGrid.Refresh) // TODO fix root cause in refresh on wrong thread
 
 	switch {
 	case shouldBlink && t.tickerCancel == nil:
@@ -82,7 +82,7 @@ func (t *TermGrid) runBlink() {
 				return
 			case <-ticker.C:
 				blinking = !blinking
-				fyne.Do(func() {
+				granio.Do(func() {
 					t.refreshBlink(blinking)
 				})
 			}

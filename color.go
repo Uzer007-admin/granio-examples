@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 var (
@@ -83,7 +83,7 @@ func (t *Terminal) handleColorEscape(message string) {
 func (t *Terminal) handleColorMode(modeStr string) {
 	mode, err := strconv.Atoi(modeStr)
 	if err != nil {
-		fyne.LogError("Failed to parse color mode: "+modeStr, err)
+		granio.LogError("Failed to parse color mode: "+modeStr, err)
 		return
 	}
 	switch mode {

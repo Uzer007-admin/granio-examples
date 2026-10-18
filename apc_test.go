@@ -3,7 +3,7 @@ package terminal
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +27,7 @@ func TestAPC(t *testing.T) {
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
 			term := New()
-			term.Resize(fyne.NewSize(50, 50))
+			term.Resize(granio.NewSize(50, 50))
 			term.handleOutput(testCase.input)
 
 			assert.Equal(t, testCase.expected, APCString)

@@ -6,33 +6,33 @@ package main
 import (
 	_ "embed"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 //go:embed font/Hack-Bold.ttf
 var resourceHackBoldTtfData []byte
-var resourceHackBoldTtf = &fyne.StaticResource{
+var resourceHackBoldTtf = &granio.StaticResource{
 	StaticName:    "font/Hack-Bold.ttf",
 	StaticContent: resourceHackBoldTtfData,
 }
 
 //go:embed font/Hack-BoldItalic.ttf
 var resourceHackBoldItalicTtfData []byte
-var resourceHackBoldItalicTtf = &fyne.StaticResource{
+var resourceHackBoldItalicTtf = &granio.StaticResource{
 	StaticName:    "font/Hack-BoldItalic.ttf",
 	StaticContent: resourceHackBoldItalicTtfData,
 }
 
 //go:embed font/Hack-Italic.ttf
 var resourceHackItalicTtfData []byte
-var resourceHackItalicTtf = &fyne.StaticResource{
+var resourceHackItalicTtf = &granio.StaticResource{
 	StaticName:    "font/Hack-Italic.ttf",
 	StaticContent: resourceHackItalicTtfData,
 }
 
 //go:embed font/Hack-Regular.ttf
 var resourceHackRegularTtfData []byte
-var resourceHackRegularTtf = &fyne.StaticResource{
+var resourceHackRegularTtf = &granio.StaticResource{
 	StaticName:    "font/Hack-Regular.ttf",
 	StaticContent: resourceHackRegularTtfData,
 }

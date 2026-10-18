@@ -5,12 +5,12 @@ package main
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 type termTheme struct {
-	fyne.Theme
+	granio.Theme
 
 	fontSize float32
 }
@@ -20,7 +20,7 @@ func newTermTheme() *termTheme {
 }
 
 // Color fixes a bug < 2.1 where theme.DarkTheme() would not override user preference.
-func (t *termTheme) Color(n fyne.ThemeColorName, v fyne.ThemeVariant) color.Color {
+func (t *termTheme) Color(n granio.ThemeColorName, v granio.ThemeVariant) color.Color {
 	switch n {
 	case theme.ColorNameBackground, theme.ColorNameForeground:
 		return t.Theme.Color(n, v)
@@ -28,7 +28,7 @@ func (t *termTheme) Color(n fyne.ThemeColorName, v fyne.ThemeVariant) color.Colo
 	return t.Theme.Color(n, theme.VariantDark)
 }
 
-func (t *termTheme) Size(n fyne.ThemeSizeName) float32 {
+func (t *termTheme) Size(n granio.ThemeSizeName) float32 {
 	if n == theme.SizeNameText {
 		return t.fontSize
 	}
@@ -36,7 +36,7 @@ func (t *termTheme) Size(n fyne.ThemeSizeName) float32 {
 	return t.Theme.Size(n)
 }
 
-func (t *termTheme) Font(s fyne.TextStyle) fyne.Resource {
+func (t *termTheme) Font(s granio.TextStyle) granio.Resource {
 	if !s.Monospace {
 		return t.Theme.Font(s)
 	}

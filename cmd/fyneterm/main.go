@@ -9,18 +9,18 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/FyshOS/fancyfs"
-	"github.com/fyne-io/terminal"
-	"github.com/fyne-io/terminal/cmd/fyneterm/data"
+	"github.com/Uzer007-admin/granio-terminal"
+	"github.com/Uzer007-admin/granio-terminal/cmd/fyneterm/data"
+	fancyfs "github.com/Uzer007-admin/granio/v2/storage/foldermeta"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/lang"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/lang"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 //go:embed translation
@@ -30,13 +30,13 @@ func termTitle() string {
 	return lang.L("Title")
 }
 
-func guessCellSize(th *termTheme) fyne.Size {
+func guessCellSize(th *termTheme) granio.Size {
 	cell := canvas.NewText("M", color.White)
 	cell.TextStyle.Monospace = true
 
 	min := cell.MinSize()
 	scale := th.fontSize / theme.TextSize()
-	return fyne.NewSize(float32(math.Round(float64(min.Width*scale))), float32(math.Round(float64(min.Height*scale))))
+	return granio.NewSize(float32(math.Round(float64(min.Width*scale))), float32(math.Round(float64(min.Height*scale))))
 }
 
 func main() {
@@ -54,7 +54,7 @@ func main() {
 
 func findTerminal(item *container.TabItem) *terminal.Terminal {
 	override := item.Content.(*container.ThemeOverride)
-	stack := override.Content.(*fyne.Container)
+	stack := override.Content.(*granio.Container)
 	for _, obj := range stack.Objects {
 		if t, ok := obj.(*terminal.Terminal); ok {
 			return t
@@ -63,7 +63,7 @@ func findTerminal(item *container.TabItem) *terminal.Terminal {
 	return nil
 }
 
-func newTerminalWindow(a fyne.App, debug bool) fyne.Window {
+func newTerminalWindow(a granio.App, debug bool) granio.Window {
 	w, _, _ := buildTerminalWindow(a, debug, true)
 	return w
 }
@@ -71,12 +71,12 @@ func newTerminalWindow(a fyne.App, debug bool) fyne.Window {
 // buildTerminalWindow constructs the terminal window and returns the window,
 // its DocTabs and the updateView callback so the tab/resize behaviour can be
 // exercised from tests.
-func buildTerminalWindow(a fyne.App, debug, runShell bool) (fyne.Window, *container.DocTabs, func(bool)) {
+func buildTerminalWindow(a granio.App, debug, runShell bool) (granio.Window, *container.DocTabs, func(bool)) {
 	w := a.NewWindow(termTitle())
 	w.SetPadded(false)
 	th := newTermTheme()
 
-	var wrapper *fyne.Container
+	var wrapper *granio.Container
 	tabs := container.NewDocTabs()
 	// dirs tracks the working directory of each tab so new tabs can open in the same place
 	dirs := make(map[*container.TabItem]string)
@@ -88,13 +88,13 @@ func buildTerminalWindow(a fyne.App, debug, runShell bool) (fyne.Window, *contai
 		barHeight := tabs.MinSize().Height - tabs.Selected().Content.MinSize().Height
 		size := w.Canvas().Size()
 		if !adding && len(tabs.Items) == 1 {
-			wrapper.Objects = []fyne.CanvasObject{tabs.Items[0].Content}
-			w.Resize(fyne.NewSize(size.Width, size.Height-barHeight))
+			wrapper.Objects = []granio.CanvasObject{tabs.Items[0].Content}
+			w.Resize(granio.NewSize(size.Width, size.Height-barHeight))
 		} else if adding && len(tabs.Items) == 2 {
-			wrapper.Objects = []fyne.CanvasObject{tabs}
-			w.Resize(fyne.NewSize(size.Width, size.Height+barHeight))
+			wrapper.Objects = []granio.CanvasObject{tabs}
+			w.Resize(granio.NewSize(size.Width, size.Height+barHeight))
 		} else {
-			wrapper.Objects = []fyne.CanvasObject{tabs}
+			wrapper.Objects = []granio.CanvasObject{tabs}
 		}
 		wrapper.Refresh()
 	}
@@ -131,7 +131,7 @@ func buildTerminalWindow(a fyne.App, debug, runShell bool) (fyne.Window, *contai
 	w.SetContent(wrapper)
 
 	cellSize := guessCellSize(th)
-	w.Resize(fyne.NewSize(cellSize.Width*80, cellSize.Height*24))
+	w.Resize(granio.NewSize(cellSize.Width*80, cellSize.Height*24))
 
 	w.Canvas().Focus(findTerminal(firstTab))
 
@@ -151,7 +151,7 @@ func currentDir(tabs *container.DocTabs, dirs map[*container.TabItem]string) str
 	return pwd
 }
 
-func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh func(bool), debug bool, th *termTheme, w fyne.Window, a fyne.App, runShell bool) *container.TabItem {
+func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh func(bool), debug bool, th *termTheme, w granio.Window, a granio.App, runShell bool) *container.TabItem {
 	bg := canvas.NewRectangle(theme.Color(theme.ColorNameBackground))
 	img := canvas.NewImageFromResource(data.FyneLogo)
 	img.FillMode = canvas.ImageFillContain
@@ -161,7 +161,7 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 		ff, err := fancyfs.DetailsForFolder(storage.NewFileURI(pwd))
 		if ff == nil || err != nil {
 			if err != nil && err != fancyfs.ErrNoMetadata {
-				fyne.LogError("Could not read dir metadata", err)
+				granio.LogError("Could not read dir metadata", err)
 			}
 
 			img.File = ""
@@ -208,7 +208,7 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 		}
 	}
 
-	a.Settings().AddListener(func(s fyne.Settings) {
+	a.Settings().AddListener(func(s granio.Settings) {
 		bg.FillColor = theme.Color(theme.ColorNameBackground)
 		bg.Refresh()
 	})
@@ -222,7 +222,7 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 		listen = make(chan terminal.Config)
 		go func() {
 			for config := range listen {
-				fyne.Do(func() {
+				granio.Do(func() {
 					title := config.Title
 					if title == "" {
 						tabItem.Text = termTitle()
@@ -252,26 +252,26 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 	}
 
 	// New window shortcut
-	newWin := func(_ fyne.Shortcut) {
+	newWin := func(_ granio.Shortcut) {
 		w := newTerminalWindow(a, debug)
 		w.Show()
 	}
-	t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyN, Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift}, newWin)
+	t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyN, Modifier: granio.KeyModifierControl | granio.KeyModifierShift}, newWin)
 	if runtime.GOOS == "darwin" {
-		t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyN, Modifier: fyne.KeyModifierSuper}, newWin)
+		t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyN, Modifier: granio.KeyModifierSuper}, newWin)
 	}
 
 	// New tab shortcut
-	newTabShortcut := func(_ fyne.Shortcut) {
+	newTabShortcut := func(_ granio.Shortcut) {
 		item := newTab(tabs, dirs, refresh, debug, th, w, a, true)
 		tabs.Append(item)
 		tabs.Select(item)
 		refresh(true)
 		w.Canvas().Focus(findTerminal(item))
 	}
-	t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyT, Modifier: fyne.KeyModifierControl | fyne.KeyModifierShift}, newTabShortcut)
+	t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyT, Modifier: granio.KeyModifierControl | granio.KeyModifierShift}, newTabShortcut)
 	if runtime.GOOS == "darwin" {
-		t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyT, Modifier: fyne.KeyModifierSuper}, newTabShortcut)
+		t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyT, Modifier: granio.KeyModifierSuper}, newTabShortcut)
 	}
 
 	// Font size shortcuts
@@ -280,13 +280,13 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 			item.Content.Refresh()
 		}
 	}
-	t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyEqual, Modifier: fyne.KeyModifierShortcutDefault | fyne.KeyModifierShift},
-		func(_ fyne.Shortcut) {
+	t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyEqual, Modifier: granio.KeyModifierShortcutDefault | granio.KeyModifierShift},
+		func(_ granio.Shortcut) {
 			th.fontSize++
 			refreshAllTabs()
 		})
-	t.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyMinus, Modifier: fyne.KeyModifierShortcutDefault},
-		func(_ fyne.Shortcut) {
+	t.AddShortcut(&desktop.CustomShortcut{KeyName: granio.KeyMinus, Modifier: granio.KeyModifierShortcutDefault},
+		func(_ granio.Shortcut) {
 			th.fontSize--
 			refreshAllTabs()
 		})
@@ -295,10 +295,10 @@ func newTab(tabs *container.DocTabs, dirs map[*container.TabItem]string, refresh
 		go func() {
 			err := t.RunLocalShell()
 			if err != nil {
-				fyne.LogError("Failure in terminal", err)
+				granio.LogError("Failure in terminal", err)
 			}
 			t.RemoveListener(listen)
-			fyne.Do(func() {
+			granio.Do(func() {
 				if _, ok := dirs[tabItem]; !ok {
 					return
 				}

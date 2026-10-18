@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestOSC_Title(t *testing.T) {
 
 func TestOSC_LongStrings(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(50, 50))
+	term.Resize(granio.NewSize(50, 50))
 	handle := func(data string) {
 		for len(data) > 0 { // in reads as the terminal gets them
 			n := min(len(data), bufLen)

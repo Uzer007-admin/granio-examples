@@ -1,8 +1,8 @@
 package terminal
 
 import (
-	"fyne.io/fyne/v2"
-	widget2 "github.com/fyne-io/terminal/internal/widget"
+	widget2 "github.com/Uzer007-admin/granio-terminal/internal/widget"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 // getSelectedRange returns the current selection range, start row, start col, end row, end col
@@ -62,14 +62,14 @@ func (t *Terminal) SelectedText() string {
 	return widget2.GetTextRange(t.content, t.blockMode, sr, sc, er, ec)
 }
 
-func (t *Terminal) copySelectedText(clipboard fyne.Clipboard) {
+func (t *Terminal) copySelectedText(clipboard granio.Clipboard) {
 	// copy start and end sel to clipboard and clear the sel style
 	text := t.SelectedText()
 	clipboard.SetContent(text)
 	t.clearSelectedText()
 }
 
-func (t *Terminal) pasteText(clipboard fyne.Clipboard) {
+func (t *Terminal) pasteText(clipboard granio.Clipboard) {
 	content := clipboard.Content()
 
 	if t.bracketedPasteMode {

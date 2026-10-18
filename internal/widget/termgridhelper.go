@@ -3,9 +3,9 @@ package widget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // HighlightRange highlight options to the given range
@@ -14,7 +14,7 @@ func HighlightRange(t *TermGrid, blockMode bool, startRow, startCol, endRow, end
 	applyHighlight := func(cell *widget.TextGridCell) {
 		// Check if already highlighted
 		if h, ok := cell.Style.(*TermTextGridStyle); !ok {
-			baseStyle := fyne.TextStyle{Monospace: true}
+			baseStyle := granio.TextStyle{Monospace: true}
 
 			if cell.Style != nil {
 				cell.Style = NewTermTextGridStyle(cell.Style.TextColor(), cell.Style.BackgroundColor(), bitmask, false, baseStyle)
@@ -169,7 +169,7 @@ func forRange(t *TermGrid, blockMode bool, startRow, startCol, endRow, endCol in
 
 // TermTextGridStyle defines a style that can be original or highlighted.
 type TermTextGridStyle struct {
-	TextStyle               fyne.TextStyle
+	TextStyle               granio.TextStyle
 	OriginalTextColor       color.Color
 	OriginalBackgroundColor color.Color
 	InvertedTextColor       color.Color
@@ -180,7 +180,7 @@ type TermTextGridStyle struct {
 }
 
 // Style is the text style a cell should use.
-func (h *TermTextGridStyle) Style() fyne.TextStyle {
+func (h *TermTextGridStyle) Style() granio.TextStyle {
 	return h.TextStyle
 }
 
@@ -230,7 +230,7 @@ type HighlightOption func(h *TermTextGridStyle)
 // Returns:
 //
 //	A pointer to a TermTextGridStyle initialized with the provided colors and inversion settings.
-func NewTermTextGridStyle(fg, bg color.Color, bitmask byte, blinkEnabled bool, style fyne.TextStyle) widget.TextGridStyle {
+func NewTermTextGridStyle(fg, bg color.Color, bitmask byte, blinkEnabled bool, style granio.TextStyle) widget.TextGridStyle {
 	// calculate the inverted colors
 	var invertedFg, invertedBg color.Color
 	if fg == nil {

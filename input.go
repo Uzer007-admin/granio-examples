@@ -5,8 +5,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
 )
 
 var lastKeyTime = time.Now()
@@ -20,7 +20,7 @@ func (t *Terminal) TypedRune(r rune) {
 }
 
 // TypedKey will be called if a non-printable keyboard event occurs
-func (t *Terminal) TypedKey(e *fyne.KeyEvent) {
+func (t *Terminal) TypedKey(e *granio.KeyEvent) {
 	lastKeyTime = time.Now()
 	if t.keyboardState.shiftPressed {
 		t.keyTypedWithShift(e)
@@ -28,111 +28,111 @@ func (t *Terminal) TypedKey(e *fyne.KeyEvent) {
 	}
 
 	switch e.Name {
-	case fyne.KeyReturn:
+	case granio.KeyReturn:
 		_, _ = t.in.Write([]byte{'\r'})
-	case fyne.KeyEnter:
+	case granio.KeyEnter:
 		if t.newLineMode {
 			_, _ = t.in.Write([]byte{'\r'})
 			return
 		}
 		_, _ = t.in.Write([]byte{'\n'})
-	case fyne.KeyTab:
+	case granio.KeyTab:
 		_, _ = t.in.Write([]byte{'\t'})
-	case fyne.KeyF1:
+	case granio.KeyF1:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'P'})
-	case fyne.KeyF2:
+	case granio.KeyF2:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'Q'})
-	case fyne.KeyF3:
+	case granio.KeyF3:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'R'})
-	case fyne.KeyF4:
+	case granio.KeyF4:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'S'})
-	case fyne.KeyF5:
+	case granio.KeyF5:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '5', '~'})
-	case fyne.KeyF6:
+	case granio.KeyF6:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '7', '~'})
-	case fyne.KeyF7:
+	case granio.KeyF7:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '8', '~'})
-	case fyne.KeyF8:
+	case granio.KeyF8:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '9', '~'})
-	case fyne.KeyF9:
+	case granio.KeyF9:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '0', '~'})
-	case fyne.KeyF10:
+	case granio.KeyF10:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '1', '~'})
-	case fyne.KeyF11:
+	case granio.KeyF11:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '3', '~'})
-	case fyne.KeyF12:
+	case granio.KeyF12:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '4', '~'})
-	case fyne.KeyEscape:
+	case granio.KeyEscape:
 		_, _ = t.in.Write([]byte{asciiEscape})
-	case fyne.KeyBackspace:
+	case granio.KeyBackspace:
 		_, _ = t.in.Write([]byte{asciiBackspace})
-	case fyne.KeyDelete:
+	case granio.KeyDelete:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '3', '~'})
-	case fyne.KeyUp, fyne.KeyDown, fyne.KeyLeft, fyne.KeyRight:
+	case granio.KeyUp, granio.KeyDown, granio.KeyLeft, granio.KeyRight:
 		t.typeCursorKey(e.Name)
-	case fyne.KeyPageUp:
+	case granio.KeyPageUp:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '5', '~'})
-	case fyne.KeyPageDown:
+	case granio.KeyPageDown:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '6', '~'})
-	case fyne.KeyHome:
+	case granio.KeyHome:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'H'})
-	case fyne.KeyInsert:
+	case granio.KeyInsert:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '~'})
-	case fyne.KeyEnd:
+	case granio.KeyEnd:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'F'})
 	}
 }
 
-func (t *Terminal) keyTypedWithShift(e *fyne.KeyEvent) {
+func (t *Terminal) keyTypedWithShift(e *granio.KeyEvent) {
 	switch e.Name {
-	case fyne.KeyF1:
+	case granio.KeyF1:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '5', '~'})
-	case fyne.KeyF2:
+	case granio.KeyF2:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '6', '~'})
-	case fyne.KeyF3:
+	case granio.KeyF3:
 		_, _ = t.in.Write([]byte{asciiEscape, 'O', 'R', ';', '2', '~'})
-	case fyne.KeyF4:
+	case granio.KeyF4:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', ';', '2', 'S'})
-	case fyne.KeyF5:
+	case granio.KeyF5:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '5', ';', '2', '~'})
-	case fyne.KeyF6:
+	case granio.KeyF6:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '7', ';', '2', '~'})
-	case fyne.KeyF7:
+	case granio.KeyF7:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '8', ';', '2', '~'})
-	case fyne.KeyF8:
+	case granio.KeyF8:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', '9', ';', '2', '~'})
-	case fyne.KeyF9:
+	case granio.KeyF9:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '0', ';', '2', '~'})
-	case fyne.KeyF10:
+	case granio.KeyF10:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '1', ';', '2', '~'})
-	case fyne.KeyF11:
+	case granio.KeyF11:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '3', ';', '2', '~'})
-	case fyne.KeyF12:
+	case granio.KeyF12:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', '4', ';', '2', '~'})
-	case fyne.KeyPageUp:
+	case granio.KeyPageUp:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '5', ';', '2', '~'})
-	case fyne.KeyPageDown:
+	case granio.KeyPageDown:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '6', ';', '2', '~'})
-	case fyne.KeyHome:
+	case granio.KeyHome:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', ';', '2', 'H'})
-	case fyne.KeyInsert:
+	case granio.KeyInsert:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '2', ';', '2', '~'})
-	case fyne.KeyDelete:
+	case granio.KeyDelete:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '3', ';', '2', '~'})
-	case fyne.KeyEnd:
+	case granio.KeyEnd:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', '1', ';', '2', 'F'})
-	case fyne.KeyUp:
+	case granio.KeyUp:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', 'A', ';', '2'})
-	case fyne.KeyDown:
+	case granio.KeyDown:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', 'B', ';', '2'})
-	case fyne.KeyLeft:
+	case granio.KeyLeft:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', 'D', ';', '2'})
-	case fyne.KeyRight:
+	case granio.KeyRight:
 		_, _ = t.in.Write([]byte{asciiEscape, '[', 'C', ';', '2'})
 	}
 }
 
-func (t *Terminal) trackKeyboardState(down bool, e *fyne.KeyEvent) {
+func (t *Terminal) trackKeyboardState(down bool, e *granio.KeyEvent) {
 	switch e.Name {
 	case desktop.KeyShiftLeft:
 		t.keyboardState.shiftPressed = down
@@ -150,12 +150,12 @@ func (t *Terminal) trackKeyboardState(down bool, e *fyne.KeyEvent) {
 }
 
 // KeyDown is called when we get a down key event
-func (t *Terminal) KeyDown(e *fyne.KeyEvent) {
+func (t *Terminal) KeyDown(e *granio.KeyEvent) {
 	t.trackKeyboardState(true, e)
 }
 
 // KeyUp is called when we get an up key event
-func (t *Terminal) KeyUp(e *fyne.KeyEvent) {
+func (t *Terminal) KeyUp(e *granio.KeyEvent) {
 	t.trackKeyboardState(false, e)
 }
 
@@ -166,16 +166,16 @@ func (t *Terminal) FocusGained() {
 }
 
 // TypedShortcut handles key combinations, we pass them on to the tty.
-func (t *Terminal) TypedShortcut(s fyne.Shortcut) {
+func (t *Terminal) TypedShortcut(s granio.Shortcut) {
 	if ds, ok := s.(*desktop.CustomShortcut); ok {
 		t.ShortcutHandler.TypedShortcut(s) // it's not clear how we can check if this consumed the event
 
 		// handle CTRL+A to CTRL+_ and everything in-between
-		if ds.Modifier == fyne.KeyModifierControl && len(ds.KeyName) > 0 {
+		if ds.Modifier == granio.KeyModifierControl && len(ds.KeyName) > 0 {
 			char := ds.KeyName[0]
 			off := char - 'A' + 1
 			switch {
-			case ds.Key() == fyne.KeySpace:
+			case ds.Key() == granio.KeySpace:
 				fallthrough
 			case ds.Key() == "@":
 				off = 0
@@ -193,29 +193,29 @@ func (t *Terminal) TypedShortcut(s fyne.Shortcut) {
 	} else {
 		// we need to override the default ctrl-X/C/V/A for non-mac and do it ourselves
 		switch sh := s.(type) {
-		case *fyne.ShortcutCut:
+		case *granio.ShortcutCut:
 			if sh.Secondary {
 				// shift+del - cut is no-op
 			} else {
 				_, _ = t.in.Write([]byte{0x18})
 			}
-		case *fyne.ShortcutCopy:
+		case *granio.ShortcutCopy:
 			if sh.Secondary {
 				t.copySelectedText(t.selectClipboard()) // ctrl+ins
 			} else {
 				_, _ = t.in.Write([]byte{0x3})
 			}
-		case *fyne.ShortcutPaste:
+		case *granio.ShortcutPaste:
 			if sh.Secondary {
 				t.pasteText(t.selectClipboard()) // shift+ins
 			} else {
 				_, _ = t.in.Write([]byte{0x16})
 			}
-		case *fyne.ShortcutUndo:
+		case *granio.ShortcutUndo:
 			_, _ = t.in.Write([]byte{0x1a})
-		case *fyne.ShortcutRedo:
+		case *granio.ShortcutRedo:
 			_, _ = t.in.Write([]byte{0x19})
-		case *fyne.ShortcutSelectAll:
+		case *granio.ShortcutSelectAll:
 			_, _ = t.in.Write([]byte{0x1})
 		}
 	}
@@ -236,20 +236,20 @@ func (t *Terminal) Focused() bool {
 	return t.focused
 }
 
-func (t *Terminal) typeCursorKey(key fyne.KeyName) {
+func (t *Terminal) typeCursorKey(key granio.KeyName) {
 	cursorPrefix := byte('[')
 	if t.bufferMode {
 		cursorPrefix = 'O'
 	}
 
 	switch key {
-	case fyne.KeyUp:
+	case granio.KeyUp:
 		_, _ = t.in.Write([]byte{asciiEscape, cursorPrefix, 'A'})
-	case fyne.KeyDown:
+	case granio.KeyDown:
 		_, _ = t.in.Write([]byte{asciiEscape, cursorPrefix, 'B'})
-	case fyne.KeyLeft:
+	case granio.KeyLeft:
 		_, _ = t.in.Write([]byte{asciiEscape, cursorPrefix, 'D'})
-	case fyne.KeyRight:
+	case granio.KeyRight:
 		_, _ = t.in.Write([]byte{asciiEscape, cursorPrefix, 'C'})
 	}
 }

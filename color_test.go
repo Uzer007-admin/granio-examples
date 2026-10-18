@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
-	widget2 "github.com/fyne-io/terminal/internal/widget"
+	widget2 "github.com/Uzer007-admin/granio-terminal/internal/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +20,7 @@ func testColor(t *testing.T, tests map[string]struct {
 	inputSeq      string
 	expectedFg    color.Color
 	expectedBg    color.Color
-	expectedStyle fyne.TextStyle
+	expectedStyle granio.TextStyle
 },
 ) {
 	// Iterate through the test cases
@@ -56,19 +56,19 @@ func testColor(t *testing.T, tests map[string]struct {
 func TestHandleOutput_Text(t *testing.T) {
 	tests := map[string]struct {
 		inputSeq      string
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"bold": {
 			inputSeq:      esc("[1m"),
-			expectedStyle: fyne.TextStyle{Bold: true},
+			expectedStyle: granio.TextStyle{Bold: true},
 		},
 		"italic": {
 			inputSeq:      esc("[3m"),
-			expectedStyle: fyne.TextStyle{Italic: true},
+			expectedStyle: granio.TextStyle{Italic: true},
 		},
 		"bold and italic": {
 			inputSeq:      esc("[1m") + esc("[3m"),
-			expectedStyle: fyne.TextStyle{Bold: true, Italic: true},
+			expectedStyle: granio.TextStyle{Bold: true, Italic: true},
 		},
 		"bold then disable bold": {
 			inputSeq: esc("[1m") + esc("[22m"),
@@ -102,7 +102,7 @@ func TestHandleOutput_Normal_Text(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"reverse video": {
 			inputSeq:   esc("[7m"),
@@ -113,7 +113,7 @@ func TestHandleOutput_Normal_Text(t *testing.T) {
 			inputSeq:      esc("[7m") + esc("[1m"),
 			expectedFg:    color.NRGBA{R: 34, G: 34, B: 34, A: 255},
 			expectedBg:    color.NRGBA{R: 255, G: 255, B: 255, A: 255},
-			expectedStyle: fyne.TextStyle{Bold: true},
+			expectedStyle: granio.TextStyle{Bold: true},
 		},
 		"reverse video and bold then reset": {
 			inputSeq:   esc("[7m") + esc("[1m") + esc("[m"),
@@ -130,7 +130,7 @@ func TestHandleOutput_ANSI_Colors(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"[30m": {
 			inputSeq:   esc("[30m"),
@@ -176,7 +176,7 @@ func TestHandleOutput_ANSI_Colors(t *testing.T) {
 			inputSeq:      esc("[1m") + esc("[37m"),
 			expectedFg:    &color.RGBA{170, 170, 170, 255},
 			expectedBg:    nil,
-			expectedStyle: fyne.TextStyle{Bold: true},
+			expectedStyle: granio.TextStyle{Bold: true},
 		},
 		"reverse video": {
 			inputSeq:   esc("[7m") + esc("[37m"),
@@ -185,19 +185,19 @@ func TestHandleOutput_ANSI_Colors(t *testing.T) {
 		},
 		"underline": {
 			inputSeq:      esc("[4m"),
-			expectedStyle: fyne.TextStyle{Underline: true},
+			expectedStyle: granio.TextStyle{Underline: true},
 		},
 		"bold and underline": {
 			inputSeq:      esc("[1m") + esc("[4m"),
-			expectedStyle: fyne.TextStyle{Bold: true, Underline: true},
+			expectedStyle: granio.TextStyle{Bold: true, Underline: true},
 		},
 		"strikethrough": {
 			inputSeq:      esc("[9m"),
-			expectedStyle: fyne.TextStyle{Strikethrough: true},
+			expectedStyle: granio.TextStyle{Strikethrough: true},
 		},
 		"strikethrough and underline": {
 			inputSeq:      esc("[9m") + esc("[4m"),
-			expectedStyle: fyne.TextStyle{Strikethrough: true, Underline: true},
+			expectedStyle: granio.TextStyle{Strikethrough: true, Underline: true},
 		},
 	}
 
@@ -209,7 +209,7 @@ func TestHandleOutput_xterm_bright(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"[90m": {
 			inputSeq:   esc("[90m"),
@@ -302,7 +302,7 @@ func TestHandleOutput_xterm_256_1(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"[48;5;16m": {
 			inputSeq:   esc("[48;5;16m"),
@@ -624,7 +624,7 @@ func TestHandleOutput_xterm_256_2(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"[38;5;0m": {
 			inputSeq:   esc("[38;5;0m"),
@@ -796,7 +796,7 @@ func TestHandleOutput_24_bit_colour(t *testing.T) {
 		inputSeq      string
 		expectedFg    color.Color
 		expectedBg    color.Color
-		expectedStyle fyne.TextStyle
+		expectedStyle granio.TextStyle
 	}{
 		"SlateGrey": {
 			inputSeq:   esc("[38;2;112;128;144m"),
@@ -830,7 +830,7 @@ func TestHandleOutput_24_bit_colour(t *testing.T) {
 
 func TestHandleOutput_BufferCutoff(t *testing.T) {
 	term := New()
-	termsize := fyne.NewSize(80, 50)
+	termsize := granio.NewSize(80, 50)
 	term.Resize(termsize)
 	term.handleOutput([]byte("\x1b[38;5;64"))
 	term.handleOutput([]byte("m40\x1b[38;5;65m41"))
@@ -839,7 +839,7 @@ func TestHandleOutput_BufferCutoff(t *testing.T) {
 	c1 := &color.RGBA{R: 95, G: 135, A: 255}
 	c2 := &color.RGBA{R: 95, G: 135, B: 95, A: 255}
 
-	mono := fyne.TextStyle{Monospace: true}
+	mono := granio.TextStyle{Monospace: true}
 	tg.Rows = []widget.TextGridRow{
 		{
 			Cells: []widget.TextGridCell{

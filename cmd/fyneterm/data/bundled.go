@@ -6,19 +6,19 @@ package data
 import (
 	_ "embed"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 //go:embed fyne_logo.png
 var fynelogoData []byte
-var fynelogo = &fyne.StaticResource{
+var fynelogo = &granio.StaticResource{
 	StaticName:    "fyne_logo.png",
 	StaticContent: fynelogoData,
 }
 
 //go:embed Icon.png
 var resourceIconPngData []byte
-var resourceIconPng = &fyne.StaticResource{
+var resourceIconPng = &granio.StaticResource{
 	StaticName:    "Icon.png",
 	StaticContent: resourceIconPngData,
 }

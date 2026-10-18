@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 	"github.com/creack/pty"
 )
 
@@ -19,7 +19,7 @@ func (t *Terminal) updatePTYSize() {
 		return
 	}
 	scale := float32(1.0)
-	c := fyne.CurrentApp().Driver().CanvasForObject(t)
+	c := granio.CurrentApp().Driver().CanvasForObject(t)
 	if c != nil {
 		scale = c.Scale()
 	}
@@ -76,7 +76,7 @@ func (t *Terminal) startPTY() (io.WriteCloser, io.Reader, io.Closer, error) {
 
 			if wd != "" && wd != t.config.PWD {
 				t.config.PWD = wd
-				fyne.Do(t.onConfigure)
+				granio.Do(t.onConfigure)
 			}
 		}
 	}()

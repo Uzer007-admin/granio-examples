@@ -3,14 +3,14 @@ package terminal
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTerminal_Backspace(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(50, 50))
+	term.Resize(granio.NewSize(50, 50))
 	term.handleOutput([]byte("Hi"))
 	assert.Equal(t, "Hi", term.content.Text())
 
@@ -22,7 +22,7 @@ func TestTerminal_Backspace(t *testing.T) {
 
 func TestTerminal_WrapBeyondEdge(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	assert.Equal(t, uint(5), term.config.Columns)
 
 	term.cursorCol = 8 // as if restored from a wider terminal
@@ -35,7 +35,7 @@ func TestTerminal_WrapBeyondEdge(t *testing.T) {
 
 func TestTerminal_TabAtTheRightMargin(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	assert.Equal(t, uint(5), term.config.Columns)
 
 	term.handleOutput([]byte("ab\tc"))

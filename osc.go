@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 const (
@@ -55,10 +55,10 @@ func (t *Terminal) handleOSCTerm(code, terminator string) {
 
 // replyColor answers an OSC colour query with the current theme colour
 // in the xterm "rgb:rrrr/gggg/bbbb" form.
-func (t *Terminal) replyColor(cmd string, name fyne.ThemeColorName, terminator string) {
+func (t *Terminal) replyColor(cmd string, name granio.ThemeColorName, terminator string) {
 	var c color.Color = color.Black
 	if t.Theme() != nil {
-		c = t.Theme().Color(name, fyne.CurrentApp().Settings().ThemeVariant())
+		c = t.Theme().Color(name, granio.CurrentApp().Settings().ThemeVariant())
 	}
 	r, g, b, _ := c.RGBA()
 	_, _ = fmt.Fprintf(t.in, "\x1b]%s;rgb:%04x/%04x/%04x%s", cmd, r, g, b, terminator)

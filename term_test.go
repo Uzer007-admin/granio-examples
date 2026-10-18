@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"fyne.io/fyne/v2"
-	_ "fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	_ "github.com/Uzer007-admin/granio/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +22,7 @@ func TestNewTerminal(t *testing.T) {
 
 func TestTerminal_CreateRenderer_KeepsContent(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(200, 100))
+	term.Resize(granio.NewSize(200, 100))
 	term.handleOutput([]byte("Hello"))
 	assert.Equal(t, "Hello", term.Text())
 
@@ -43,7 +43,7 @@ func TestExitCode(t *testing.T) {
 
 func testExitCodeN(t *testing.T, n int) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	go func() {
 		_ = term.RunLocalShell()
 	}()
@@ -66,7 +66,7 @@ func TestExitCode01(t *testing.T) {
 
 func TestTerminal_Resize(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 
 	assert.Equal(t, uint(5), term.config.Columns)
 	assert.Equal(t, uint(2), term.config.Rows)
@@ -74,13 +74,13 @@ func TestTerminal_Resize(t *testing.T) {
 
 func TestTerminal_Resize_Narrower(t *testing.T) {
 	term := New()
-	term.Resize(fyne.NewSize(85, 45))
+	term.Resize(granio.NewSize(85, 45))
 	assert.Equal(t, uint(10), term.config.Columns)
 
 	term.handleOutput([]byte("12345678"))
 	assert.Equal(t, 8, term.cursorCol)
 
-	term.Resize(fyne.NewSize(45, 45))
+	term.Resize(granio.NewSize(45, 45))
 	assert.Equal(t, uint(5), term.config.Columns)
 	assert.Equal(t, 4, term.cursorCol)
 
@@ -113,52 +113,52 @@ func TestTerminal_AddListener(t *testing.T) {
 func TestTerminal_SanitizePosition(t *testing.T) {
 	tests := []struct {
 		name   string
-		pos    fyne.Position
+		pos    granio.Position
 		width  int
 		height int
-		want   fyne.Position
+		want   granio.Position
 	}{
 		{
 			name:   "WithinBounds",
-			pos:    fyne.NewPos(2, 3),
+			pos:    granio.NewPos(2, 3),
 			width:  45,
 			height: 45,
-			want:   fyne.NewPos(2, 3),
+			want:   granio.NewPos(2, 3),
 		},
 		{
 			name:   "NegativeX",
-			pos:    fyne.NewPos(-1, 2),
+			pos:    granio.NewPos(-1, 2),
 			width:  45,
 			height: 45,
-			want:   fyne.NewPos(0, 2),
+			want:   granio.NewPos(0, 2),
 		},
 		{
 			name:   "ExceedsWidth",
-			pos:    fyne.NewPos(46, 2),
+			pos:    granio.NewPos(46, 2),
 			width:  45,
 			height: 45,
-			want:   fyne.NewPos(45, 2),
+			want:   granio.NewPos(45, 2),
 		},
 		{
 			name:   "NegativeY",
-			pos:    fyne.NewPos(3, -1),
+			pos:    granio.NewPos(3, -1),
 			width:  45,
 			height: 45,
-			want:   fyne.NewPos(3, 0),
+			want:   granio.NewPos(3, 0),
 		},
 		{
 			name:   "ExceedsHeight",
-			pos:    fyne.NewPos(3, 46),
+			pos:    granio.NewPos(3, 46),
 			width:  45,
 			height: 45,
-			want:   fyne.NewPos(3, 45),
+			want:   granio.NewPos(3, 45),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			term := New()
-			term.Resize(fyne.NewSize(float32(tt.width), float32(tt.height)))
+			term.Resize(granio.NewSize(float32(tt.width), float32(tt.height)))
 
 			got := term.sanitizePosition(tt.pos)
 
