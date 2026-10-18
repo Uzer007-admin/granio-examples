@@ -1,0 +1,468 @@
+// Package gl provides a full Fyne render implementation using system OpenGL libraries.
+package gl
+
+import (
+	"fmt"
+	"image"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/internal"
+	"github.com/Uzer007-admin/granio/v2/internal/driver"
+	paint "github.com/Uzer007-admin/granio/v2/internal/painter"
+)
+
+// Painter defines the functionality of our OpenGL based renderer
+type Painter interface {
+	// Init tell a new painter to initialize, usually called after a context is available
+	Init()
+	// Capture requests that the specified canvas be drawn to an in-memory image
+	Capture(granio.Canvas) image.Image
+	// Clear tells our painter to prepare a fresh paint
+	Clear()
+	// Free is used to indicate that a certain canvas object is no longer needed
+	Free(granio.CanvasObject)
+	// MaxTextureSize returns the largest texture dimension supported by the GL driver, or 0 if not yet known
+	MaxTextureSize() int
+	// Paint a single granio.CanvasObject but not its children.
+	Paint(granio.CanvasObject, granio.Position, granio.Size, *internal.ClipItem)
+	// SetFrameBufferScale tells us when we have more than 1 framebuffer pixel for each output pixel
+	SetFrameBufferScale(float32)
+	// SetOutputSize is used to change the resolution of our output viewport
+	SetOutputSize(int, int)
+	// StartClipping tells us that the following paint actions should be clipped to the specified area.
+	StartClipping(granio.Position, granio.Size)
+	// StopClipping stops clipping paint actions.
+	StopClipping()
+}
+
+// NewPainter creates a new GL based renderer for the provided canvas.
+// If it is a master painter it will also initialize OpenGL
+func NewPainter(c granio.Canvas, ctx driver.WithContext) Painter {
+	p := &painter{canvas: c, contextProvider: ctx}
+	p.SetFrameBufferScale(1.0)
+	return p
+}
+
+type painter struct {
+	atlas               paint.GlyphAtlas
+	atlasTex            Texture
+	atlasTexValid       bool       // whether atlasTex has been allocated
+	blurKernel          blurKernel // cached 1D kernel texture on GPU
+	blurSnap            blurSnap   // cached texture for GPU-side blur snapshot
+	canvas              granio.Canvas
+	clippedTextTextures map[*canvas.Text]clippedTextTexture
+	contextProvider     driver.WithContext
+	ctx                 context
+	fbHeight            int       // current framebuffer height in pixels
+	glyphPending        []float32 // queued batch vertices, glyphVertexFloats each
+	linePending         []float32 // queued line vertices, lineVertexFloats each
+	maxTextureSize      int
+	materials           materialPipeline
+	materialUnavailable bool
+	materialGeneration  uint64
+	pixScale            float32 // pre-calculate scale*texScale for each draw
+	programs            *programs
+	quadScratch         []paint.GlyphQuad       // one string's glyph quads, reused
+	shaderPrograms      map[string]*shaderState // lazily compiled programs for user shaders, keyed by Shader.Name
+	stats               drawStats               // FYNE_GL_DEBUG counters
+	texScale            float32
+	vertices            []float32 // updateBuffer's upload buffer, reused
+	windowSurface       WindowSurfaceMode
+}
+
+// Declare conformity to Painter interface
+var _ Painter = (*painter)(nil)
+
+func (p *painter) Clear() {
+	if p.materials != nil {
+		p.materials.ResetFrame()
+	}
+	if glDebug {
+		p.startFrame()
+	}
+	// Anything still queued belongs to a frame that is about to be wiped.
+	p.glyphPending = p.glyphPending[:0]
+	p.linePending = p.linePending[:0]
+	r, g, b, a := p.windowClearColor()
+	p.ctx.ClearColor(r, g, b, a)
+	p.ctx.Clear(bitColorBuffer | bitDepthBuffer)
+	p.logError()
+}
+
+func (p *painter) Free(obj granio.CanvasObject) {
+	p.materialGeneration++
+	// Shader programs are immutable and compiled once per Shader.Name, living for
+	// the lifetime of the GL context like the built-in shader programs. They are
+	// deliberately not freed here: Free is also called for every object on each
+	// Refresh (see Canvas.FreeDirtyTextures), so freeing would recompile the
+	// program - and reset its animation clock - every single frame.
+	if text, ok := obj.(*canvas.Text); ok {
+		p.freeClippedTextTexture(text)
+	}
+	p.freeTexture(obj)
+}
+
+func (p *painter) MaxTextureSize() int {
+	return p.maxTextureSize
+}
+
+func (p *painter) Paint(obj granio.CanvasObject, pos granio.Position, frame granio.Size, clip *internal.ClipItem) {
+	if !obj.Visible() {
+		return
+	}
+
+	size := obj.Size()
+	var clipPos granio.Position
+	var clipSize granio.Size
+	if clip != nil {
+		clipPos, clipSize = clip.Rect()
+	} else {
+		clipSize = frame
+	}
+	if pos.Y > clipPos.Y+clipSize.Height || pos.Y+size.Height < clipPos.Y ||
+		pos.X > clipPos.X+clipSize.Width || pos.X+size.Width < clipPos.X {
+		return
+	}
+
+	if !glDebug {
+		p.drawObject(obj, pos, frame, clip)
+		return
+	}
+	draws, batches := p.stats.draws, p.stats.batches
+	p.drawObject(obj, pos, frame, clip)
+	// A batch flushed while drawing obj carried earlier objects, not obj.
+	p.countDraws(obj, p.stats.draws-draws-(p.stats.batches-batches))
+}
+
+func (p *painter) SetFrameBufferScale(scale float32) {
+	p.texScale = scale
+	p.pixScale = p.canvas.Scale() * p.texScale
+}
+
+func (p *painter) SetOutputSize(width, height int) {
+	p.ctx.Viewport(0, 0, width, height)
+	p.fbHeight = height
+	p.logError()
+}
+
+func (p *painter) SetUniform1f(pState programState, name string, v float32) {
+	u := p.getUniformLocation(pState, name)
+	if u.prev[0] == v {
+		return
+	}
+	u.prev[0] = v
+	p.ctx.Uniform1f(u.ref, v)
+}
+
+func (p *painter) SetUniform1i(pState programState, name string, v int32) {
+	u := p.getUniformLocation(pState, name)
+	fv := float32(v)
+	if u.prev[0] == fv {
+		return
+	}
+	u.prev[0] = fv
+	p.ctx.Uniform1i(u.ref, v)
+}
+
+func (p *painter) SetUniform1fv(pState programState, name string, v []float32) {
+	u := p.getUniformLocation(pState, name)
+	if float32SlicesEqual(u.prevv, v) {
+		return
+	}
+	u.prevv = append(u.prevv[:0], v...)
+	p.ctx.Uniform1fv(u.ref, v)
+}
+
+func (p *painter) SetUniform2f(pState programState, name string, v0, v1 float32) {
+	u := p.getUniformLocation(pState, name)
+	if u.prev[0] == v0 && u.prev[1] == v1 {
+		return
+	}
+	u.prev[0] = v0
+	u.prev[1] = v1
+	p.ctx.Uniform2f(u.ref, v0, v1)
+}
+
+func (p *painter) SetUniform2fv(pState programState, name string, v []float32) {
+	u := p.getUniformLocation(pState, name)
+	if float32SlicesEqual(u.prevv, v) {
+		return
+	}
+	u.prevv = append(u.prevv[:0], v...)
+	p.ctx.Uniform2fv(u.ref, v)
+}
+
+func (p *painter) SetUniform4f(pState programState, name string, v0, v1, v2, v3 float32) {
+	u := p.getUniformLocation(pState, name)
+	if u.prev[0] == v0 && u.prev[1] == v1 && u.prev[2] == v2 && u.prev[3] == v3 {
+		return
+	}
+	u.prev[0] = v0
+	u.prev[1] = v1
+	u.prev[2] = v2
+	u.prev[3] = v3
+	p.ctx.Uniform4f(u.ref, v0, v1, v2, v3)
+}
+
+func (p *painter) StartClipping(pos granio.Position, size granio.Size) {
+	p.FlushGlyphs() // queued quads belong to the outgoing scissor rectangle
+	x := p.textureScale(pos.X)
+	y := p.textureScale(p.canvas.Size().Height - pos.Y - size.Height)
+	w := p.textureScale(size.Width)
+	h := p.textureScale(size.Height)
+	// must be positive, just clamp to 0
+	if w < 0 {
+		w = 0
+	}
+	if h < 0 {
+		h = 0
+	}
+	p.ctx.Scissor(int32(x), int32(y), int32(w), int32(h))
+	p.ctx.Enable(scissorTest)
+	p.logError()
+}
+
+func (p *painter) StopClipping() {
+	p.FlushGlyphs() // as in StartClipping: draw under the rectangle still in force
+	p.ctx.Disable(scissorTest)
+	p.logError()
+}
+
+func (p *painter) UpdateVertexArray(pState programState, name string, size, stride, offset int) {
+	a := p.enableAttribArray(pState, name)
+
+	p.ctx.VertexAttribPointerWithOffset(a, size, float, false, stride*floatSize, offset*floatSize)
+	p.logError()
+}
+
+func (p *painter) compilePrograms() *programs {
+	return &programs{
+		arbitraryPolygon: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragArbitraryPolygon),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		arc: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragArc),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		bezierCurve: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragBezierCurve),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		blur: programState{
+			ref:        p.mustCreateProgram(shaderVertTexturedPassthrough2D, shaderFragBlur),
+			buff:       p.createBuffer(coordinatesSizeRectangleWithTexture),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		ellipse: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragEllipse),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		glyph: programState{
+			ref:        p.mustCreateProgram(shaderVertGlyph, shaderFragGlyph),
+			buff:       p.createBuffer(6 * glyphVertexFloats),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		line: programState{
+			ref:        p.mustCreateProgram(shaderVertLine, shaderFragLine),
+			buff:       p.createBuffer(coordinatesSizeLine),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		polygon: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragPolygon),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		rectangle: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragRectangle),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		roundRectangle: programState{
+			ref:        p.mustCreateProgram(shaderVertPassthrough2D, shaderFragRoundRectangle),
+			buff:       p.createBuffer(coordinatesSizeRectangle),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+		simple: programState{
+			ref:        p.mustCreateProgram(shaderVertTexturedPassthrough2D, shaderFragSimple),
+			buff:       p.createBuffer(coordinatesSizeRectangleWithTexture),
+			uniforms:   make(map[string]*uniformState),
+			attributes: make(map[string]Attribute),
+		},
+	}
+}
+
+func (p *painter) compileShader(source string, shaderType uint32) (Shader, error) {
+	shader := p.ctx.CreateShader(shaderType)
+
+	p.ctx.ShaderSource(shader, source)
+	p.logError()
+	p.ctx.CompileShader(shader)
+	p.logError()
+
+	info := p.ctx.GetShaderInfoLog(shader)
+	if p.ctx.GetShaderi(shader, compileStatus) == glFalse {
+		return noShader, fmt.Errorf("failed to compile OpenGL shader:\n%s\n>>> SHADER SOURCE\n%s\n<<< SHADER SOURCE", info, source)
+	}
+
+	// The info is probably a null terminated string.
+	// An empty info has been seen as "\x00" or "\x00\x00".
+	if len(info) > 0 && info != "\x00" && info != "\x00\x00" {
+		fmt.Printf("OpenGL shader compilation output:\n%s\n>>> SHADER SOURCE\n%s\n<<< SHADER SOURCE\n", info, source)
+	}
+
+	return shader, nil
+}
+
+// createProgram compiles and links the given vertex and fragment shader sources into a program.
+func (p *painter) createProgram(vertexSrc, fragmentSrc []byte) (Program, error) {
+	vertShader, err := p.compileShader(string(vertexSrc), vertexShader)
+	if err != nil {
+		return noProgram, err
+	}
+	fragShader, err := p.compileShader(string(fragmentSrc), fragmentShader)
+	if err != nil {
+		return noProgram, err
+	}
+
+	prog := p.ctx.CreateProgram()
+	p.ctx.AttachShader(prog, vertShader)
+	p.ctx.AttachShader(prog, fragShader)
+	p.ctx.LinkProgram(prog)
+
+	info := p.ctx.GetProgramInfoLog(prog)
+	if p.ctx.GetProgrami(prog, linkStatus) == glFalse {
+		return noProgram, fmt.Errorf("failed to link OpenGL program:\n%s", info)
+	}
+
+	// The info is probably a null terminated string.
+	// An empty info has been seen as "\x00" or "\x00\x00".
+	if len(info) > 0 && info != "\x00" && info != "\x00\x00" {
+		fmt.Printf("OpenGL program linking output:\n%s\n", info)
+	}
+
+	if glErr := p.ctx.GetError(); glErr != 0 {
+		return noProgram, fmt.Errorf("failed to link OpenGL program; error code: %x", glErr)
+	}
+
+	p.ctx.UseProgram(prog)
+
+	return prog, nil
+}
+
+func (p *painter) enableAttribArray(pState programState, name string) Attribute {
+	a, ok := pState.attributes[name]
+	if !ok {
+		a = p.ctx.GetAttribLocation(pState.ref, name)
+		p.ctx.EnableVertexAttribArray(a)
+		pState.attributes[name] = a
+	}
+
+	return a
+}
+
+func (p *painter) getUniformLocation(pState programState, name string) *uniformState {
+	u, ok := pState.uniforms[name]
+	if !ok {
+		u = &uniformState{ref: p.ctx.GetUniformLocation(pState.ref, name)}
+		pState.uniforms[name] = u
+	}
+
+	return u
+}
+
+func (p *painter) logError() {
+	logGLError(p.ctx.GetError)
+}
+
+func (p *painter) mustCreateProgram(vertexSrc, fragmentSrc []byte) Program {
+	prog, err := p.createProgram(vertexSrc, fragmentSrc)
+	if err != nil {
+		panic(err)
+	}
+
+	return prog
+}
+
+type blurKernel struct {
+	radius   float32
+	tex      Texture
+	texValid bool // whether tex has been allocated
+}
+
+type blurSnap struct {
+	height   int
+	tex      Texture
+	texValid bool // whether tex has been allocated
+	width    int
+}
+
+type programState struct {
+	ref        Program
+	buff       Buffer
+	uniforms   map[string]*uniformState
+	attributes map[string]Attribute
+}
+
+type programs struct {
+	arbitraryPolygon programState
+	arc              programState
+	bezierCurve      programState
+	blur             programState
+	ellipse          programState
+	glyph            programState
+	line             programState
+	polygon          programState
+	rectangle        programState
+	roundRectangle   programState
+	simple           programState
+}
+
+// shaderState caches a user shader's compiled program and uploaded textures.
+// valid is false when the source failed to compile, so we can record the
+// failure without comparing the (not always comparable) program reference.
+type shaderState struct {
+	program  programState
+	valid    bool
+	textures map[string]*shaderTexture // uploaded textures, keyed by uniform name
+}
+
+// shaderTexture is a GPU texture uploaded for a shader, remembering the source
+// image so we only re-upload when it is replaced.
+type shaderTexture struct {
+	tex Texture
+	src image.Image
+}
+
+type uniformState struct {
+	ref   Uniform
+	prev  [4]float32
+	prevv []float32
+}
+
+func float32SlicesEqual(a, b []float32) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}

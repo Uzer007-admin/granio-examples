@@ -1,0 +1,29 @@
+//go:build !ci && !android && !ios && !mobile && (wasm || test_web_driver)
+
+package widget
+
+import (
+	"strings"
+	"syscall/js"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/yuin/goldmark/ast"
+)
+
+func parseMarkdownImage(t *ast.Image) []RichTextSegment {
+	dest := string(t.Destination)
+	u, err := storage.ParseURI(dest)
+	if err != nil {
+		if !strings.HasPrefix(dest, "/") {
+			dest = "/" + dest
+		}
+		origin := js.Global().Get("location").Get("origin").String()
+		u, err = storage.ParseURI(origin + dest)
+		if err != nil {
+			granio.LogError("Can't load image in markdown", err)
+			return []RichTextSegment{}
+		}
+	}
+	return []RichTextSegment{&ImageSegment{Source: u, Title: string(t.Title), Alignment: granio.TextAlignCenter}}
+}

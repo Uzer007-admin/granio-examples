@@ -1,0 +1,30 @@
+[submodule "extras/apps"]
+	path = extras/apps
+	url = https://github.com/Uzer007-admin/granio-apps.git
+[submodule "deps/gl"]
+	path = deps/gl
+	url = https://github.com/Uzer007-admin/gl.git
+[submodule "deps/glfw"]
+	path = deps/glfw
+	url = https://github.com/Uzer007-admin/glfw.git
+[submodule "deps/glow"]
+	path = deps/glow
+	url = https://github.com/Uzer007-admin/glow.git
+[submodule "deps/dbus"]
+	path = deps/dbus
+	url = https://github.com/Uzer007-admin/dbus.git
+[submodule "deps/gl-js"]
+	path = deps/gl-js
+	url = https://github.com/Uzer007-admin/granio-gl-js.git
+[submodule "deps/glfw-js"]
+	path = deps/glfw-js
+	url = https://github.com/Uzer007-admin/granio-glfw-js.git
+[submodule "deps/systray"]
+	path = deps/systray
+	url = https://github.com/Uzer007-admin/granio-systray.git
+[submodule "deps/image"]
+	path = deps/image
+	url = https://github.com/Uzer007-admin/granio-image.git
+[submodule "deps/oksvg"]
+	path = deps/oksvg
+	url = https://github.com/Uzer007-admin/granio-oksvg.git

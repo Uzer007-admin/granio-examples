@@ -1,0 +1,494 @@
+package common
+
+import (
+	"image/color"
+	"reflect"
+	"sync/atomic"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/internal"
+	"github.com/Uzer007-admin/granio/v2/internal/app"
+	"github.com/Uzer007-admin/granio/v2/internal/async"
+	"github.com/Uzer007-admin/granio/v2/internal/build"
+	"github.com/Uzer007-admin/granio/v2/internal/cache"
+	"github.com/Uzer007-admin/granio/v2/internal/driver"
+	"github.com/Uzer007-admin/granio/v2/internal/painter/gl"
+	"github.com/Uzer007-admin/granio/v2/internal/theme"
+)
+
+// SizeableCanvas defines a canvas with size related functions.
+type SizeableCanvas interface {
+	granio.Canvas
+	Resize(granio.Size)
+	MinSize() granio.Size
+}
+
+// Canvas defines common canvas implementation.
+type Canvas struct {
+	OnFocus   func(obj granio.Focusable)
+	OnUnfocus func()
+
+	impl SizeableCanvas
+
+	contentFocusMgr *app.FocusManager
+	menuFocusMgr    *app.FocusManager
+	overlays        overlayStack
+
+	shortcut granio.ShortcutHandler
+
+	painter gl.Painter
+
+	// Any object that requests to enter to the refresh queue should
+	// not be omitted as it is always a rendering task's decision
+	// for skipping frames or drawing calls.
+	//
+	// If an object failed to ender the refresh queue, the object may
+	// disappear or blink from the view at any frames. As of this reason,
+	// the refreshQueue is an unbounded queue which is able to cache
+	// arbitrary number of granio.CanvasObject for the rendering.
+	refreshQueue deduplicatedObjectQueue
+	dirty        atomic.Bool
+
+	mWindowHeadTree, contentTree, menuTree *renderCacheTree
+}
+
+// AddShortcut adds a shortcut to the canvas.
+func (c *Canvas) AddShortcut(shortcut granio.Shortcut, handler func(shortcut granio.Shortcut)) {
+	c.shortcut.AddShortcut(shortcut, handler)
+}
+
+func (c *Canvas) DrawDebugOverlay(obj granio.CanvasObject, pos granio.Position, size granio.Size, clip *internal.ClipItem) {
+	//revive:disable:add-constant
+	switch obj.(type) {
+	case granio.Widget:
+		r := canvas.NewRectangle(color.Transparent)
+		r.StrokeColor = color.NRGBA{R: 0xcc, G: 0x33, B: 0x33, A: 0xff}
+		r.StrokeWidth = 1
+		r.Resize(obj.Size())
+		c.Painter().Paint(r, pos, size, clip)
+
+		t := canvas.NewText(reflect.ValueOf(obj).Elem().Type().Name(), r.StrokeColor)
+		t.TextSize = 10
+		c.Painter().Paint(t, pos.AddXY(2, 2), size, clip)
+	case *granio.Container:
+		r := canvas.NewRectangle(color.Transparent)
+		r.StrokeColor = color.NRGBA{R: 0x33, G: 0x33, B: 0xcc, A: 0xff}
+		r.StrokeWidth = 1
+		r.Resize(obj.Size())
+		c.Painter().Paint(r, pos, size, clip)
+	}
+	//revive:enable:add-constant
+}
+
+// EnsureMinSize ensure canvas min size.
+//
+// This function uses lock.
+func (c *Canvas) EnsureMinSize() bool {
+	if c.impl.Content() == nil {
+		return false
+	}
+	windowNeedsMinSizeUpdate := false
+	csize := c.impl.Size()
+	minSize := c.impl.MinSize()
+
+	var parentNeedingUpdate *RenderCacheNode
+
+	setup := func(node *RenderCacheNode, _ granio.Position) {
+		if !node.obj.Visible() {
+			return
+		}
+		if th, ok := node.Obj().(*container.ThemeOverride); ok {
+			theme.PushRenderingTheme(th.Theme)
+		}
+	}
+	ensureMinSize := func(node *RenderCacheNode, _ granio.Position) {
+		obj := node.obj
+		cache.SetCanvasForObject(obj, c.impl, func() {
+			if img, ok := obj.(*canvas.Image); ok {
+				img.Refresh() // this may now have a different texScale
+			}
+		})
+
+		if parentNeedingUpdate == node {
+			c.updateLayout(obj)
+			parentNeedingUpdate = nil
+		}
+
+		if !obj.Visible() {
+			return
+		}
+		minSize := obj.MinSize()
+
+		minSizeChanged := node.minSize != minSize
+		if minSizeChanged {
+			node.minSize = minSize
+			if node.parent != nil {
+				parentNeedingUpdate = node.parent
+			} else {
+				windowNeedsMinSizeUpdate = true
+				size := obj.Size()
+				expectedSize := internal.MaxSizes(minSize, size)
+				if expectedSize != size && size != csize {
+					obj.Resize(expectedSize)
+				} else {
+					c.updateLayout(obj)
+				}
+			}
+		}
+
+		if _, ok := node.Obj().(*container.ThemeOverride); ok {
+			theme.PopRenderingTheme()
+		}
+	}
+	c.WalkTrees(setup, ensureMinSize)
+
+	shouldResize := windowNeedsMinSizeUpdate && (csize.Width < minSize.Width || csize.Height < minSize.Height)
+	if shouldResize {
+		c.impl.Resize(internal.MaxSizes(csize, minSize))
+	}
+	return windowNeedsMinSizeUpdate
+}
+
+// Focus makes the provided item focused.
+func (c *Canvas) Focus(obj granio.Focusable) {
+	focusMgr := c.focusManager()
+	if focusMgr != nil && focusMgr.Focus(obj) { // fast path – probably >99.9% of all cases
+		if c.OnFocus != nil {
+			c.OnFocus(obj)
+		}
+		return
+	}
+
+	focusMgrs := append([]*app.FocusManager{c.contentFocusMgr, c.menuFocusMgr}, c.overlays.ListFocusManagers()...)
+
+	for _, mgr := range focusMgrs {
+		if mgr == nil {
+			continue
+		}
+		if focusMgr != mgr && mgr.Focus(obj) {
+			if c.OnFocus != nil {
+				c.OnFocus(obj)
+			}
+			return
+		}
+	}
+
+	granio.LogError("Failed to focus object which is not part of the canvas’ content, menu or overlays.", nil)
+}
+
+// Focused returns the current focused object.
+func (c *Canvas) Focused() granio.Focusable {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return nil
+	}
+	return mgr.Focused()
+}
+
+// FocusGained signals to the manager that its content got focus.
+// Valid only on Desktop.
+func (c *Canvas) FocusGained() {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return
+	}
+	mgr.FocusGained()
+}
+
+// FocusLost signals to the manager that its content lost focus.
+// Valid only on Desktop.
+func (c *Canvas) FocusLost() {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return
+	}
+	mgr.FocusLost()
+}
+
+// FocusNext focuses the next focusable item.
+func (c *Canvas) FocusNext() {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return
+	}
+	mgr.FocusNext()
+}
+
+// FocusPrevious focuses the previous focusable item.
+func (c *Canvas) FocusPrevious() {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return
+	}
+	mgr.FocusPrevious()
+}
+
+// FreeDirtyTextures frees dirty textures and returns the number of freed textures.
+func (c *Canvas) FreeDirtyTextures() uint64 {
+	if c.painter == nil {
+		return 0
+	}
+
+	objectsToFree := c.refreshQueue.Len()
+	for object := c.refreshQueue.Out(); object != nil; object = c.refreshQueue.Out() {
+		c.freeObject(object)
+	}
+
+	cache.RangeExpiredTexturesFor(c.impl, c.painter.Free)
+	return objectsToFree
+}
+
+// Initialize initializes the canvas.
+func (c *Canvas) Initialize(impl SizeableCanvas, onOverlayChanged func()) {
+	c.impl = impl
+	c.refreshQueue.queue = async.NewCanvasObjectQueue()
+	c.overlays.OverlayStack = internal.OverlayStack{
+		OnChange: onOverlayChanged,
+		Canvas:   impl,
+	}
+}
+
+// ObjectTrees return canvas object trees.
+//
+// This function uses lock.
+func (c *Canvas) ObjectTrees() []granio.CanvasObject {
+	var content, menu granio.CanvasObject
+	if c.contentTree != nil && c.contentTree.root != nil {
+		content = c.contentTree.root.obj
+	}
+	if c.menuTree != nil && c.menuTree.root != nil {
+		menu = c.menuTree.root.obj
+	}
+	trees := make([]granio.CanvasObject, 0, len(c.Overlays().List())+2)
+	trees = append(trees, content)
+	if menu != nil {
+		trees = append(trees, menu)
+	}
+	trees = append(trees, c.Overlays().List()...)
+	return trees
+}
+
+// Overlays returns the overlay stack.
+func (c *Canvas) Overlays() granio.OverlayStack {
+	return &c.overlays
+}
+
+// Painter returns the canvas painter.
+func (c *Canvas) Painter() gl.Painter {
+	return c.painter
+}
+
+// Refresh refreshes a canvas object.
+func (c *Canvas) Refresh(obj granio.CanvasObject) {
+	c.refreshQueue.In(obj)
+	// EnsureMain's own check, done here because handing it the c.SetDirty
+	// method value allocates, and this runs for every refreshed object.
+	if build.MigratedToFyneDo() || async.IsMainGoroutine() {
+		c.SetDirty()
+		return
+	}
+	async.EnsureMain(c.SetDirty)
+}
+
+// RemoveShortcut removes a shortcut from the canvas.
+func (c *Canvas) RemoveShortcut(shortcut granio.Shortcut) {
+	c.shortcut.RemoveShortcut(shortcut)
+}
+
+// SetContentTreeAndFocusMgr sets content tree and focus manager.
+//
+// This function does not use the canvas lock.
+func (c *Canvas) SetContentTreeAndFocusMgr(content granio.CanvasObject) {
+	c.contentTree = &renderCacheTree{root: &RenderCacheNode{obj: content}}
+
+	newFocusMgr := app.NewFocusManager(content)
+	if c.contentFocusMgr != nil {
+		focused := c.contentFocusMgr.Focused()
+		if focused != nil {
+			newFocusMgr.Focus(focused) // Focus old object if possible.
+		}
+	}
+	c.contentFocusMgr = newFocusMgr
+}
+
+// CheckDirtyAndClear returns true if the canvas is dirty and
+// clears the dirty state atomically.
+func (c *Canvas) CheckDirtyAndClear() bool {
+	return c.dirty.Swap(false)
+}
+
+// SetDirty sets canvas dirty flag atomically.
+func (c *Canvas) SetDirty() {
+	c.dirty.Store(true)
+}
+
+// HasDirty reports pending paint work without clearing it.
+func (c *Canvas) HasDirty() bool { return c.dirty.Load() }
+
+// SetMenuTreeAndFocusMgr sets menu tree and focus manager.
+//
+// This function does not use the canvas lock.
+func (c *Canvas) SetMenuTreeAndFocusMgr(menu granio.CanvasObject) {
+	c.menuTree = &renderCacheTree{root: &RenderCacheNode{obj: menu}}
+	if menu != nil {
+		c.menuFocusMgr = app.NewFocusManager(menu)
+	} else {
+		c.menuFocusMgr = nil
+	}
+}
+
+// SetMobileWindowHeadTree sets window head tree.
+//
+// This function does not use the canvas lock.
+func (c *Canvas) SetMobileWindowHeadTree(head granio.CanvasObject) {
+	c.mWindowHeadTree = &renderCacheTree{root: &RenderCacheNode{obj: head}}
+}
+
+// SetPainter sets the canvas painter.
+func (c *Canvas) SetPainter(p gl.Painter) {
+	c.painter = p
+}
+
+// TypedShortcut handle the registered shortcut.
+func (c *Canvas) TypedShortcut(shortcut granio.Shortcut) {
+	c.shortcut.TypedShortcut(shortcut)
+}
+
+// Unfocus unfocuses all the objects in the canvas.
+func (c *Canvas) Unfocus() {
+	mgr := c.focusManager()
+	if mgr == nil {
+		return
+	}
+	if mgr.Focus(nil) && c.OnUnfocus != nil {
+		c.OnUnfocus()
+	}
+}
+
+// WalkTrees walks over the trees.
+func (c *Canvas) WalkTrees(
+	beforeChildren func(*RenderCacheNode, granio.Position),
+	afterChildren func(*RenderCacheNode, granio.Position),
+) {
+	c.walkTree(c.contentTree, beforeChildren, afterChildren)
+	if c.mWindowHeadTree != nil && c.mWindowHeadTree.root.obj != nil {
+		c.walkTree(c.mWindowHeadTree, beforeChildren, afterChildren)
+	}
+	if c.menuTree != nil && c.menuTree.root.obj != nil {
+		c.walkTree(c.menuTree, beforeChildren, afterChildren)
+	}
+	for _, tree := range c.overlays.renderCaches {
+		if tree != nil {
+			c.walkTree(tree, beforeChildren, afterChildren)
+		}
+	}
+}
+
+func (c *Canvas) focusManager() *app.FocusManager {
+	if focusMgr := c.overlays.TopFocusManager(); focusMgr != nil {
+		return focusMgr
+	}
+	if c.isMenuActive() {
+		return c.menuFocusMgr
+	}
+	return c.contentFocusMgr
+}
+
+func (c *Canvas) freeObject(object granio.CanvasObject) {
+	// Image.Refresh will trigger a refresh specific to the object,
+	// while recursing on parent widget would just lead to a double texture upload.
+	if img, ok := object.(*canvas.Image); ok {
+		c.painter.Free(img)
+		return
+	}
+
+	driver.WalkCompleteObjectTree(object, func(obj granio.CanvasObject, _ granio.Position, _ granio.Position, _ granio.Size) bool {
+		if _, ok := obj.(*canvas.Image); !ok { // No image refresh while recursing to avoid double texture upload.
+			c.painter.Free(obj)
+		}
+		return false
+	}, nil)
+}
+
+func (c *Canvas) isMenuActive() bool {
+	if c.menuTree == nil || c.menuTree.root == nil || c.menuTree.root.obj == nil {
+		return false
+	}
+	menu := c.menuTree.root.obj
+	if am, ok := menu.(activatableMenu); ok {
+		return am.IsActive()
+	}
+	return true
+}
+
+func (*Canvas) walkTree(
+	tree *renderCacheTree,
+	beforeChildren func(*RenderCacheNode, granio.Position),
+	afterChildren func(*RenderCacheNode, granio.Position),
+) {
+	var node, parent, prev *RenderCacheNode
+	node = tree.root
+
+	bc := func(obj granio.CanvasObject, pos granio.Position, _ granio.Position, _ granio.Size) bool {
+		if node != nil && node.obj != obj {
+			if parent.firstChild == node {
+				parent.firstChild = nil
+			}
+			node = nil
+		}
+		if node == nil {
+			node = &RenderCacheNode{parent: parent, obj: obj}
+			if parent.firstChild == nil {
+				parent.firstChild = node
+			} else {
+				prev.nextSibling = node
+			}
+		}
+		if prev != nil && prev.parent != parent {
+			prev = nil
+		}
+
+		if beforeChildren != nil {
+			beforeChildren(node, pos)
+		}
+
+		parent = node
+		node = parent.firstChild
+		return false
+	}
+	ac := func(_ granio.CanvasObject, pos granio.Position, _ granio.CanvasObject) {
+		node = parent
+		parent = node.parent
+		if prev != nil && prev.parent != parent {
+			prev.nextSibling = nil
+		}
+
+		if afterChildren != nil {
+			afterChildren(node, pos)
+		}
+
+		prev = node
+		node = node.nextSibling
+	}
+	driver.WalkVisibleObjectTree(tree.root.obj, bc, ac)
+}
+
+type activatableMenu interface {
+	IsActive() bool
+}
+
+func (*Canvas) updateLayout(objToLayout granio.CanvasObject) {
+	switch cont := objToLayout.(type) {
+	case *granio.Container:
+		if cont.Layout != nil {
+			layout := cont.Layout
+			objects := cont.Objects
+			layout.Layout(objects, cont.Size())
+		}
+	case granio.Widget:
+		renderer := cache.Renderer(cont)
+		renderer.Layout(cont.Size())
+	}
+}

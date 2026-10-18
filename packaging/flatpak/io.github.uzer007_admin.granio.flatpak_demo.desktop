@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+
+Name=Granio Flatpak Demo
+Comment=Пример приложения Granio в пакете Flatpak. 
+Categories=Development;Documentation;
+Keywords=granio;
+
+Icon=io.github.uzer007_admin.granio.flatpak_demo
+Exec=flatpak_demo
+Terminal=false

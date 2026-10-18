@@ -1,0 +1,165 @@
+package widget
+
+import (
+	"time"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
+)
+
+var (
+	_ granio.Widget      = (*DateEntry)(nil)
+	_ granio.Tappable    = (*DateEntry)(nil)
+	_ granio.Disableable = (*DateEntry)(nil)
+)
+
+// DateEntry is an input field which supports selecting from a fixed set of options.
+//
+// Since: 2.6
+type DateEntry struct {
+	Entry
+	Date      *time.Time
+	OnChanged func(*time.Time) `json:"-"`
+
+	dropDown *Calendar
+	popUp    *PopUp
+}
+
+// NewDateEntry creates a date input where the date can be selected or typed.
+//
+// Since: 2.6
+func NewDateEntry() *DateEntry {
+	e := &DateEntry{}
+	e.ExtendBaseWidget(e)
+	e.Wrapping = granio.TextWrap(granio.TextTruncateClip)
+	return e
+}
+
+// CreateRenderer returns a new renderer for this select entry.
+func (e *DateEntry) CreateRenderer() granio.WidgetRenderer {
+	e.ExtendBaseWidget(e)
+
+	dateFormat := getLocaleDateFormat()
+	e.Validator = func(in string) error {
+		_, err := time.Parse(dateFormat, in)
+		return err
+	}
+	e.Entry.OnChanged = func(in string) {
+		if in == "" {
+			e.Date = nil
+
+			if f := e.OnChanged; f != nil {
+				f(nil)
+			}
+		}
+		t, err := time.Parse(dateFormat, in)
+		if err != nil {
+			return
+		}
+
+		e.Date = &t
+
+		if f := e.OnChanged; f != nil {
+			f(&t)
+		}
+	}
+
+	if e.ActionItem == nil {
+		e.ActionItem = e.setupDropDown()
+		if e.Disabled() {
+			e.ActionItem.(granio.Disableable).Disable()
+		}
+	}
+
+	return e.Entry.CreateRenderer()
+}
+
+// Enable this widget, updating any style or features appropriately.
+func (e *DateEntry) Enable() {
+	if e.ActionItem != nil {
+		if d, ok := e.ActionItem.(granio.Disableable); ok {
+			d.Enable()
+		}
+	}
+	e.Entry.Enable()
+}
+
+// Disable this widget so that it cannot be interacted with, updating any style appropriately.
+func (e *DateEntry) Disable() {
+	if e.ActionItem != nil {
+		if d, ok := e.ActionItem.(granio.Disableable); ok {
+			d.Disable()
+		}
+	}
+	e.Entry.Disable()
+}
+
+// MinSize returns the minimal size of the select entry.
+func (e *DateEntry) MinSize() granio.Size {
+	e.ExtendBaseWidget(e)
+	return e.Entry.MinSize()
+}
+
+// Move changes the relative position of the date entry.
+func (e *DateEntry) Move(pos granio.Position) {
+	e.Entry.Move(pos)
+	if e.popUp != nil {
+		e.popUp.Move(e.popUpPos())
+	}
+}
+
+// Resize changes the size of the date entry.
+func (e *DateEntry) Resize(size granio.Size) {
+	e.Entry.Resize(size)
+	if e.popUp != nil {
+		e.popUp.Resize(granio.NewSize(size.Width, e.popUp.Size().Height))
+	}
+}
+
+// SetDate will update the widget to a specific date.
+// You can pass nil to unselect a date.
+func (e *DateEntry) SetDate(d *time.Time) {
+	if d == nil {
+		e.Date = nil
+		e.SetText("")
+
+		return
+	}
+
+	e.applyDate(*d)
+}
+
+func (e *DateEntry) applyDate(d time.Time) {
+	e.Date = &d
+	if e.popUp != nil {
+		e.popUp.Hide()
+	}
+
+	e.SetText(d.Format(getLocaleDateFormat()))
+}
+
+func (e *DateEntry) popUpPos() granio.Position {
+	entryPos := granio.CurrentApp().Driver().AbsolutePositionForObject(e.super())
+	return entryPos.Add(granio.NewPos(0, e.Size().Height-e.Theme().Size(theme.SizeNameInputBorder)))
+}
+
+func (e *DateEntry) setupDropDown() *Button {
+	if e.dropDown == nil {
+		e.dropDown = NewCalendar(time.Now(), e.applyDate)
+	}
+	dropDownButton := NewButton("", func() {
+		c := granio.CurrentApp().Driver().CanvasForObject(e.super())
+		if c == nil {
+			// DateEntry detached from its canvas; cannot host calendar
+			// dropdown (see fyne-io/fyne#5965).
+			return
+		}
+
+		e.popUp = NewPopUp(e.dropDown, c)
+		e.popUp.ShowAtPosition(e.popUpPos())
+		e.popUp.Resize(granio.NewSize(e.Size().Width, e.popUp.MinSize().Height))
+	})
+	dropDownButton.Importance = LowImportance
+	dropDownButton.SetIcon(e.Theme().Icon(theme.IconNameCalendar))
+	return dropDownButton
+}

@@ -1,0 +1,180 @@
+package granio
+
+import "sync"
+
+// ShortcutHandler is a default implementation of the shortcut handler
+// for [CanvasObject].
+type ShortcutHandler struct {
+	entry sync.Map // map[string]func(Shortcut)
+}
+
+// TypedShortcut handle the registered shortcut
+func (sh *ShortcutHandler) TypedShortcut(shortcut Shortcut) {
+	if val, ok := sh.entry.Load(shortcut.ShortcutName()); ok {
+		val.(func(Shortcut))(shortcut)
+	}
+}
+
+// AddShortcut register a handler to be executed when the shortcut action is triggered
+func (sh *ShortcutHandler) AddShortcut(shortcut Shortcut, handler func(shortcut Shortcut)) {
+	sh.entry.Store(shortcut.ShortcutName(), handler)
+}
+
+// RemoveShortcut removes a registered shortcut
+func (sh *ShortcutHandler) RemoveShortcut(shortcut Shortcut) {
+	sh.entry.Delete(shortcut.ShortcutName())
+}
+
+// Shortcut is the interface used to describe a shortcut action
+type Shortcut interface {
+	ShortcutName() string
+}
+
+// KeyboardShortcut describes a shortcut meant to be triggered by a keyboard action.
+type KeyboardShortcut interface {
+	Shortcut
+	Key() KeyName
+	Mod() KeyModifier
+}
+
+var _ KeyboardShortcut = (*ShortcutPaste)(nil)
+
+// ShortcutPaste describes a shortcut paste action.
+type ShortcutPaste struct {
+	Clipboard Clipboard
+	// Secondary indicates an alternative buffer such as selection, when true
+	//
+	// Since: 2.8
+	Secondary bool
+}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutPaste) Key() KeyName {
+	return KeyV
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutPaste) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutPaste) ShortcutName() string {
+	return "Paste"
+}
+
+var _ KeyboardShortcut = (*ShortcutCopy)(nil)
+
+// ShortcutCopy describes a shortcut copy action.
+type ShortcutCopy struct {
+	Clipboard Clipboard
+	// Secondary indicates an alternative buffer such as selection, when true
+	//
+	// Since: 2.8
+	Secondary bool
+}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutCopy) Key() KeyName {
+	return KeyC
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutCopy) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutCopy) ShortcutName() string {
+	return "Copy"
+}
+
+var _ KeyboardShortcut = (*ShortcutCut)(nil)
+
+// ShortcutCut describes a shortcut cut action.
+type ShortcutCut struct {
+	Clipboard Clipboard
+	// Secondary indicates an alternative buffer such as selection, when true
+	//
+	// Since: 2.8
+	Secondary bool
+}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutCut) Key() KeyName {
+	return KeyX
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutCut) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutCut) ShortcutName() string {
+	return "Cut"
+}
+
+var _ KeyboardShortcut = (*ShortcutSelectAll)(nil)
+
+// ShortcutSelectAll describes a shortcut selectAll action.
+type ShortcutSelectAll struct{}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutSelectAll) Key() KeyName {
+	return KeyA
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutSelectAll) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutSelectAll) ShortcutName() string {
+	return "SelectAll"
+}
+
+var _ KeyboardShortcut = (*ShortcutUndo)(nil)
+
+// ShortcutUndo describes a shortcut undo action.
+//
+// Since: 2.5
+type ShortcutUndo struct{}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutUndo) Key() KeyName {
+	return KeyZ
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutUndo) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutUndo) ShortcutName() string {
+	return "Undo"
+}
+
+var _ KeyboardShortcut = (*ShortcutRedo)(nil)
+
+// ShortcutRedo describes a shortcut redo action.
+//
+// Since: 2.5
+type ShortcutRedo struct{}
+
+// Key returns the [KeyName] for this shortcut.
+func (*ShortcutRedo) Key() KeyName {
+	return KeyY
+}
+
+// Mod returns the [KeyModifier] for this shortcut.
+func (*ShortcutRedo) Mod() KeyModifier {
+	return KeyModifierShortcutDefault
+}
+
+// ShortcutName returns the shortcut name
+func (*ShortcutRedo) ShortcutName() string {
+	return "Redo"
+}
