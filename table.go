@@ -5,14 +5,14 @@ import (
 	"sync"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/solitaire/faces"
+	"github.com/Uzer007-admin/granio-solitaire/faces"
 )
 
 // Table represents the rendering of a game in progress
@@ -24,16 +24,16 @@ type Table struct {
 
 	float       []*canvas.Image
 	floatSource []*canvas.Image
-	floatPos    fyne.Position
+	floatPos    granio.Position
 
 	shuffle *widget.ToolbarAction
 
-	findCard func(fyne.Position) ([]*Card, []*canvas.Image, bool)
-	stackPos func(int) fyne.Position
+	findCard func(granio.Position) ([]*Card, []*canvas.Image, bool)
+	stackPos func(int) granio.Position
 }
 
 // CreateRenderer gets the widget renderer for this table - internal use only
-func (t *Table) CreateRenderer() fyne.WidgetRenderer {
+func (t *Table) CreateRenderer() granio.WidgetRenderer {
 	return newTableRender(t)
 }
 
@@ -60,7 +60,7 @@ func cardEquals(card1, card2 *Card) bool {
 	return card1.Value == card2.Value && card1.Suit == card2.Suit
 }
 
-func (t *Table) cardTapped(cardPos *canvas.Image, pos fyne.Position, move func()) bool {
+func (t *Table) cardTapped(cardPos *canvas.Image, pos granio.Position, move func()) bool {
 	if !withinCardBounds(cardPos, pos) {
 		return false
 	}
@@ -91,7 +91,7 @@ func (t *Table) cardTapped(cardPos *canvas.Image, pos fyne.Position, move func()
 	return true
 }
 
-func (t *Table) checkStackTapped(render *stackRender, stack *Stack, pos fyne.Position) bool {
+func (t *Table) checkStackTapped(render *stackRender, stack *Stack, pos granio.Position) bool {
 	for i := len(stack.Cards) - 1; i >= 0; i-- {
 		//		card := stack.Cards[i]
 
@@ -118,7 +118,7 @@ func (t *Table) Restart() {
 }
 
 // Dragged is called when the user drags on the table widget
-func (t *Table) Dragged(event *fyne.DragEvent) {
+func (t *Table) Dragged(event *granio.DragEvent) {
 	t.floatPos = event.Position
 	if !t.float[0].Hidden { // existing drag
 
@@ -181,7 +181,7 @@ func (t *Table) DragEnd() {
 }
 
 // Tapped is called when the user taps the table widget
-func (t *Table) Tapped(event *fyne.PointEvent) {
+func (t *Table) Tapped(event *granio.PointEvent) {
 	render := test.WidgetRenderer(t).(*tableRender)
 
 	if withinCardBounds(render.deck, event.Position) {
@@ -201,7 +201,7 @@ func (t *Table) Tapped(event *fyne.PointEvent) {
 	t.dropCard(event.Position)
 }
 
-func (t *Table) dropCard(pos fyne.Position) bool {
+func (t *Table) dropCard(pos granio.Position) bool {
 	render := test.WidgetRenderer(t).(*tableRender)
 
 	if t.game.Draw3 != nil {
@@ -260,7 +260,7 @@ func (t *Table) dropCard(pos fyne.Position) bool {
 func (t *Table) finishAnimation() {
 	anim := container.NewWithoutLayout()
 	anim.Resize(t.Size())
-	fyne.CurrentApp().Driver().CanvasForObject(t).Overlays().Add(anim)
+	granio.CurrentApp().Driver().CanvasForObject(t).Overlays().Add(anim)
 	wg := &sync.WaitGroup{}
 
 	for _, p := range []*Stack{t.game.Build1, t.game.Build2, t.game.Build3, t.game.Build4} {
@@ -279,7 +279,7 @@ func (t *Table) finishAnimation() {
 				}
 				pos := t.stackPos(j)
 
-				off := fyne.Delta{DX: -2, DY: 1}
+				off := granio.Delta{DX: -2, DY: 1}
 				switch j {
 				case 0:
 					off.DX = 2
@@ -289,9 +289,9 @@ func (t *Table) finishAnimation() {
 				case 2:
 					off.DY = -1
 				}
-				fyne.Do(func() {
+				granio.Do(func() {
 					image := t.startCardAnimation(card, pos, off, wg)
-					anim.Objects = append([]fyne.CanvasObject{image}, anim.Objects...)
+					anim.Objects = append([]granio.CanvasObject{image}, anim.Objects...)
 
 					t.Refresh()
 				})
@@ -300,12 +300,12 @@ func (t *Table) finishAnimation() {
 		}
 
 		wg.Wait()
-		anim.Objects = []fyne.CanvasObject{}
-		fyne.CurrentApp().Driver().CanvasForObject(t).Overlays().Remove(anim)
+		anim.Objects = []granio.CanvasObject{}
+		granio.CurrentApp().Driver().CanvasForObject(t).Overlays().Remove(anim)
 	}()
 }
 
-func (t *Table) startCardAnimation(card *Card, pos fyne.Position, off fyne.Delta, wg *sync.WaitGroup) fyne.CanvasObject {
+func (t *Table) startCardAnimation(card *Card, pos granio.Position, off granio.Delta, wg *sync.WaitGroup) granio.CanvasObject {
 	bounds := t.Size()
 	pad := theme.Padding()
 	i := canvas.NewImageFromResource(faces.ForCard(card.Value, int(card.Suit)))
@@ -315,14 +315,14 @@ func (t *Table) startCardAnimation(card *Card, pos fyne.Position, off fyne.Delta
 	go func() {
 		for pos.X > -cardSize.Width-pad && pos.Y > -cardSize.Height-pad && pos.X < bounds.Width && pos.Y < bounds.Height {
 			pos = pos.Add(off)
-			fyne.Do(func() {
+			granio.Do(func() {
 				i.Move(pos)
 			})
 
 			time.Sleep(time.Millisecond * 12)
 		}
 
-		fyne.Do(func() {
+		granio.Do(func() {
 			i.Hide()
 			wg.Done()
 		})

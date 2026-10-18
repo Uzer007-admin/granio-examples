@@ -2,24 +2,24 @@
 
 package faces
 
-import "fyne.io/fyne/v2"
+import "github.com/Uzer007-admin/granio/v2"
 
 // ForCard returns the face resource for the specified card value and suit.
-func ForCard(card, suit int) fyne.Resource {
+func ForCard(card, suit int) granio.Resource {
 	return faceResources[card-1+(suit*13)]
 }
 
 // ForBack returns a face resource for the back of a card
-func ForBack() fyne.Resource {
+func ForBack() granio.Resource {
 	return cardBackSvg
 }
 
 // ForSpace returns a special resource to use when a vacant spot should be indicated
-func ForSpace() fyne.Resource {
+func ForSpace() granio.Resource {
 	return cardSpaceSvg
 }
 
-var faceResources = [52]fyne.Resource{
+var faceResources = [52]granio.Resource{
 	cardACSvg,
 	card2CSvg,
 	card3CSvg,

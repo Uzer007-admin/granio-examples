@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/solitaire/faces"
+	"github.com/Uzer007-admin/granio-solitaire/faces"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	cardSize = fyne.Size{Width: minCardWidth, Height: minCardWidth * cardRatio}
+	cardSize = granio.Size{Width: minCardWidth, Height: minCardWidth * cardRatio}
 
 	smallPad = minPadding
 	overlap  = smallPad * 5
@@ -29,10 +29,10 @@ var (
 
 func updateCardPosition(c *canvas.Image, x, y float32) {
 	c.Resize(cardSize)
-	c.Move(fyne.NewPos(x, y))
+	c.Move(granio.NewPos(x, y))
 }
 
-func withinCardBounds(c *canvas.Image, pos fyne.Position) bool {
+func withinCardBounds(c *canvas.Image, pos granio.Position) bool {
 	if pos.X < c.Position().X || pos.Y < c.Position().Y {
 		return false
 	}
@@ -49,7 +49,7 @@ func newCardPos(card *Card) *canvas.Image {
 		return &canvas.Image{}
 	}
 
-	var face fyne.Resource
+	var face granio.Resource
 	if card.FaceUp {
 		face = card.Face()
 	} else {
@@ -80,7 +80,7 @@ type tableRender struct {
 
 	stack1, stack2, stack3, stack4, stack5, stack6, stack7 *stackRender
 
-	objects []fyne.CanvasObject
+	objects []granio.CanvasObject
 	table   *Table
 }
 
@@ -89,16 +89,16 @@ func updateSizes(pad float32) {
 	overlap = smallPad * 5
 }
 
-func (t *tableRender) MinSize() fyne.Size {
-	return fyne.NewSize(220, 140)
+func (t *tableRender) MinSize() granio.Size {
+	return granio.NewSize(220, 140)
 }
 
-func (t *tableRender) Layout(size fyne.Size) {
+func (t *tableRender) Layout(size granio.Size) {
 	padding := size.Width * .006
 	updateSizes(padding)
 
 	newWidth := (size.Width - smallPad*6) / 7.0
-	cardSize = fyne.NewSize(newWidth, newWidth*cardRatio)
+	cardSize = granio.NewSize(newWidth, newWidth*cardRatio)
 
 	updateCardPosition(t.deck, 0, 0)
 
@@ -113,24 +113,24 @@ func (t *tableRender) Layout(size fyne.Size) {
 	updateCardPosition(t.build4, size.Width-cardSize.Width, 0)
 
 	sepThick := theme.SeparatorThicknessSize()
-	t.sep.Resize(fyne.NewSize(size.Width, sepThick))
-	t.sep.Move(fyne.NewPos(0, cardSize.Height+smallPad))
+	t.sep.Resize(granio.NewSize(size.Width, sepThick))
+	t.sep.Move(granio.NewPos(0, cardSize.Height+smallPad))
 
 	stackYPos := smallPad*2 + sepThick + cardSize.Height
-	t.stack1.Layout(fyne.NewPos(0, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack2.Layout(fyne.NewPos(smallPad+cardSize.Width, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack3.Layout(fyne.NewPos((smallPad+cardSize.Width)*2, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack4.Layout(fyne.NewPos((smallPad+cardSize.Width)*3, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack5.Layout(fyne.NewPos((smallPad+cardSize.Width)*4, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack6.Layout(fyne.NewPos((smallPad+cardSize.Width)*5, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
-	t.stack7.Layout(fyne.NewPos((smallPad+cardSize.Width)*6, stackYPos),
-		fyne.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack1.Layout(granio.NewPos(0, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack2.Layout(granio.NewPos(smallPad+cardSize.Width, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack3.Layout(granio.NewPos((smallPad+cardSize.Width)*2, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack4.Layout(granio.NewPos((smallPad+cardSize.Width)*3, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack5.Layout(granio.NewPos((smallPad+cardSize.Width)*4, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack6.Layout(granio.NewPos((smallPad+cardSize.Width)*5, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
+	t.stack7.Layout(granio.NewPos((smallPad+cardSize.Width)*6, stackYPos),
+		granio.NewSize(cardSize.Width, size.Height-stackYPos))
 }
 
 func (t *tableRender) ApplyTheme() {
@@ -193,7 +193,7 @@ func (t *tableRender) Refresh() {
 	canvas.Refresh(t.table)
 }
 
-func (t *tableRender) Objects() []fyne.CanvasObject {
+func (t *tableRender) Objects() []granio.CanvasObject {
 	return t.objects
 }
 
@@ -210,7 +210,7 @@ func (t *tableRender) positionForCard(_ *Card) *canvas.Image {
 	return nil
 }
 
-func (t *tableRender) findCard(pos fyne.Position) ([]*Card, []*canvas.Image, bool) {
+func (t *tableRender) findCard(pos granio.Position) ([]*Card, []*canvas.Image, bool) {
 	if t.game.Draw3 != nil {
 		if withinCardBounds(t.pile3, pos) {
 			return []*Card{t.game.Draw3}, []*canvas.Image{t.pile3}, false
@@ -246,7 +246,7 @@ func (t *tableRender) findCard(pos fyne.Position) ([]*Card, []*canvas.Image, boo
 	return nil, nil, false
 }
 
-func (t *tableRender) findOnStack(render *stackRender, stack *Stack, pos fyne.Position) ([]*Card, []*canvas.Image) {
+func (t *tableRender) findOnStack(render *stackRender, stack *Stack, pos granio.Position) ([]*Card, []*canvas.Image) {
 	for i := len(stack.Cards) - 1; i >= 0; i-- {
 		if withinCardBounds(render.cards[i], pos) {
 			return stack.Cards[i:len(stack.Cards)], render.cards[i:len(stack.Cards)]
@@ -256,18 +256,18 @@ func (t *tableRender) findOnStack(render *stackRender, stack *Stack, pos fyne.Po
 	return nil, nil
 }
 
-func (t *tableRender) stackPos(i int) fyne.Position {
+func (t *tableRender) stackPos(i int) granio.Position {
 	top := t.table.Position().Y
 	size := t.table.Size()
 	switch i {
 	case 3:
-		return fyne.NewPos(size.Width-cardSize.Width, top)
+		return granio.NewPos(size.Width-cardSize.Width, top)
 	case 2:
-		return fyne.NewPos(size.Width-smallPad-cardSize.Width*2, top)
+		return granio.NewPos(size.Width-smallPad-cardSize.Width*2, top)
 	case 1:
-		return fyne.NewPos(size.Width-smallPad*2-cardSize.Width*3, top)
+		return granio.NewPos(size.Width-smallPad*2-cardSize.Width*3, top)
 	default:
-		return fyne.NewPos(size.Width-smallPad*3-cardSize.Width*4, top)
+		return granio.NewPos(size.Width-smallPad*3-cardSize.Width*4, top)
 	}
 }
 
@@ -297,7 +297,7 @@ func newTableRender(table *Table) *tableRender {
 	render.stack6 = newStackRender(render)
 	render.stack7 = newStackRender(render)
 
-	render.objects = []fyne.CanvasObject{
+	render.objects = []granio.CanvasObject{
 		render.deck, render.sep, render.pile1, render.pile2, render.pile3,
 		render.build1, render.build2, render.build3, render.build4,
 	}
@@ -324,7 +324,7 @@ type stackRender struct {
 	table *tableRender
 }
 
-func (s *stackRender) Layout(pos fyne.Position, _ fyne.Size) {
+func (s *stackRender) Layout(pos granio.Position, _ granio.Size) {
 	top := pos.Y
 	for i := range s.cards {
 		updateCardPosition(s.cards[i], pos.X, top)

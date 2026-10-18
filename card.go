@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 
-	"github.com/fyne-io/solitaire/faces"
+	"github.com/Uzer007-admin/granio-solitaire/faces"
 )
 
 // Suit encodes one of the four possible suits for a playing card
@@ -48,7 +48,7 @@ type Card struct {
 }
 
 // Face returns a resource that can be used to render the associated card
-func (c *Card) Face() fyne.Resource {
+func (c *Card) Face() granio.Resource {
 	return faces.ForCard(c.Value, int(c.Suit))
 }
 

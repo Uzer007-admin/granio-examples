@@ -4,16 +4,16 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // show creates a new game and loads a table rendered in a new window.
-func show(app fyne.App) {
+func show(app granio.App) {
 	game := NewGame()
 	table := NewTable(game)
 
@@ -29,7 +29,7 @@ func show(app fyne.App) {
 		shuffle,
 	)
 	w.SetContent(container.NewBorder(bar, nil, nil, nil, table))
-	w.Resize(fyne.NewSize(minWidth, minHeight))
+	w.Resize(granio.NewSize(minWidth, minHeight))
 
 	game.OnWin = func() {
 		table.finishAnimation()
@@ -40,7 +40,7 @@ func show(app fyne.App) {
 	w.Show()
 }
 
-func checkRestart(t *Table, w fyne.Window) {
+func checkRestart(t *Table, w granio.Window) {
 	dialog.ShowConfirm("New Game", "Start a new game?", func(ok bool) {
 		if !ok {
 			return
