@@ -1,0 +1,187 @@
+//go:generate fyne bundle -o data.go Icon.png
+
+package main
+
+import (
+	"log"
+	"strconv"
+	"strings"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
+
+	"github.com/casbin/govaluate"
+)
+
+type calc struct {
+	equation string
+
+	output  *widget.Label
+	buttons map[string]*widget.Button
+	window  granio.Window
+}
+
+func (c *calc) display(newtext string) {
+	c.equation = newtext
+	c.output.SetText(newtext)
+}
+
+func (c *calc) character(char rune) {
+	c.display(c.equation + string(char))
+}
+
+func (c *calc) digit(d int) {
+	c.character(rune(d) + '0')
+}
+
+func (c *calc) clear() {
+	c.display("")
+}
+
+func (c *calc) backspace() {
+	if len(c.equation) == 0 {
+		return
+	} else if c.equation == "error" {
+		c.clear()
+		return
+	}
+
+	c.display(c.equation[:len(c.equation)-1])
+}
+
+func (c *calc) evaluate() {
+	if strings.Contains(c.output.Text, "error") {
+		c.display("error")
+		return
+	}
+
+	expression, err := govaluate.NewEvaluableExpression(c.output.Text)
+	if err != nil {
+		log.Println("Error in calculation", err)
+		c.display("error")
+		return
+	}
+
+	result, err := expression.Evaluate(nil)
+	if err != nil {
+		log.Println("Error in calculation", err)
+		c.display("error")
+		return
+	}
+
+	value, ok := result.(float64)
+	if !ok {
+		log.Println("Invalid input:", c.output.Text)
+		c.display("error")
+		return
+	}
+
+	c.display(strconv.FormatFloat(value, 'f', -1, 64))
+}
+
+func (c *calc) addButton(text string, action func()) *widget.Button {
+	button := widget.NewButton(text, action)
+	c.buttons[text] = button
+	return button
+}
+
+func (c *calc) digitButton(number int) *widget.Button {
+	str := strconv.Itoa(number)
+	return c.addButton(str, func() {
+		c.digit(number)
+	})
+}
+
+func (c *calc) charButton(char rune) *widget.Button {
+	return c.addButton(string(char), func() {
+		c.character(char)
+	})
+}
+
+func (c *calc) onTypedRune(r rune) {
+	if r == 'c' {
+		r = 'C' // The button is using a capital C.
+	}
+
+	if button, ok := c.buttons[string(r)]; ok {
+		button.OnTapped()
+	}
+}
+
+func (c *calc) onTypedKey(ev *granio.KeyEvent) {
+	switch ev.Name {
+	case granio.KeyReturn, granio.KeyEnter:
+		c.evaluate()
+	case granio.KeyBackspace:
+		c.backspace()
+	}
+}
+
+func (c *calc) onPasteShortcut(shortcut granio.Shortcut) {
+	content := shortcut.(*granio.ShortcutPaste).Clipboard.Content()
+	if _, err := strconv.ParseFloat(content, 64); err != nil {
+		return
+	}
+
+	c.display(c.equation + content)
+}
+
+func (c *calc) onCopyShortcut(shortcut granio.Shortcut) {
+	shortcut.(*granio.ShortcutCopy).Clipboard.SetContent(c.equation)
+}
+
+func (c *calc) loadUI(app granio.App) {
+	c.output = &widget.Label{Alignment: granio.TextAlignTrailing}
+	c.output.TextStyle.Monospace = true
+
+	equals := c.addButton("=", c.evaluate)
+	equals.Importance = widget.HighImportance
+	clrBtn := c.addButton("C", c.clear)
+	clrBtn.Importance = widget.WarningImportance
+
+	c.window = app.NewWindow("Calc")
+	c.window.SetContent(
+		container.NewGridWithColumns(1,
+			c.output,
+			container.NewGridWithColumns(4,
+				clrBtn,
+				c.charButton('('),
+				c.charButton(')'),
+				c.charButton('/')),
+			container.NewGridWithColumns(4,
+				c.digitButton(7),
+				c.digitButton(8),
+				c.digitButton(9),
+				c.charButton('*')),
+			container.NewGridWithColumns(4,
+				c.digitButton(4),
+				c.digitButton(5),
+				c.digitButton(6),
+				c.charButton('-')),
+			container.NewGridWithColumns(4,
+				c.digitButton(1),
+				c.digitButton(2),
+				c.digitButton(3),
+				c.charButton('+')),
+			container.NewGridWithColumns(2,
+				container.NewGridWithColumns(2,
+					c.digitButton(0),
+					c.charButton('.')),
+				equals)),
+	)
+
+	canvas := c.window.Canvas()
+	canvas.SetOnTypedRune(c.onTypedRune)
+	canvas.SetOnTypedKey(c.onTypedKey)
+	canvas.AddShortcut(&granio.ShortcutCopy{}, c.onCopyShortcut)
+	canvas.AddShortcut(&granio.ShortcutPaste{}, c.onPasteShortcut)
+	c.window.Resize(granio.NewSize(200, 300))
+	c.window.Show()
+}
+
+func newCalculator() *calc {
+	return &calc{
+		buttons: make(map[string]*widget.Button, 19),
+	}
+}
