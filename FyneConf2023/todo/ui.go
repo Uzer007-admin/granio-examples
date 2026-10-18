@@ -1,19 +1,19 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func makeUI(data binding.StringList) fyne.CanvasObject {
+func makeUI(data binding.StringList) granio.CanvasObject {
 	list := widget.NewListWithData(data,
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return widget.NewCheck("An item title", nil)
 		},
-		func(di binding.DataItem, co fyne.CanvasObject) {
+		func(di binding.DataItem, co granio.CanvasObject) {
 			str, _ := di.(binding.String).Get()
 			ch := co.(*widget.Check)
 			ch.OnChanged = func(done bool) {

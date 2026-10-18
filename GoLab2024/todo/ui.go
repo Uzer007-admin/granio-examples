@@ -3,22 +3,22 @@ package main
 import (
 	"slices"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func makeUI(data []string) fyne.CanvasObject {
+func makeUI(data []string) granio.CanvasObject {
 	var list *widget.List
 	list = widget.NewList(
 		func() int {
 			return len(data)
 		},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return widget.NewCheck("An item title", nil)
 		},
-		func(i widget.ListItemID, co fyne.CanvasObject) {
+		func(i widget.ListItemID, co granio.CanvasObject) {
 			ch := co.(*widget.Check)
 			ch.SetText(data[i])
 
@@ -30,7 +30,7 @@ func makeUI(data []string) fyne.CanvasObject {
 
 				data = slices.Delete(data, i, i+1)
 				list.Refresh()
-				fyne.CurrentApp().Preferences().SetStringList("todos", data)
+				granio.CurrentApp().Preferences().SetStringList("todos", data)
 			}
 		})
 
@@ -44,7 +44,7 @@ func makeUI(data []string) fyne.CanvasObject {
 			data = append(data, input.Text)
 			list.Refresh()
 			input.SetText("")
-			fyne.CurrentApp().Preferences().SetStringList("todos", data)
+			granio.CurrentApp().Preferences().SetStringList("todos", data)
 		})
 
 	top := container.NewBorder(nil, nil, nil, add, input)

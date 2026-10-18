@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
 )
 
 func main() {
@@ -21,6 +21,6 @@ func main() {
 		a.Preferences().SetStringList("todos", vals)
 	}))
 
-	w.Resize(fyne.NewSize(180, 240))
+	w.Resize(granio.NewSize(180, 240))
 	w.ShowAndRun()
 }

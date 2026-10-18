@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -23,17 +23,17 @@ type imageSwapper struct {
 
 	Reversed bool
 
-	img1, img2 fyne.Resource
+	img1, img2 granio.Resource
 }
 
-func newImageSwapper(img1, img2 fyne.Resource) fyne.Widget {
+func newImageSwapper(img1, img2 granio.Resource) granio.Widget {
 	i := &imageSwapper{img1: img1, img2: img2}
 	i.ExtendBaseWidget(i)
 
 	return i
 }
 
-func (i *imageSwapper) CreateRenderer() fyne.WidgetRenderer {
+func (i *imageSwapper) CreateRenderer() granio.WidgetRenderer {
 	return &imageSwapRenderer{img: i}
 }
 
@@ -42,7 +42,7 @@ func (i *imageSwapper) Swap() {
 	i.Refresh()
 }
 
-func (i *imageSwapper) Tapped(_ *fyne.PointEvent) {
+func (i *imageSwapper) Tapped(_ *granio.PointEvent) {
 	i.Swap()
 }
 
@@ -50,12 +50,12 @@ type imageSwapRenderer struct {
 	img *imageSwapper
 
 	left, right *canvas.Image
-	content     *fyne.Container
+	content     *granio.Container
 }
 
 func (r *imageSwapRenderer) Destroy() {}
 
-func (r *imageSwapRenderer) Layout(s fyne.Size) {
+func (r *imageSwapRenderer) Layout(s granio.Size) {
 	if r.content == nil {
 		return
 	}
@@ -63,14 +63,14 @@ func (r *imageSwapRenderer) Layout(s fyne.Size) {
 	r.content.Resize(s)
 }
 
-func (r *imageSwapRenderer) MinSize() fyne.Size {
+func (r *imageSwapRenderer) MinSize() granio.Size {
 	iconMin := theme.SizeForWidget(theme.SizeNameInlineIcon, r.img)
 	pad := theme.SizeForWidget(theme.SizeNamePadding, r.img)
 
-	return fyne.NewSize(iconMin*2+pad, iconMin)
+	return granio.NewSize(iconMin*2+pad, iconMin)
 }
 
-func (r *imageSwapRenderer) Objects() []fyne.CanvasObject {
+func (r *imageSwapRenderer) Objects() []granio.CanvasObject {
 	if r.content == nil {
 		r.left = canvas.NewImageFromResource(r.img.img1)
 		r.right = canvas.NewImageFromResource(r.img.img2)
@@ -78,7 +78,7 @@ func (r *imageSwapRenderer) Objects() []fyne.CanvasObject {
 		r.content = container.NewGridWithColumns(2, r.left, r.right)
 	}
 
-	return []fyne.CanvasObject{r.content}
+	return []granio.CanvasObject{r.content}
 }
 
 func (r *imageSwapRenderer) Refresh() {

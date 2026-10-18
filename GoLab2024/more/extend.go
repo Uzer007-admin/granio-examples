@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -18,10 +18,10 @@ func main() {
 type rightClickLabel struct {
 	widget.Label
 
-	canvas fyne.Canvas
+	canvas granio.Canvas
 }
 
-func newRightClickLabel(text string, c fyne.Canvas) fyne.Widget {
+func newRightClickLabel(text string, c granio.Canvas) granio.Widget {
 	r := &rightClickLabel{canvas: c}
 	r.Text = text
 	r.ExtendBaseWidget(r)
@@ -29,9 +29,9 @@ func newRightClickLabel(text string, c fyne.Canvas) fyne.Widget {
 	return r
 }
 
-func (r *rightClickLabel) TappedSecondary(e *fyne.PointEvent) {
-	m := fyne.NewMenu("",
-		fyne.NewMenuItem("Item 1", func() {}),
-		fyne.NewMenuItem("Item 2", func() {}))
+func (r *rightClickLabel) TappedSecondary(e *granio.PointEvent) {
+	m := granio.NewMenu("",
+		granio.NewMenuItem("Item 1", func() {}),
+		granio.NewMenuItem("Item 2", func() {}))
 	widget.ShowPopUpMenuAtPosition(m, r.canvas, e.AbsolutePosition)
 }

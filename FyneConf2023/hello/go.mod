@@ -1,22 +1,22 @@
-module hello
+module github.com/Uzer007-admin/granio-workshops/FyneConf2023/hello
 
-go 1.20
+go 1.27.1
 
-require fyne.io/fyne/v2 v2.4.1
+require github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1
 
 require (
-	fyne.io/systray v1.10.1-0.20230722100817-88df1e0ffa9a // indirect
+	github.com/Uzer007-admin/dbus/v5 v5.3.0 // indirect
+	github.com/Uzer007-admin/gl v0.0.0-20261017234122-3756695c6558 // indirect
+	github.com/Uzer007-admin/glfw/v3.3/glfw v0.0.0-20261017234256-57a5925f8166 // indirect
+	github.com/Uzer007-admin/granio-gl-js v0.2.1-0.20261017234923-9e3b07127717 // indirect
+	github.com/Uzer007-admin/granio-glfw-js v0.4.1-0.20261017234950-9e15a5515cc9 // indirect
+	github.com/Uzer007-admin/granio-image v0.1.2-0.20261017234830-b1607a79c1eb // indirect
+	github.com/Uzer007-admin/granio-systray v1.12.3-0.20261017235015-fd45fbf4dbbd // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fredbi/uri v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/fyne-io/gl-js v0.0.0-20220119005834-d2da28d9ccfe // indirect
-	github.com/fyne-io/glfw-js v0.0.0-20220120001248-ee7290d23504 // indirect
-	github.com/fyne-io/image v0.0.0-20220602074514-4956b0afb3d2 // indirect
-	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/go-text/render v0.0.0-20230619120952-35bccb6164b8 // indirect
 	github.com/go-text/typesetting v0.0.0-20230616162802-9c17dd34aa4a // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
