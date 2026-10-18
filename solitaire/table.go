@@ -1,0 +1,347 @@
+package main
+
+import (
+	"math"
+	"sync"
+	"time"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
+
+	"github.com/Uzer007-admin/granio-solitaire/faces"
+)
+
+// Table represents the rendering of a game in progress
+type Table struct {
+	widget.BaseWidget
+
+	game     *Game
+	selected *Card
+
+	float       []*canvas.Image
+	floatSource []*canvas.Image
+	floatPos    granio.Position
+
+	shuffle *widget.ToolbarAction
+
+	findCard func(granio.Position) ([]*Card, []*canvas.Image, bool)
+	stackPos func(int) granio.Position
+}
+
+// CreateRenderer gets the widget renderer for this table - internal use only
+func (t *Table) CreateRenderer() granio.WidgetRenderer {
+	return newTableRender(t)
+}
+
+// find card from an image, easier than keeping them in sync
+func (t *Table) cardForPos(pos *canvas.Image) *Card {
+	deck := NewSortedDeck()
+
+	for i, face := range deck.Cards {
+		if face.Face() == pos.Resource {
+			card := NewCard((i%13)+1, Suit(math.Floor(float64(i)/13)))
+			card.FaceUp = true // we know this as we checked the face
+			return card
+		}
+	}
+
+	return nil
+}
+
+func cardEquals(card1, card2 *Card) bool {
+	if card1 == nil || card2 == nil {
+		return card1 == nil && card2 == nil
+	}
+
+	return card1.Value == card2.Value && card1.Suit == card2.Suit
+}
+
+func (t *Table) cardTapped(cardPos *canvas.Image, pos granio.Position, move func()) bool {
+	if !withinCardBounds(cardPos, pos) {
+		return false
+	}
+
+	card := t.cardForPos(cardPos)
+	if cardPos.Resource != faces.ForSpace() && (card == nil || !card.FaceUp) {
+		t.selected = nil
+		t.Refresh()
+
+		return true
+	}
+
+	if t.selected == nil {
+		t.selected = card
+	} else {
+		if cardEquals(t.selected, card) {
+			t.game.AutoBuild(card)
+		} else {
+			if move != nil {
+				move()
+			}
+		}
+
+		t.selected = nil
+	}
+
+	t.Refresh()
+	return true
+}
+
+func (t *Table) checkStackTapped(render *stackRender, stack *Stack, pos granio.Position) bool {
+	for i := len(stack.Cards) - 1; i >= 0; i-- {
+		//		card := stack.Cards[i]
+
+		if t.cardTapped(render.cards[i], pos, func() {
+			t.game.MoveCardToStack(stack, t.selected)
+		}) {
+			return true
+		}
+	}
+
+	return t.cardTapped(render.cards[0], pos, func() {
+		t.game.MoveCardToStack(stack, t.selected)
+	})
+}
+
+func (t *Table) Restart() {
+	oldWin := t.game.OnWin
+	t.game = NewGame()
+	t.game.OnWin = oldWin
+	t.shuffle.Enable()
+
+	test.WidgetRenderer(t).(*tableRender).game = t.game
+	t.Refresh()
+}
+
+// Dragged is called when the user drags on the table widget
+func (t *Table) Dragged(event *granio.DragEvent) {
+	t.floatPos = event.Position
+	if !t.float[0].Hidden { // existing drag
+
+		for i := 0; i < len(t.float); i++ {
+			if t.float[i] != nil && !t.float[i].Hidden {
+				t.float[i].Move(t.float[i].Position().Add(event.Dragged))
+			}
+		}
+		return
+	}
+
+	if t.selected != nil {
+		return
+	}
+
+	card, source, last := t.findCard(event.Position)
+	if card == nil {
+		return
+	}
+	if !card[0].FaceUp { // only drag visible cards
+		return
+	}
+
+	t.selected = card[0]
+
+	for i := 0; i < len(source); i++ {
+		t.floatSource[i] = source[i]
+		t.float[i].Resource = source[i].Resource
+		if last && i == 0 {
+			source[i].Resource = faces.ForSpace()
+		} else {
+			source[i].Resource = nil
+		}
+		source[i].Image = nil
+		source[i].Refresh()
+
+		t.float[i].Hidden = false
+		t.float[i].Image = nil
+		t.float[i].Refresh()
+		updateCardPosition(t.float[i], source[i].Position().X, source[i].Position().Y)
+	}
+}
+
+// DragEnd is called when the user stops dragging on the table widget
+func (t *Table) DragEnd() {
+	for i := 0; i < ValueKing; i++ {
+		t.float[i].Hide()
+	}
+
+	if t.dropCard(t.floatPos) {
+		return
+	}
+
+	for i := 0; i < ValueKing; i++ {
+		if t.floatSource[i] != nil {
+			t.floatSource[i].Resource = t.float[i].Resource
+			t.floatSource[i].Refresh()
+		}
+	}
+}
+
+// Tapped is called when the user taps the table widget
+func (t *Table) Tapped(event *granio.PointEvent) {
+	render := test.WidgetRenderer(t).(*tableRender)
+
+	if withinCardBounds(render.deck, event.Position) {
+		t.selected = nil
+		t.game.DrawThree()
+
+		if len(t.game.Drawn.Cards) == 0 {
+			t.shuffle.Enable()
+		} else {
+			t.shuffle.Disable()
+		}
+
+		render.Refresh()
+		return
+	}
+
+	t.dropCard(event.Position)
+}
+
+func (t *Table) dropCard(pos granio.Position) bool {
+	render := test.WidgetRenderer(t).(*tableRender)
+
+	if t.game.Draw3 != nil {
+		if t.cardTapped(render.pile3, pos, nil) {
+			return true
+		}
+	} else if t.game.Draw2 != nil {
+		if t.cardTapped(render.pile2, pos, nil) {
+			return true
+		}
+	} else if t.game.Draw1 != nil {
+		if t.cardTapped(render.pile1, pos, nil) {
+			return true
+		}
+	}
+
+	if t.cardTapped(render.build1, pos, func() {
+		t.game.MoveCardToBuild(t.game.Build1, t.selected)
+	}) {
+		return true
+	} else if t.cardTapped(render.build2, pos, func() {
+		t.game.MoveCardToBuild(t.game.Build2, t.selected)
+	}) {
+		return true
+	} else if t.cardTapped(render.build3, pos, func() {
+		t.game.MoveCardToBuild(t.game.Build3, t.selected)
+	}) {
+		return true
+	} else if t.cardTapped(render.build4, pos, func() {
+		t.game.MoveCardToBuild(t.game.Build4, t.selected)
+	}) {
+		return true
+	}
+
+	if t.checkStackTapped(render.stack1, t.game.Stack1, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack2, t.game.Stack2, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack3, t.game.Stack3, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack4, t.game.Stack4, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack5, t.game.Stack5, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack6, t.game.Stack6, pos) {
+		return true
+	} else if t.checkStackTapped(render.stack7, t.game.Stack7, pos) {
+		return true
+	}
+
+	t.selected = nil // clicked elsewhere
+	t.Refresh()
+	return false
+}
+
+func (t *Table) finishAnimation() {
+	anim := container.NewWithoutLayout()
+	anim.Resize(t.Size())
+	granio.CurrentApp().Driver().CanvasForObject(t).Overlays().Add(anim)
+	wg := &sync.WaitGroup{}
+
+	for _, p := range []*Stack{t.game.Build1, t.game.Build2, t.game.Build3, t.game.Build4} {
+		c := len(p.Cards)
+		if c == 0 {
+			continue
+		}
+		wg.Add(c)
+	}
+	go func() {
+		for i := ValueKing; i > 0; i-- {
+			for j, p := range []*Stack{t.game.Build1, t.game.Build2, t.game.Build3, t.game.Build4} {
+				card := p.Pop()
+				if card == nil {
+					break
+				}
+				pos := t.stackPos(j)
+
+				off := granio.Delta{DX: -2, DY: 1}
+				switch j {
+				case 0:
+					off.DX = 2
+				case 1:
+					off.DX = 2
+					off.DY = -1
+				case 2:
+					off.DY = -1
+				}
+				granio.Do(func() {
+					image := t.startCardAnimation(card, pos, off, wg)
+					anim.Objects = append([]granio.CanvasObject{image}, anim.Objects...)
+
+					t.Refresh()
+				})
+				time.Sleep(time.Second / 6)
+			}
+		}
+
+		wg.Wait()
+		anim.Objects = []granio.CanvasObject{}
+		granio.CurrentApp().Driver().CanvasForObject(t).Overlays().Remove(anim)
+	}()
+}
+
+func (t *Table) startCardAnimation(card *Card, pos granio.Position, off granio.Delta, wg *sync.WaitGroup) granio.CanvasObject {
+	bounds := t.Size()
+	pad := theme.Padding()
+	i := canvas.NewImageFromResource(faces.ForCard(card.Value, int(card.Suit)))
+	i.Resize(cardSize)
+	i.Move(pos)
+
+	go func() {
+		for pos.X > -cardSize.Width-pad && pos.Y > -cardSize.Height-pad && pos.X < bounds.Width && pos.Y < bounds.Height {
+			pos = pos.Add(off)
+			granio.Do(func() {
+				i.Move(pos)
+			})
+
+			time.Sleep(time.Millisecond * 12)
+		}
+
+		granio.Do(func() {
+			i.Hide()
+			wg.Done()
+		})
+	}()
+
+	return i
+}
+
+// NewTable creates a new table widget for the specified game
+func NewTable(g *Game) *Table {
+	table := &Table{game: g}
+	table.ExtendBaseWidget(table)
+
+	table.float = make([]*canvas.Image, ValueKing)
+	for i := 0; i < ValueKing; i++ {
+		table.float[i] = &canvas.Image{}
+		table.float[i].Hide()
+	}
+	table.floatSource = make([]*canvas.Image, ValueKing)
+
+	return table
+}
