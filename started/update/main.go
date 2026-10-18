@@ -3,8 +3,8 @@ package main
 import (
 	"time"
 
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func updateTime(clock *widget.Label) {

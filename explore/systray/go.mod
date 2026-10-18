@@ -1,5 +1,5 @@
-module systray
+module github.com/Uzer007-admin/granio-tutorials/explore/systray
 
-go 1.14
+go 1.27.1
 
-require fyne.io/fyne/v2 v2.2.1
+require github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1

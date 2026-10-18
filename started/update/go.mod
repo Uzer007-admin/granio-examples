@@ -1,7 +1,5 @@
-module update
+module github.com/Uzer007-admin/granio-tutorials/started/update
 
-go 1.15
+go 1.27.1
 
-require (
-	fyne.io/fyne/v2 v2.1.2
-)
+require github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1

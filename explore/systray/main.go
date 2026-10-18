@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -12,8 +12,8 @@ func main() {
 	w := a.NewWindow("SysTray")
 
 	if desk, ok := a.(desktop.App); ok {
-		m := fyne.NewMenu("MyApp",
-			fyne.NewMenuItem("Show", func() {
+		m := granio.NewMenu("MyApp",
+			granio.NewMenuItem("Show", func() {
 				w.Show()
 			}))
 		desk.SetSystemTrayMenu(m)
