@@ -4,8 +4,8 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 	minYCount = 40
 )
 
-func show(app fyne.App) {
+func show(app granio.App) {
 	board := newBoard(minXCount, minYCount)
 	board.load()
 	game := newGame(board)
@@ -26,7 +26,7 @@ func show(app fyne.App) {
 	// start the board animation before we show the window - it will block
 	game.animate()
 
-	window.Resize(fyne.NewSize(200, 220))
+	window.Resize(granio.NewSize(200, 220))
 	window.Show()
 }
 

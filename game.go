@@ -6,18 +6,18 @@ import (
 	"image/color"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 const cellSize = 8
 
 type gameRenderer struct {
 	render   *canvas.Raster
-	objects  []fyne.CanvasObject
+	objects  []granio.CanvasObject
 	imgCache *image.RGBA
 
 	aliveColor color.Color
@@ -26,12 +26,12 @@ type gameRenderer struct {
 	game *game
 }
 
-func (g *gameRenderer) MinSize() fyne.Size {
+func (g *gameRenderer) MinSize() granio.Size {
 	pixDensity := g.game.pixelDensity()
-	return fyne.NewSize(float32(minXCount*cellSize)/pixDensity, float32(minYCount*cellSize)/pixDensity)
+	return granio.NewSize(float32(minXCount*cellSize)/pixDensity, float32(minYCount*cellSize)/pixDensity)
 }
 
-func (g *gameRenderer) Layout(size fyne.Size) {
+func (g *gameRenderer) Layout(size granio.Size) {
 	g.render.Resize(size)
 }
 
@@ -45,7 +45,7 @@ func (g *gameRenderer) Refresh() {
 	canvas.Refresh(g.render)
 }
 
-func (g *gameRenderer) Objects() []fyne.CanvasObject {
+func (g *gameRenderer) Objects() []granio.CanvasObject {
 	return g.objects
 }
 
@@ -84,13 +84,13 @@ type game struct {
 	paused  bool
 }
 
-func (g *game) CreateRenderer() fyne.WidgetRenderer {
+func (g *game) CreateRenderer() granio.WidgetRenderer {
 	renderer := &gameRenderer{game: g}
 
 	render := canvas.NewRaster(renderer.draw)
 	render.ScaleMode = canvas.ImageScalePixels
 	renderer.render = render
-	renderer.objects = []fyne.CanvasObject{render}
+	renderer.objects = []granio.CanvasObject{render}
 	renderer.ApplyTheme()
 
 	return renderer
@@ -117,7 +117,7 @@ func (g *game) animate() {
 			}
 
 			g.board.nextGen()
-			fyne.Do(func() {
+			granio.Do(func() {
 				g.updateGeneration()
 				g.Refresh()
 			})
@@ -131,7 +131,7 @@ func (g *game) typedRune(r rune) {
 	}
 }
 
-func (g *game) Tapped(ev *fyne.PointEvent) {
+func (g *game) Tapped(ev *granio.PointEvent) {
 	pixDensity := g.pixelDensity()
 	xpos, ypos := g.cellForCoord(int(ev.Position.X*pixDensity), int(ev.Position.Y*pixDensity), pixDensity)
 
@@ -144,10 +144,10 @@ func (g *game) Tapped(ev *fyne.PointEvent) {
 	g.Refresh()
 }
 
-func (g *game) TappedSecondary(ev *fyne.PointEvent) {
+func (g *game) TappedSecondary(ev *granio.PointEvent) {
 }
 
-func (g *game) buildUI() fyne.CanvasObject {
+func (g *game) buildUI() granio.CanvasObject {
 	var pause *widget.Button
 	pause = widget.NewButton("Pause", func() {
 		g.paused = !g.paused
@@ -168,12 +168,12 @@ func (g *game) updateGeneration() {
 }
 
 func (g *game) pixelDensity() float32 {
-	c := fyne.CurrentApp().Driver().CanvasForObject(g)
+	c := granio.CurrentApp().Driver().CanvasForObject(g)
 	if c == nil {
 		return 1.0
 	}
 
-	pixW, _ := c.PixelCoordinateForPosition(fyne.NewPos(cellSize, cellSize))
+	pixW, _ := c.PixelCoordinateForPosition(granio.NewPos(cellSize, cellSize))
 	return float32(pixW) / float32(cellSize)
 }
 
