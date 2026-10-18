@@ -66,7 +66,7 @@ github.com/Uzer007-admin/granio-oksvg
 github.com/Uzer007-admin/granio-systray
 github.com/Uzer007-admin/granio-systray/internal/generated/menu
 github.com/Uzer007-admin/granio-systray/internal/generated/notifier
-# github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1
+# github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778
 ## explicit; go 1.27.1
 github.com/Uzer007-admin/granio/v2
 github.com/Uzer007-admin/granio/v2/app
