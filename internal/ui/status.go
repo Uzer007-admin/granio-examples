@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func newStatusBar() *widget.Label {

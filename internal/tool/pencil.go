@@ -1,11 +1,11 @@
 package tool
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
 
-	"github.com/fyne-io/pixeledit/internal/api"
-	"github.com/fyne-io/pixeledit/internal/data"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/data"
 )
 
 // Pencil is a pixel setting tool
@@ -19,7 +19,7 @@ func (p *Pencil) Name() string {
 }
 
 // Icon returns the icon of this tool
-func (p *Pencil) Icon() fyne.Resource {
+func (p *Pencil) Icon() granio.Resource {
 	return data.PencilIcon
 }
 

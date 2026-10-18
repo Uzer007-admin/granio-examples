@@ -4,12 +4,12 @@ import (
 	"os"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/storage"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/storage"
 
-	"github.com/fyne-io/pixeledit/internal/api"
-	"github.com/fyne-io/pixeledit/internal/ui"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/ui"
 )
 
 func loadFileArgs(e api.Editor) {
@@ -20,7 +20,7 @@ func loadFileArgs(e api.Editor) {
 	time.Sleep(time.Second / 3) // wait for us to be shown before loading so scales are correct
 	read, err := storage.Reader(storage.NewFileURI(os.Args[1]))
 	if err != nil {
-		fyne.LogError("Unable to open file \""+os.Args[1]+"\"", err)
+		granio.LogError("Unable to open file \""+os.Args[1]+"\"", err)
 		return
 	}
 	e.LoadFile(read)
@@ -32,7 +32,7 @@ func main() {
 	a := app.NewWithID("io.fyne.pixeledit")
 	w := a.NewWindow("Pixel Editor")
 	e.BuildUI(w)
-	w.Resize(fyne.NewSize(520, 320))
+	w.Resize(granio.NewSize(520, 320))
 
 	go loadFileArgs(e)
 	w.ShowAndRun()

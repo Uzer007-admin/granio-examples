@@ -3,16 +3,16 @@ package api
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 // Editor describes the editing capabilities of a pixel editor
 type Editor interface {
-	BuildUI(fyne.Window)         // BuildUI Loads the main editor GUI
-	LoadFile(fyne.URIReadCloser) // LoadFile specifies a data stream to load from
-	Reload()                     // Reload will reset the image to its original state
-	Save()                       // Save writes the image back to its source location
-	SaveAs(fyne.URIWriteCloser)  // SaveAs specifies a data stream to save to
+	BuildUI(granio.Window)         // BuildUI Loads the main editor GUI
+	LoadFile(granio.URIReadCloser) // LoadFile specifies a data stream to load from
+	Reload()                       // Reload will reset the image to its original state
+	Save()                         // Save writes the image back to its source location
+	SaveAs(granio.URIWriteCloser)  // SaveAs specifies a data stream to save to
 
 	PixelColor(x, y int) color.Color         // Get the color of a pixel in our image
 	SetPixelColor(x, y int, col color.Color) // Set the color of the indicated pixel

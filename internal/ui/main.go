@@ -3,16 +3,16 @@ package ui
 import (
 	"path/filepath"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func (e *editor) fileOpen() {
-	open := dialog.NewFileOpen(func(read fyne.URIReadCloser, err error) {
+	open := dialog.NewFileOpen(func(read granio.URIReadCloser, err error) {
 		if err != nil {
 			dialog.ShowError(err, e.win)
 			return
@@ -29,7 +29,7 @@ func (e *editor) fileOpen() {
 }
 
 func (e *editor) fileReset() {
-	win := fyne.CurrentApp().Driver().AllWindows()[0]
+	win := granio.CurrentApp().Driver().AllWindows()[0]
 	dialog.ShowConfirm("Reset content?", "Are you sure you want to re-load the image?",
 		func(ok bool) {
 			if !ok {
@@ -45,7 +45,7 @@ func (e *editor) fileSave() {
 }
 
 func (e *editor) fileSaveAs() {
-	open := dialog.NewFileSave(func(write fyne.URIWriteCloser, err error) {
+	open := dialog.NewFileSave(func(write granio.URIWriteCloser, err error) {
 		if err != nil {
 			dialog.ShowError(err, e.win)
 			return
@@ -61,7 +61,7 @@ func (e *editor) fileSaveAs() {
 	open.Show()
 }
 
-func buildToolbar(e *editor) fyne.CanvasObject {
+func buildToolbar(e *editor) granio.CanvasObject {
 	return widget.NewToolbar(
 		&widget.ToolbarAction{Icon: theme.FolderOpenIcon(), OnActivated: e.fileOpen},
 		&widget.ToolbarAction{Icon: theme.CancelIcon(), OnActivated: e.fileReset},
@@ -69,32 +69,32 @@ func buildToolbar(e *editor) fyne.CanvasObject {
 	)
 }
 
-func (e *editor) buildMainMenu() *fyne.MainMenu {
-	recents := fyne.NewMenuItem("Open Recent", nil)
+func (e *editor) buildMainMenu() *granio.MainMenu {
+	recents := granio.NewMenuItem("Open Recent", nil)
 	recents.ChildMenu = e.loadRecentMenu()
 
-	file := fyne.NewMenu("File",
-		fyne.NewMenuItem("Open ...", e.fileOpen),
+	file := granio.NewMenu("File",
+		granio.NewMenuItem("Open ...", e.fileOpen),
 		recents,
-		fyne.NewMenuItemSeparator(),
-		fyne.NewMenuItem("Reset ...", e.fileReset),
-		fyne.NewMenuItem("Save", e.fileSave),
-		fyne.NewMenuItem("Save As ...", e.fileSaveAs),
+		granio.NewMenuItemSeparator(),
+		granio.NewMenuItem("Reset ...", e.fileReset),
+		granio.NewMenuItem("Save", e.fileSave),
+		granio.NewMenuItem("Save As ...", e.fileSaveAs),
 	)
 
-	return fyne.NewMainMenu(file)
+	return granio.NewMainMenu(file)
 }
 
-func (e *editor) loadRecentMenu() *fyne.Menu {
-	var items []*fyne.MenuItem
+func (e *editor) loadRecentMenu() *granio.Menu {
+	var items []*granio.MenuItem
 	for _, item := range e.loadRecent() {
 		u := item
 		label := filepath.Base(item.String())
 
-		items = append(items, fyne.NewMenuItem(label, func() {
+		items = append(items, granio.NewMenuItem(label, func() {
 			read, err := storage.OpenFileFromURI(u)
 			if err != nil {
-				fyne.LogError("Unable to open file \""+u.String()+"\"", err)
+				granio.LogError("Unable to open file \""+u.String()+"\"", err)
 				return
 			}
 			e.LoadFile(read)
@@ -102,7 +102,7 @@ func (e *editor) loadRecentMenu() *fyne.Menu {
 	}
 
 	if e.recentMenu == nil {
-		e.recentMenu = fyne.NewMenu("Recent Items", items...)
+		e.recentMenu = granio.NewMenu("Recent Items", items...)
 	} else {
 		e.recentMenu.Items = items
 	}
@@ -111,13 +111,13 @@ func (e *editor) loadRecentMenu() *fyne.Menu {
 }
 
 // BuildUI creates the main window of our pixel edit application
-func (e *editor) BuildUI(w fyne.Window) {
+func (e *editor) BuildUI(w granio.Window) {
 	palette := newPalette(e)
 	toolbar := buildToolbar(e)
 	e.win = w
 	w.SetMainMenu(e.buildMainMenu())
 
-	content := fyne.NewContainerWithLayout(layout.NewBorderLayout(toolbar, e.status, palette, nil),
+	content := granio.NewContainerWithLayout(layout.NewBorderLayout(toolbar, e.status, palette, nil),
 		toolbar, e.status, palette, e.buildUI())
 	w.SetContent(content)
 }

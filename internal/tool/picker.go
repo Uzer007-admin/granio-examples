@@ -1,10 +1,10 @@
 package tool
 
 import (
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 
-	"github.com/fyne-io/pixeledit/internal/api"
-	"github.com/fyne-io/pixeledit/internal/data"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/data"
 )
 
 // Picker allows setting the current image colors from a pixel in an image
@@ -17,7 +17,7 @@ func (p *Picker) Name() string {
 }
 
 // Icon returns the icon for this tool
-func (p *Picker) Icon() fyne.Resource {
+func (p *Picker) Icon() granio.Resource {
 	return data.DropperIcon
 }
 

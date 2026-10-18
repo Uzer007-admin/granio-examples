@@ -4,8 +4,8 @@ import (
 	"image"
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type testEditor struct {
@@ -14,11 +14,11 @@ type testEditor struct {
 	fg color.Color
 }
 
-func (t *testEditor) BuildUI(w fyne.Window) {
+func (t *testEditor) BuildUI(w granio.Window) {
 	w.SetContent(widget.NewLabel("Not used"))
 }
 
-func (t *testEditor) LoadFile(fyne.URIReadCloser) {
+func (t *testEditor) LoadFile(granio.URIReadCloser) {
 	// no-op
 }
 
@@ -30,7 +30,7 @@ func (t *testEditor) Save() {
 	//no-op
 }
 
-func (t *testEditor) SaveAs(fyne.URIWriteCloser) {
+func (t *testEditor) SaveAs(granio.URIWriteCloser) {
 	//no-op
 }
 

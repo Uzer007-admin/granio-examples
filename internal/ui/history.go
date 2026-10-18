@@ -3,8 +3,8 @@ package ui
 import (
 	"fmt"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
 )
 
 const (
@@ -12,11 +12,11 @@ const (
 	recentFormatKey = "recent-%d"
 )
 
-func (e *editor) loadRecent() []fyne.URI {
-	pref := fyne.CurrentApp().Preferences()
+func (e *editor) loadRecent() []granio.URI {
+	pref := granio.CurrentApp().Preferences()
 	count := pref.Int(recentCountKey)
 
-	var recent []fyne.URI
+	var recent []granio.URI
 	for i := 0; i < count; i++ {
 		key := fmt.Sprintf(recentFormatKey, i)
 		u, _ := storage.ParseURI(pref.String(key))
@@ -26,11 +26,11 @@ func (e *editor) loadRecent() []fyne.URI {
 	return recent
 }
 
-func (e *editor) addRecent(u fyne.URI) {
-	pref := fyne.CurrentApp().Preferences()
+func (e *editor) addRecent(u granio.URI) {
+	pref := granio.CurrentApp().Preferences()
 	recent := e.loadRecent()
 
-	recent = append([]fyne.URI{u}, recent...)
+	recent = append([]granio.URI{u}, recent...)
 	if len(recent) > 5 {
 		recent = recent[:5]
 	}

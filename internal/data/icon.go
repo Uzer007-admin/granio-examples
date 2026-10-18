@@ -1,6 +1,6 @@
 package data
 
-import "fyne.io/fyne/v2/theme"
+import "github.com/Uzer007-admin/granio/v2/theme"
 
 var (
 	// PencilIcon is the themed icon that shows for the pixel setting tool

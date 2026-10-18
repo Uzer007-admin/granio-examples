@@ -3,9 +3,9 @@ package ui
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func TestDefaultZoom(t *testing.T) {
 	e := testEditorWithFile(file)
 
 	p := newPalette(e.(*editor))
-	zoom := p.(*widget.Box).Children[0].(*fyne.Container).Objects[1].(*widget.Box).Children[1].(*widget.Label)
+	zoom := p.(*granio.Container).Objects[2].(*granio.Container).Objects[1].(*widget.Label)
 	assert.Equal(t, "100%", zoom.Text)
 }
 
@@ -24,7 +24,7 @@ func TestZoomIn(t *testing.T) {
 	assert.Equal(t, 1, e.(*editor).zoom)
 
 	p := newPalette(e.(*editor))
-	zoomItems := p.(*widget.Box).Children[0].(*fyne.Container).Objects[1].(*widget.Box).Children
+	zoomItems := p.(*granio.Container).Objects[2].(*granio.Container).Objects
 	zoom := zoomItems[1].(*widget.Label)
 	zoomIn := zoomItems[2].(*widget.Button)
 	test.Tap(zoomIn)

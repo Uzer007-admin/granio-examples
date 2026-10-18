@@ -3,13 +3,13 @@ package ui
 import (
 	"fmt"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/pixeledit/internal/api"
-	"github.com/fyne-io/pixeledit/internal/tool"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/tool"
 )
 
 type palette struct {
@@ -36,12 +36,12 @@ func (p *palette) loadTools() []api.Tool {
 	}
 }
 
-func newPalette(edit *editor) fyne.CanvasObject {
+func newPalette(edit *editor) granio.CanvasObject {
 	p := &palette{edit: edit, zoom: widget.NewLabel("100%")}
 
 	tools := p.loadTools()
 
-	var toolIcons []fyne.CanvasObject
+	var toolIcons []granio.CanvasObject
 	for _, item := range tools {
 		var icon *widget.Button
 		thisTool := item
@@ -69,6 +69,6 @@ func newPalette(edit *editor) fyne.CanvasObject {
 			p.updateZoom(p.edit.zoom * 2)
 		}))
 
-	return container.NewVBox(append([]fyne.CanvasObject{container.NewGridWithColumns(1),
+	return container.NewVBox(append([]granio.CanvasObject{container.NewGridWithColumns(1),
 		widget.NewLabel("Tools"), zoom, edit.fgPreview}, toolIcons...)...)
 }

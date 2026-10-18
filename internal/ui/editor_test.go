@@ -4,39 +4,39 @@ import (
 	"image"
 	"image/color"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/test"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/fyne-io/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
 )
 
-func uriForTestFile(name string) fyne.URI {
+func uriForTestFile(name string) granio.URI {
 	path := filepath.Join(".", "testdata", name+".png")
 
 	return storage.NewURI("file://" + path)
 }
 
-func testFile(name string) fyne.URIReadCloser {
+func testFile(name string) granio.URIReadCloser {
 	read, err := storage.OpenFileFromURI(uriForTestFile(name))
 	if err != nil {
-		fyne.LogError("Unable to open file \""+name+"\"", err)
+		granio.LogError("Unable to open file \""+name+"\"", err)
 		return nil
 	}
 
 	return read
 }
 
-func testFileWrite(name string) fyne.URIWriteCloser {
+func testFileWrite(name string) granio.URIWriteCloser {
 	write, err := storage.SaveFileToURI(uriForTestFile(name))
 	if err != nil {
-		fyne.LogError("Unable to save file \""+name+"\"", err)
+		granio.LogError("Unable to save file \""+name+"\"", err)
 		return nil
 	}
 
@@ -67,23 +67,18 @@ func TestEditor_Reset(t *testing.T) {
 
 func TestEditor_Save(t *testing.T) {
 	origFile := testFile("8x8")
-	outFile := testFileWrite("8x8-tmp")
+	defer origFile.Close()
+	outURI := storage.NewFileURI(filepath.Join(t.TempDir(), "8x8.png"))
+	outFile, err := storage.Writer(outURI)
+	require.NoError(t, err)
 	content, err := ioutil.ReadAll(origFile)
-	if err != nil {
-		t.Error("Failed to read test file")
-	}
-	_, err = outFile.Write([]byte(content))
-	if err != nil {
-		t.Error("Failed to write temporary file")
-	}
-	defer func() {
-		err = os.Remove(outFile.URI().String()[7:])
-		if err != nil {
-			t.Error("Failed to remove temporary file")
-		}
-	}()
+	require.NoError(t, err)
+	_, err = outFile.Write(content)
+	require.NoError(t, err)
+	require.NoError(t, outFile.Close())
 
-	file := testFile("8x8-tmp")
+	file, err := storage.Reader(outURI)
+	require.NoError(t, err)
 	e := testEditorWithFile(file)
 
 	assert.Equal(t, color.RGBA{A: 255}, e.PixelColor(0, 0))
@@ -94,7 +89,7 @@ func TestEditor_Save(t *testing.T) {
 
 	e.Save()
 
-	e.LoadFile(file)
+	e.Reload()
 	assert.Equal(t, red, e.PixelColor(0, 0))
 }
 
@@ -153,7 +148,7 @@ func TestEditor_isPNG(t *testing.T) {
 	assert.False(t, e.isPNG("wrong.ping"))
 }
 
-func testEditorWithFile(path fyne.URIReadCloser) api.Editor {
+func testEditorWithFile(path granio.URIReadCloser) api.Editor {
 	e := NewEditor()
 	e.(*editor).win = test.NewWindow(nil)
 	e.LoadFile(path)

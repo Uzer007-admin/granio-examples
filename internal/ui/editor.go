@@ -10,13 +10,13 @@ import (
 
 	"golang.org/x/image/draw"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
 )
 
 type editor struct {
@@ -32,8 +32,8 @@ type editor struct {
 	fg   color.Color
 	tool api.Tool
 
-	win        fyne.Window
-	recentMenu *fyne.Menu
+	win        granio.Window
+	recentMenu *granio.Menu
 }
 
 func (e *editor) PixelColor(x, y int) color.Color {
@@ -66,7 +66,7 @@ func (e *editor) SetFGColor(col color.Color) {
 	e.fgPreview.Refresh()
 }
 
-func (e *editor) buildUI() fyne.CanvasObject {
+func (e *editor) buildUI() granio.CanvasObject {
 	return container.NewScroll(e.drawSurface)
 }
 
@@ -101,12 +101,12 @@ func (e *editor) updateSizes() {
 	e.cacheWidth = e.img.Bounds().Dx() * e.zoom
 	e.cacheHeight = e.img.Bounds().Dy() * e.zoom
 
-	c := fyne.CurrentApp().Driver().CanvasForObject(e.status)
+	c := granio.CurrentApp().Driver().CanvasForObject(e.status)
 	scale := float32(1.0)
 	if c != nil {
 		scale = c.Scale()
 	}
-	e.drawSurface.SetMinSize(fyne.NewSize(
+	e.drawSurface.SetMinSize(granio.NewSize(
 		float32(e.cacheWidth)/scale,
 		float32(e.cacheHeight)/scale))
 
@@ -150,11 +150,11 @@ func fixEncoding(img image.Image) *image.RGBA {
 	return newImg
 }
 
-func (e *editor) LoadFile(read fyne.URIReadCloser) {
+func (e *editor) LoadFile(read granio.URIReadCloser) {
 	defer read.Close()
 	img, _, err := image.Decode(read)
 	if err != nil {
-		fyne.LogError("Unable to decode image", err)
+		granio.LogError("Unable to decode image", err)
 		e.status.SetText(err.Error())
 		return
 	}
@@ -175,7 +175,7 @@ func (e *editor) Reload() {
 	u, _ := storage.ParseURI(e.uri)
 	read, err := storage.Reader(u)
 	if err != nil {
-		fyne.LogError("Unable to open file \""+e.uri+"\"", err)
+		granio.LogError("Unable to open file \""+e.uri+"\"", err)
 		return
 	}
 	e.LoadFile(read)
@@ -188,30 +188,30 @@ func (e *editor) Save() {
 
 	uri, _ := storage.ParseURI(e.uri)
 	if !e.isSupported(uri.Extension()) {
-		fyne.LogError("Save only supports PNG", nil)
+		granio.LogError("Save only supports PNG", nil)
 		return
 	}
 	write, err := storage.Writer(uri)
 	if err != nil {
-		fyne.LogError("Error opening file to replace", err)
+		granio.LogError("Error opening file to replace", err)
 		return
 	}
 
 	e.saveToWriter(write)
 }
 
-func (e *editor) saveToWriter(write fyne.URIWriteCloser) {
+func (e *editor) saveToWriter(write granio.URIWriteCloser) {
 	defer write.Close()
 	if e.isPNG(write.URI().Extension()) {
 		err := png.Encode(write, e.img)
 
 		if err != nil {
-			fyne.LogError("Could not encode image", err)
+			granio.LogError("Could not encode image", err)
 		}
 	}
 }
 
-func (e *editor) SaveAs(writer fyne.URIWriteCloser) {
+func (e *editor) SaveAs(writer granio.URIWriteCloser) {
 	e.saveToWriter(writer)
 }
 
@@ -227,7 +227,7 @@ func (e *editor) isPNG(path string) bool {
 func NewEditor() api.Editor {
 	fgCol := color.Black
 	preview := canvas.NewRectangle(fgCol)
-	preview.SetMinSize(fyne.NewSize(1, 32))
+	preview.SetMinSize(granio.NewSize(1, 32))
 	edit := &editor{zoom: 1, fg: fgCol, fgPreview: preview, status: newStatusBar()}
 	edit.drawSurface = newInteractiveRaster(edit)
 
