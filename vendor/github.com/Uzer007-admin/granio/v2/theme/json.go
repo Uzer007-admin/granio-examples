@@ -1,0 +1,166 @@
+package theme
+
+import (
+	"encoding/json"
+	"image/color"
+	"io"
+	"strings"
+
+	"github.com/Uzer007-admin/granio/v2"
+	fynecolor "github.com/Uzer007-admin/granio/v2/internal/color"
+	"github.com/Uzer007-admin/granio/v2/storage"
+)
+
+// FromJSON returns a Theme created from the given JSON metadata.
+// Any values not present in the data will fall back to the default theme.
+// If a parse error occurs it will be returned along with a default theme.
+//
+// Since: 2.2
+func FromJSON(data string) (granio.Theme, error) {
+	return FromJSONReader(strings.NewReader(data))
+}
+
+// FromJSONWithFallback returns a Theme created from the given JSON metadata.
+// Any values not present in the data will fall back to the specified theme.
+// If a parse error occurs it will be returned along with a specified fallback theme.
+//
+// Since: 2.7
+func FromJSONWithFallback(data string, fallback granio.Theme) (granio.Theme, error) {
+	return FromJSONReaderWithFallback(strings.NewReader(data), fallback)
+}
+
+// FromJSONReader returns a Theme created from the given JSON metadata through the reader.
+// Any values not present in the data will fall back to the default theme.
+// If a parse error occurs it will be returned along with a default theme.
+//
+// Since: 2.2
+func FromJSONReader(r io.Reader) (granio.Theme, error) {
+	return FromJSONReaderWithFallback(r, DefaultTheme())
+}
+
+// FromJSONReaderWithFallback returns a Theme created from the given JSON metadata through the reader.
+// Any values not present in the data will fall back to the specified theme.
+// If a parse error occurs it will be returned along with a specified fallback theme.
+//
+// Since: 2.7
+func FromJSONReaderWithFallback(r io.Reader, fallback granio.Theme) (granio.Theme, error) {
+	var th *schema
+	if err := json.NewDecoder(r).Decode(&th); err != nil {
+		return fallback, err
+	}
+
+	return &jsonTheme{data: th, fallback: fallback}, nil
+}
+
+type jsonColor struct {
+	color color.Color
+}
+
+func (h *jsonColor) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return err
+	}
+	return h.parseColor(str)
+}
+
+func (h *jsonColor) parseColor(str string) error {
+	c, err := fynecolor.Parse(str)
+	if err != nil {
+		return err
+	}
+
+	h.color = c
+	return nil
+}
+
+type uriString string
+
+func (u uriString) resource() granio.Resource {
+	uri, err := storage.ParseURI(string(u))
+	if err != nil {
+		granio.LogError("Failed to parse URI", err)
+		return nil
+	}
+	r, err := storage.LoadResourceFromURI(uri)
+	if err != nil {
+		granio.LogError("Failed to load resource from URI", err)
+		return nil
+	}
+	return r
+}
+
+type schema struct {
+	Colors      map[string]jsonColor `json:"Colors,omitempty"`
+	DarkColors  map[string]jsonColor `json:"Colors-dark,omitempty"`
+	LightColors map[string]jsonColor `json:"Colors-light,omitempty"`
+	Sizes       map[string]float32   `json:"Sizes,omitempty"`
+
+	Fonts map[string]uriString `json:"Fonts,omitempty"`
+	Icons map[string]uriString `json:"Icons,omitempty"`
+}
+
+type jsonTheme struct {
+	data     *schema
+	fallback granio.Theme
+}
+
+func (t *jsonTheme) Color(name granio.ThemeColorName, variant granio.ThemeVariant) color.Color {
+	switch variant {
+	case VariantLight:
+		if val, ok := t.data.LightColors[string(name)]; ok {
+			return val.color
+		}
+	case VariantDark:
+		if val, ok := t.data.DarkColors[string(name)]; ok {
+			return val.color
+		}
+	}
+
+	if val, ok := t.data.Colors[string(name)]; ok {
+		return val.color
+	}
+
+	return t.fallback.Color(name, variant)
+}
+
+func (t *jsonTheme) Font(style granio.TextStyle) granio.Resource {
+	if val, ok := t.data.Fonts[styleString(style)]; ok {
+		r := val.resource()
+		if r != nil {
+			return r
+		}
+	}
+	return t.fallback.Font(style)
+}
+
+func (t *jsonTheme) Icon(name granio.ThemeIconName) granio.Resource {
+	if val, ok := t.data.Icons[string(name)]; ok {
+		r := val.resource()
+		if r != nil {
+			return r
+		}
+	}
+	return t.fallback.Icon(name)
+}
+
+func (t *jsonTheme) Size(name granio.ThemeSizeName) float32 {
+	if val, ok := t.data.Sizes[string(name)]; ok {
+		return val
+	}
+
+	return t.fallback.Size(name)
+}
+
+func styleString(s granio.TextStyle) string {
+	if s.Bold {
+		if s.Italic {
+			return "boldItalic"
+		}
+		return "bold"
+	}
+	if s.Monospace {
+		return "monospace"
+	}
+	return "regular"
+}

@@ -1,0 +1,241 @@
+package embedded
+
+import (
+	"image"
+	"math"
+	"time"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/driver/embedded"
+	"github.com/Uzer007-admin/granio/v2/internal/async"
+	"github.com/Uzer007-admin/granio/v2/internal/cache"
+	intdriver "github.com/Uzer007-admin/granio/v2/internal/driver"
+	"github.com/Uzer007-admin/granio/v2/internal/painter"
+)
+
+type noosDriver struct {
+	events chan embedded.Event
+	queue  chan funcData
+	render func(image.Image)
+	run    func(func())
+	size   func() granio.Size
+	done   bool
+
+	wins    []granio.Window
+	current int
+	device  noosDevice
+}
+
+func (n *noosDriver) CreateWindow(_ string) granio.Window {
+	w := newWindow(n)
+	n.wins = append(n.wins, w)
+	n.current = len(n.wins) - 1
+
+	if f := n.size; f != nil {
+		w.Resize(f())
+	}
+	return w
+}
+
+func (n *noosDriver) AllWindows() []granio.Window {
+	return n.wins
+}
+
+func (*noosDriver) RenderedTextSize(text string, fontSize float32, style granio.TextStyle, source granio.Resource) (size granio.Size, baseline float32) {
+	return painter.RenderedTextSize(text, fontSize, style, source)
+}
+
+func (*noosDriver) CanvasForObject(obj granio.CanvasObject) granio.Canvas {
+	return cache.GetCanvasForObject(obj)
+}
+
+func (n *noosDriver) AbsolutePositionForObject(o granio.CanvasObject) granio.Position {
+	c := n.CanvasForObject(o)
+	if c == nil {
+		return granio.NewPos(0, 0)
+	}
+
+	pos := intdriver.AbsolutePositionForObject(o, []granio.CanvasObject{c.Content()})
+	inset, _ := c.InteractiveArea()
+	return pos.Subtract(inset)
+}
+
+func (n *noosDriver) Device() granio.Device {
+	return &n.device
+}
+
+func (n *noosDriver) Run() {
+	n.run(n.doRun)
+}
+
+func (n *noosDriver) doRun() {
+	for _, w := range n.wins {
+		n.renderWindow(w)
+	}
+
+	for !n.done {
+		select {
+		case fn := <-n.queue:
+			fn.f()
+			if fn.done != nil {
+				fn.done <- struct{}{}
+			}
+		case e := <-n.events:
+			if e == nil {
+				// closing
+				n.Quit()
+				continue
+			}
+
+			w, _ := n.wins[n.current].(*noosWindow)
+
+			switch t := e.(type) {
+			case *embedded.CharacterEvent:
+				if focused := w.c.Focused(); focused != nil {
+					focused.TypedRune(t.Rune)
+				} else if tr := w.c.OnTypedRune(); tr != nil {
+					tr(t.Rune)
+				}
+
+				n.renderWindow(n.wins[n.current])
+			case *embedded.KeyEvent:
+				keyEvent := &granio.KeyEvent{Name: t.Name}
+
+				if t.Direction == embedded.KeyReleased {
+					// No desktop events so key/up down not reported
+					continue // ignore key up in other core events
+				}
+
+				if t.Name == granio.KeyTab {
+					captures := false
+
+					if ent, ok := w.Canvas().Focused().(granio.Tabbable); ok {
+						captures = ent.AcceptsTab()
+					}
+					if !captures {
+						// TODO handle shift
+						w.Canvas().FocusNext()
+						n.renderWindow(n.wins[n.current])
+						continue
+					}
+				}
+
+				// No shortcut detected, pass down to TypedKey
+				focused := w.c.Focused()
+				if focused != nil {
+					focused.TypedKey(keyEvent)
+				} else if tk := w.c.OnTypedKey(); tk != nil {
+					tk(keyEvent)
+				}
+
+				n.renderWindow(n.wins[n.current])
+			case *embedded.TouchDownEvent:
+				n.handleTouchDown(t, n.wins[n.current].(*noosWindow))
+			case *embedded.TouchMoveEvent:
+				n.handleTouchMove(t, n.wins[n.current].(*noosWindow))
+			case *embedded.TouchUpEvent:
+				n.handleTouchUp(t, n.wins[n.current].(*noosWindow))
+			}
+		}
+	}
+}
+
+func (n *noosDriver) handleTouchDown(ev *embedded.TouchDownEvent, w *noosWindow) {
+	w.c.tapDown(ev.Position, ev.ID)
+	n.renderWindow(w)
+}
+
+func (n *noosDriver) handleTouchMove(ev *embedded.TouchMoveEvent, w *noosWindow) {
+	w.c.tapMove(ev.Position, ev.ID, func(wid granio.Draggable, ev *granio.DragEvent) {
+		wid.Dragged(ev)
+	})
+	n.renderWindow(w)
+}
+
+func (n *noosDriver) handleTouchUp(ev *embedded.TouchUpEvent, w *noosWindow) {
+	w.c.tapUp(ev.Position, ev.ID, func(wid granio.Tappable, ev *granio.PointEvent) {
+		wid.Tapped(ev)
+	}, func(wid granio.SecondaryTappable, ev *granio.PointEvent) {
+		wid.TappedSecondary(ev)
+	}, func(wid granio.DoubleTappable, ev *granio.PointEvent) {
+		wid.DoubleTapped(ev)
+	}, func(wid granio.Draggable, ev *granio.DragEvent) {
+		if math.Abs(float64(ev.Dragged.DX)) <= tapMoveEndThreshold && math.Abs(float64(ev.Dragged.DY)) <= tapMoveEndThreshold {
+			wid.DragEnd()
+			return
+		}
+
+		go func() {
+			for math.Abs(float64(ev.Dragged.DX)) > tapMoveEndThreshold || math.Abs(float64(ev.Dragged.DY)) > tapMoveEndThreshold {
+				if math.Abs(float64(ev.Dragged.DX)) > 0 {
+					ev.Dragged.DX *= tapMoveDecay
+				}
+				if math.Abs(float64(ev.Dragged.DY)) > 0 {
+					ev.Dragged.DY *= tapMoveDecay
+				}
+
+				n.DoFromGoroutine(func() {
+					wid.Dragged(ev)
+				}, false)
+				time.Sleep(time.Millisecond * 16)
+			}
+
+			n.DoFromGoroutine(wid.DragEnd, false)
+		}()
+	})
+	n.renderWindow(w)
+}
+
+func (n *noosDriver) Quit() {
+	n.done = true
+
+	go func() {
+		n.queue <- funcData{f: func() {}}
+	}()
+}
+
+func (*noosDriver) StartAnimation(*granio.Animation) {
+	// no animations on embedded
+}
+
+func (*noosDriver) StopAnimation(*granio.Animation) {
+	// no animations on embedded
+}
+
+func (*noosDriver) DoubleTapDelay() time.Duration {
+	return tapDoubleDelay
+}
+
+func (*noosDriver) SetDisableScreenBlanking(bool) {}
+
+func (n *noosDriver) DoFromGoroutine(fn func(), wait bool) {
+	if wait {
+		async.EnsureNotMain(func() {
+			done := make(chan struct{})
+
+			n.queue <- funcData{f: fn, done: done}
+			<-done
+		})
+	} else {
+		n.queue <- funcData{f: fn}
+	}
+}
+
+// TODO add some caching to stop allocating images...
+func (n *noosDriver) renderWindow(w granio.Window) {
+	img := w.Canvas().Capture()
+
+	n.render(img)
+}
+
+func NewNoOSDriver(render func(img image.Image), run func(func()), events chan embedded.Event, size func() granio.Size) granio.Driver {
+	return &noosDriver{
+		events: events, queue: make(chan funcData), size: size,
+		render: render, run: run, wins: make([]granio.Window, 0),
+	}
+}
+
+type funcData struct {
+	f    func()
+	done chan struct{} // Zero allocation signalling channel
+}

@@ -1,0 +1,348 @@
+package dialog
+
+import (
+	"fmt"
+	"image/color"
+	"math"
+	"math/cmplx"
+	"strings"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	col "github.com/Uzer007-admin/granio/v2/internal/color"
+	"github.com/Uzer007-admin/granio/v2/internal/painter/geom"
+	"github.com/Uzer007-admin/granio/v2/lang"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
+)
+
+const (
+	checkeredBoxSize       = 8
+	checkeredNumberOfRings = 12
+
+	preferenceRecents    = "color_recents"
+	preferenceMaxRecents = 7
+)
+
+// ColorPickerDialog is a simple dialog window that displays a color picker.
+//
+// Since: 1.4
+type ColorPickerDialog struct {
+	*dialog
+	Advanced bool
+
+	additionalSettings *widget.Accordion
+	callback           func(c color.Color)
+	color              color.Color
+	picker             *colorAdvancedPicker
+}
+
+// NewColorPicker creates a color dialog and returns the handle.
+// Using the returned type you should call Show() and then set its color through SetColor().
+// The callback is triggered when the user selects a color.
+//
+// Since: 1.4
+func NewColorPicker(title, message string, callback func(c color.Color), parent granio.Window) *ColorPickerDialog {
+	return &ColorPickerDialog{
+		dialog:   newDialog(title, message, theme.ColorPaletteIcon(), nil /* cancel? */, parent),
+		color:    theme.Color(theme.ColorNamePrimary),
+		callback: callback,
+	}
+}
+
+// ShowColorPicker creates and shows a color dialog.
+// The callback is triggered when the user selects a color.
+//
+// Since: 1.4
+func ShowColorPicker(title, message string, callback func(c color.Color), parent granio.Window) {
+	NewColorPicker(title, message, callback, parent).Show()
+}
+
+// Refresh causes this dialog to be updated
+func (p *ColorPickerDialog) Refresh() {
+	p.updateUI()
+}
+
+// SetColor updates the color of the color picker.
+func (p *ColorPickerDialog) SetColor(c color.Color) {
+	if p.picker == nil && p.Advanced {
+		p.updateUI()
+	} else if !p.Advanced {
+		granio.LogError("Advanced mode needs to be enabled to use SetColor", nil)
+		return
+	}
+	p.picker.SetColor(c)
+}
+
+// Show causes this dialog to be displayed
+func (p *ColorPickerDialog) Show() {
+	if p.win == nil || p.Advanced != (p.additionalSettings != nil) {
+		p.updateUI()
+	}
+	p.dialog.Show()
+}
+
+func (p *ColorPickerDialog) createSimplePickers() (contents []granio.CanvasObject) {
+	contents = append(contents, newColorBasicPicker(p.selectColor), newColorGreyscalePicker(p.selectColor))
+	if recent := newColorRecentPicker(p.selectColor); len(recent.(*granio.Container).Objects) > 0 {
+		// Add divider and recents if there are any,
+		contents = append(contents, canvas.NewLine(theme.Color(theme.ColorNameShadow)), recent)
+	}
+	return contents
+}
+
+func (p *ColorPickerDialog) selectColor(c color.Color) {
+	writeRecentColor(colorToString(c))
+	if p.picker != nil {
+		p.picker.SetColor(c)
+	}
+	if f := p.callback; f != nil {
+		f(c)
+	}
+	p.Hide()
+	p.updateUI()
+}
+
+func (p *ColorPickerDialog) updateUI() {
+	if w := p.win; w != nil {
+		w.Hide()
+	}
+	p.dismiss = &widget.Button{
+		Text: lang.L("Cancel"), Icon: theme.CancelIcon(),
+		OnTapped: p.Hide,
+	}
+	if p.Advanced {
+		p.picker = newColorAdvancedPicker(p.color, func(c color.Color) {
+			p.color = c
+		})
+
+		advancedItem := widget.NewAccordionItem(lang.L("Advanced"), p.picker)
+		if p.additionalSettings != nil {
+			advancedItem.Open = p.additionalSettings.Items[0].Open
+		}
+		p.additionalSettings = widget.NewAccordion(advancedItem)
+
+		p.content = container.NewVBox(
+			container.NewCenter(
+				container.NewVBox(
+					p.createSimplePickers()...,
+				),
+			),
+			widget.NewSeparator(),
+			p.additionalSettings,
+		)
+
+		confirm := &widget.Button{
+			Text: lang.L("Confirm"), Icon: theme.ConfirmIcon(), Importance: widget.HighImportance,
+			OnTapped: func() {
+				p.selectColor(p.color)
+			},
+		}
+		p.create(container.NewGridWithColumns(2, p.dismiss, confirm))
+	} else {
+		p.content = container.NewVBox(p.createSimplePickers()...)
+		p.create(container.NewGridWithColumns(1, p.dismiss))
+	}
+}
+
+func clamp(value, minValue, maxValue int) int {
+	if value < minValue {
+		return minValue
+	}
+	if value > maxValue {
+		return maxValue
+	}
+	return value
+}
+
+func wrapHue(hue int) int {
+	for hue < 0 {
+		hue += geom.AngleFull
+	}
+	for hue > geom.AngleFull {
+		hue -= geom.AngleFull
+	}
+	return hue
+}
+
+func newColorButtonBox(colors []color.Color, icon granio.Resource, callback func(color.Color)) granio.CanvasObject {
+	var objects []granio.CanvasObject
+	if icon != nil && len(colors) > 0 {
+		objects = append(objects, widget.NewIcon(icon))
+	}
+	for _, c := range colors {
+		objects = append(objects, newColorButton(c, callback))
+	}
+	return container.NewGridWithColumns(8, objects...) //revive:disable-line:add-constant
+}
+
+func newCheckeredBackground(radial bool) *canvas.Raster {
+	f := func(x, y, _, _ int) color.Color {
+		if (x/checkeredBoxSize)%2 == (y/checkeredBoxSize)%2 {
+			return color.Gray{Y: 58} //revive:disable-line:add-constant
+		}
+
+		return color.Gray{Y: 84} //revive:disable-line:add-constant
+	}
+
+	if radial {
+		rect := f
+		f = func(x, y, w, h int) color.Color {
+			r, t := cmplx.Polar(complex(float64(x)-float64(w)/2, float64(y)-float64(h)/2))
+			limit := math.Min(float64(w), float64(h)) / 2
+			if r > limit {
+				// Out of bounds
+				return &color.NRGBA{A: 0}
+			}
+
+			x = int((t + math.Pi) / (2 * math.Pi) * checkeredNumberOfRings * checkeredBoxSize)
+			y = int(r)
+			return rect(x, y, 0, 0)
+		}
+	}
+
+	return canvas.NewRasterWithPixels(f)
+}
+
+func readRecentColors() (recents []string) {
+	for _, r := range strings.Split(granio.CurrentApp().Preferences().String(preferenceRecents), ",") {
+		if r != "" {
+			recents = append(recents, r)
+		}
+	}
+	return recents
+}
+
+func writeRecentColor(c string) {
+	recents := []string{c}
+	for _, r := range readRecentColors() {
+		if r == c {
+			continue // Color already in recents
+		}
+		recents = append(recents, r)
+	}
+	if len(recents) > preferenceMaxRecents {
+		recents = recents[:preferenceMaxRecents]
+	}
+	granio.CurrentApp().Preferences().SetString(preferenceRecents, strings.Join(recents, ","))
+}
+
+func colorToString(c color.Color) string {
+	red, green, blue, alpha := col.ToNRGBA(c)
+	if alpha == 0xff {
+		return fmt.Sprintf("#%02x%02x%02x", red, green, blue)
+	}
+	return fmt.Sprintf("#%02x%02x%02x%02x", red, green, blue, alpha)
+}
+
+func stringsToColors(ss ...string) (colors []color.Color) {
+	for _, s := range ss {
+		if s == "" {
+			continue
+		}
+		c, err := col.Parse(s)
+		if err != nil {
+			granio.LogError("Couldn't parse color:", err)
+		} else {
+			colors = append(colors, c)
+		}
+	}
+	return colors
+}
+
+// https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
+
+func rgbToHsl(r, g, b uint8) (h, s, l int) {
+	red := float64(r) / math.MaxUint8
+	green := float64(g) / math.MaxUint8
+	blue := float64(b) / math.MaxUint8
+
+	minComponentValue := math.Min(red, math.Min(green, blue))
+	maxComponentValue := math.Max(red, math.Max(green, blue))
+
+	lightness := (maxComponentValue + minComponentValue) / 2
+
+	delta := maxComponentValue - minComponentValue
+
+	if delta == 0.0 {
+		// Achromatic
+		return 0, 0, int(lightness * 100)
+	}
+
+	// Chromatic
+
+	var saturation float64
+
+	if lightness < 0.5 {
+		saturation = (maxComponentValue - minComponentValue) / (maxComponentValue + minComponentValue)
+	} else {
+		saturation = (maxComponentValue - minComponentValue) / (2 - maxComponentValue - minComponentValue)
+	}
+
+	var hue float64
+
+	if red == maxComponentValue {
+		hue = (green - blue) / delta
+	} else if green == maxComponentValue {
+		hue = 2 + (blue-red)/delta
+	} else if blue == maxComponentValue {
+		hue = 4 + (red-green)/delta
+	}
+
+	h = wrapHue(int(hue * 60.0)) //revive:disable-line:add-constant
+	s = int(saturation * 100.0)
+	l = int(lightness * 100.0)
+	return h, s, l
+}
+
+func hslToRgb(h, s, l int) (r, g, b uint8) {
+	hue := float64(h) / geom.AngleFull
+	saturation := float64(s) / 100
+	lightness := float64(l) / 100
+
+	if saturation == 0.0 {
+		// Greyscale
+		g := uint8(lightness * math.MaxUint8)
+		return g, g, g
+	}
+
+	var v1 float64
+	if lightness < 0.5 {
+		v1 = lightness * (1 + saturation)
+	} else {
+		v1 = (lightness + saturation) - (lightness * saturation)
+	}
+
+	v2 := 2*lightness - v1
+
+	red := hueToChannel(hue+(1.0/3), v1, v2)
+	green := hueToChannel(hue, v1, v2)
+	blue := hueToChannel(hue-(1.0/3), v1, v2)
+
+	r = uint8(math.Round(math.MaxUint8 * red))
+	g = uint8(math.Round(math.MaxUint8 * green))
+	b = uint8(math.Round(math.MaxUint8 * blue))
+	return r, g, b
+}
+
+func hueToChannel(h, v1, v2 float64) float64 {
+	//revive:disable:add-constant
+	for h < 0.0 {
+		h += 1.0
+	}
+	for h > 1.0 {
+		h -= 1.0
+	}
+	if 6.0*h < 1.0 {
+		return v2 + (v1-v2)*6*h
+	}
+	if 2.0*h < 1.0 {
+		return v1
+	}
+	if 3.0*h < 2.0 {
+		return v2 + (v1-v2)*6*((2.0/3.0)-h)
+	}
+	return v2
+	//revive:enable-line:add-constant
+}

@@ -17,7 +17,7 @@ import (
 // ["en-US", "en-GB", "en-IE", "en"] and the locale "en" is asked, the underlying matching
 // algorithm will return "en-US" thinking it is the best match possible. More information
 // about the algorithm in this Github issue: https://github.com/golang/go/issues/49176.
-// There is additionnal informations inside the Go code base:
+// There is additional informations inside the Go code base:
 // https://github.com/golang/text/blob/master/language/match.go#L142
 type Localizer struct {
 	// bundle contains the messages that can be returned by the Localizer.
@@ -124,7 +124,7 @@ func (l *Localizer) Localize(lc *LocalizeConfig) (string, error) {
 	return msg, err
 }
 
-// Localize returns a localized message.
+// LocalizeMessage returns a localized message.
 func (l *Localizer) LocalizeMessage(msg *Message) (string, error) {
 	return l.Localize(&LocalizeConfig{
 		DefaultMessage: msg,
@@ -231,6 +231,15 @@ func (l *Localizer) pluralForm(tag language.Tag, operands *plural.Operands) plur
 // MustLocalize is similar to Localize, except it panics if an error happens.
 func (l *Localizer) MustLocalize(lc *LocalizeConfig) string {
 	localized, err := l.Localize(lc)
+	if err != nil {
+		panic(err)
+	}
+	return localized
+}
+
+// MustLocalizeMessage is similar to LocalizeMessage, except it panics if an error happens.
+func (l *Localizer) MustLocalizeMessage(msg *Message) string {
+	localized, err := l.LocalizeMessage(msg)
 	if err != nil {
 		panic(err)
 	}

@@ -1,0 +1,644 @@
+package binding
+
+import (
+	"bytes"
+	"slices"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
+)
+
+// DataTreeRootID const is the value used as ID for the root of any tree binding.
+const DataTreeRootID = ""
+
+// Tree supports binding a tree of values with type T.
+//
+// Since: 2.7
+type Tree[T any] interface {
+	DataTree
+
+	Append(parent, id string, value T) error
+	Get() (map[string][]string, map[string]T, error)
+	GetValue(id string) (T, error)
+	Prepend(parent, id string, value T) error
+	Remove(id string) error
+	Set(ids map[string][]string, values map[string]T) error
+	SetValue(id string, value T) error
+}
+
+// ExternalTree supports binding a tree of values, of type T, from an external variable.
+//
+// Since: 2.7
+type ExternalTree[T any] interface {
+	Tree[T]
+
+	Reload() error
+}
+
+// NewTree returns a bindable tree of values with type T.
+//
+// Since: 2.7
+func NewTree[T any](comparator func(T, T) bool) Tree[T] {
+	return newBoundTree(nil, comparator)
+}
+
+// BindTree returns a bound tree of values with type T, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.7
+func BindTree[T any](ids *map[string][]string, v *map[string]T, comparator func(T, T) bool) ExternalTree[T] {
+	if v == nil {
+		return newBoundTree(nil, comparator)
+	}
+
+	t := newBoundTree(v, comparator)
+	for parent, children := range *ids {
+		for _, leaf := range children {
+			t.appendItem(bindTreeItem(v, leaf, t.updateExternal, t.comparator), leaf, parent)
+		}
+	}
+
+	return t
+}
+
+// DataTree is the base interface for all bindable data trees.
+//
+// Since: 2.4
+type DataTree interface {
+	DataItem
+	GetItem(id string) (DataItem, error)
+	ChildIDs(string) []string
+}
+
+// BoolTree supports binding a tree of bool values.
+//
+// Since: 2.4
+type BoolTree = Tree[bool]
+
+// ExternalBoolTree supports binding a tree of bool values from an external variable.
+//
+// Since: 2.4
+type ExternalBoolTree = ExternalTree[bool]
+
+// NewBoolTree returns a bindable tree of bool values.
+//
+// Since: 2.4
+func NewBoolTree() Tree[bool] {
+	return newTreeComparable[bool]()
+}
+
+// BindBoolTree returns a bound tree of bool values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindBoolTree(ids *map[string][]string, v *map[string]bool) ExternalTree[bool] {
+	return bindTreeComparable(ids, v)
+}
+
+// BytesTree supports binding a tree of []byte values.
+//
+// Since: 2.4
+type BytesTree = Tree[[]byte]
+
+// ExternalBytesTree supports binding a tree of []byte values from an external variable.
+//
+// Since: 2.4
+type ExternalBytesTree = ExternalTree[[]byte]
+
+// NewBytesTree returns a bindable tree of []byte values.
+//
+// Since: 2.4
+func NewBytesTree() Tree[[]byte] {
+	return NewTree(bytes.Equal)
+}
+
+// BindBytesTree returns a bound tree of []byte values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindBytesTree(ids *map[string][]string, v *map[string][]byte) ExternalTree[[]byte] {
+	return BindTree(ids, v, bytes.Equal)
+}
+
+// FloatTree supports binding a tree of float64 values.
+//
+// Since: 2.4
+type FloatTree = Tree[float64]
+
+// ExternalFloatTree supports binding a tree of float64 values from an external variable.
+//
+// Since: 2.4
+type ExternalFloatTree = ExternalTree[float64]
+
+// NewFloatTree returns a bindable tree of float64 values.
+//
+// Since: 2.4
+func NewFloatTree() Tree[float64] {
+	return newTreeComparable[float64]()
+}
+
+// BindFloatTree returns a bound tree of float64 values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindFloatTree(ids *map[string][]string, v *map[string]float64) ExternalTree[float64] {
+	return bindTreeComparable(ids, v)
+}
+
+// IntTree supports binding a tree of int values.
+//
+// Since: 2.4
+type IntTree = Tree[int]
+
+// ExternalIntTree supports binding a tree of int values from an external variable.
+//
+// Since: 2.4
+type ExternalIntTree = ExternalTree[int]
+
+// NewIntTree returns a bindable tree of int values.
+//
+// Since: 2.4
+func NewIntTree() Tree[int] {
+	return newTreeComparable[int]()
+}
+
+// BindIntTree returns a bound tree of int values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindIntTree(ids *map[string][]string, v *map[string]int) ExternalTree[int] {
+	return bindTreeComparable(ids, v)
+}
+
+// RuneTree supports binding a tree of rune values.
+//
+// Since: 2.4
+type RuneTree = Tree[rune]
+
+// ExternalRuneTree supports binding a tree of rune values from an external variable.
+//
+// Since: 2.4
+type ExternalRuneTree = ExternalTree[rune]
+
+// NewRuneTree returns a bindable tree of rune values.
+//
+// Since: 2.4
+func NewRuneTree() Tree[rune] {
+	return newTreeComparable[rune]()
+}
+
+// BindRuneTree returns a bound tree of rune values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindRuneTree(ids *map[string][]string, v *map[string]rune) ExternalTree[rune] {
+	return bindTreeComparable(ids, v)
+}
+
+// StringTree supports binding a tree of string values.
+//
+// Since: 2.4
+type StringTree = Tree[string]
+
+// ExternalStringTree supports binding a tree of string values from an external variable.
+//
+// Since: 2.4
+type ExternalStringTree = ExternalTree[string]
+
+// NewStringTree returns a bindable tree of string values.
+//
+// Since: 2.4
+func NewStringTree() Tree[string] {
+	return newTreeComparable[string]()
+}
+
+// BindStringTree returns a bound tree of string values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindStringTree(ids *map[string][]string, v *map[string]string) ExternalTree[string] {
+	return bindTreeComparable(ids, v)
+}
+
+// UntypedTree supports binding a tree of any values.
+//
+// Since: 2.5
+type UntypedTree = Tree[any]
+
+// ExternalUntypedTree supports binding a tree of any values from an external variable.
+//
+// Since: 2.5
+type ExternalUntypedTree = ExternalTree[any]
+
+// NewUntypedTree returns a bindable tree of any values.
+//
+// Since: 2.5
+func NewUntypedTree() Tree[any] {
+	return NewTree(func(a1, a2 any) bool { return a1 == a2 })
+}
+
+// BindUntypedTree returns a bound tree of any values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindUntypedTree(ids *map[string][]string, v *map[string]any) ExternalTree[any] {
+	return BindTree(ids, v, func(a1, a2 any) bool { return a1 == a2 })
+}
+
+// URITree supports binding a tree of granio.URI values.
+//
+// Since: 2.4
+type URITree = Tree[granio.URI]
+
+// ExternalURITree supports binding a tree of granio.URI values from an external variable.
+//
+// Since: 2.4
+type ExternalURITree = ExternalTree[granio.URI]
+
+// NewURITree returns a bindable tree of granio.URI values.
+//
+// Since: 2.4
+func NewURITree() Tree[granio.URI] {
+	return NewTree(storage.EqualURI)
+}
+
+// BindURITree returns a bound tree of granio.URI values, based on the contents of the passed values.
+// The ids map specifies how each item relates to its parent (with id ""), with the values being in the v map.
+// If your code changes the content of the maps this refers to you should call Reload() to inform the bindings.
+//
+// Since: 2.4
+func BindURITree(ids *map[string][]string, v *map[string]granio.URI) ExternalTree[granio.URI] {
+	return BindTree(ids, v, storage.EqualURI)
+}
+
+type treeBase struct {
+	base
+
+	ids   map[string][]string
+	items map[string]DataItem
+}
+
+// GetItem returns the DataItem at the specified id.
+func (t *treeBase) GetItem(id string) (DataItem, error) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	if item, ok := t.items[id]; ok {
+		return item, nil
+	}
+
+	return nil, errOutOfBounds
+}
+
+// ChildIDs returns the ordered IDs of items in this data tree that are children of the specified ID.
+func (t *treeBase) ChildIDs(id string) []string {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	if ids, ok := t.ids[id]; ok {
+		return ids
+	}
+
+	return []string{}
+}
+
+func (t *treeBase) appendItem(i DataItem, id, parent string) {
+	t.items[id] = i
+
+	ids := t.ids[parent]
+	for _, in := range ids {
+		if in == id {
+			return
+		}
+	}
+	t.ids[parent] = append(ids, id)
+}
+
+func (t *treeBase) deleteItem(id, parent string) {
+	delete(t.items, id)
+
+	ids, ok := t.ids[parent]
+	if !ok {
+		return
+	}
+
+	off := -1
+	for i, id2 := range ids {
+		if id2 == id {
+			off = i
+			break
+		}
+	}
+	if off == -1 {
+		return
+	}
+	t.ids[parent] = append(ids[:off], ids[off+1:]...)
+}
+
+func parentIDFor(id string, ids map[string][]string) string {
+	for parent, list := range ids {
+		for _, child := range list {
+			if child == id {
+				return parent
+			}
+		}
+	}
+
+	return ""
+}
+
+func newBoundTree[T any](v *map[string]T, comparator func(T, T) bool) *boundTree[T] {
+	val := v
+	if val == nil {
+		val = &map[string]T{}
+	}
+	return &boundTree[T]{
+		comparator: comparator,
+		treeBase: treeBase{
+			ids:   make(map[string][]string),
+			items: make(map[string]DataItem),
+		},
+		updateExternal: v != nil,
+		val:            val,
+	}
+}
+
+func newTreeComparable[T comparable]() Tree[T] {
+	return NewTree(func(t1, t2 T) bool { return t1 == t2 })
+}
+
+func bindTreeComparable[T comparable](ids *map[string][]string, v *map[string]T) ExternalTree[T] {
+	return BindTree(ids, v, func(t1, t2 T) bool { return t1 == t2 })
+}
+
+type boundTree[T any] struct {
+	treeBase
+
+	comparator     func(T, T) bool
+	val            *map[string]T
+	updateExternal bool
+}
+
+func (t *boundTree[T]) Append(parent, id string, val T) error {
+	t.lock.Lock()
+
+	t.ids[parent] = append(t.ids[parent], id)
+	v := *t.val
+	v[id] = val
+
+	trigger, err := t.doReload()
+	t.lock.Unlock()
+
+	if trigger {
+		t.trigger()
+	}
+
+	return err
+}
+
+func (t *boundTree[T]) Get() (map[string][]string, map[string]T, error) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	return t.ids, *t.val, nil
+}
+
+func (t *boundTree[T]) GetValue(id string) (T, error) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
+	if item, ok := (*t.val)[id]; ok {
+		return item, nil
+	}
+
+	return *new(T), errOutOfBounds
+}
+
+func (t *boundTree[T]) Prepend(parent, id string, val T) error {
+	t.lock.Lock()
+
+	t.ids[parent] = append([]string{id}, t.ids[parent]...)
+	v := *t.val
+	v[id] = val
+
+	trigger, err := t.doReload()
+	t.lock.Unlock()
+
+	if trigger {
+		t.trigger()
+	}
+
+	return err
+}
+
+func (t *boundTree[T]) Remove(id string) error {
+	t.lock.Lock()
+	t.removeChildren(id)
+	delete(t.ids, id)
+	v := *t.val
+	delete(v, id)
+
+	trigger, err := t.doReload()
+	t.lock.Unlock()
+
+	if trigger {
+		t.trigger()
+	}
+
+	return err
+}
+
+func (t *boundTree[T]) removeChildren(id string) {
+	for _, cid := range t.ids[id] {
+		t.removeChildren(cid)
+
+		delete(t.ids, cid)
+		v := *t.val
+		delete(v, cid)
+	}
+}
+
+func (t *boundTree[T]) Reload() error {
+	t.lock.Lock()
+	trigger, err := t.doReload()
+	t.lock.Unlock()
+
+	if trigger {
+		t.trigger()
+	}
+
+	return err
+}
+
+func (t *boundTree[T]) Set(ids map[string][]string, v map[string]T) error {
+	t.lock.Lock()
+	changed := !treeChildrenEqual(t.ids, ids)
+	t.ids = ids
+	*t.val = v
+
+	trigger, err := t.doReload()
+	t.lock.Unlock()
+
+	if trigger || changed {
+		t.trigger()
+	}
+
+	return err
+}
+
+func (t *boundTree[T]) doReload() (fire bool, retErr error) {
+	parents := make(map[string]string, len(*t.val))
+	for parent, children := range t.ids {
+		for _, child := range children {
+			parents[child] = parent
+		}
+	}
+	for id := range *t.val {
+		if _, ok := t.items[id]; ok {
+			continue
+		}
+
+		// append new
+		if id == DataTreeRootID {
+			// The root can carry a value, but is not its own child. Registering it
+			// through appendItem adds a cycle to the hierarchy supplied to Set.
+			t.items[id] = bindTreeItem(t.val, id, t.updateExternal, t.comparator)
+		} else {
+			t.items[id] = bindTreeItem(t.val, id, t.updateExternal, t.comparator)
+			if _, present := parents[id]; !present {
+				t.ids[DataTreeRootID] = append(t.ids[DataTreeRootID], id)
+			}
+		}
+		fire = true
+	}
+
+	removed := make(map[string]bool)
+	for id := range t.items {
+		if _, present := (*t.val)[id]; !present {
+			fire = true
+			delete(t.items, id)
+			removed[id] = true
+		}
+	}
+	if len(removed) > 0 {
+		for parent, children := range t.ids {
+			filtered := make([]string, 0, len(children))
+			for _, child := range children {
+				if !removed[child] {
+					filtered = append(filtered, child)
+				}
+			}
+			t.ids[parent] = filtered
+		}
+	}
+
+	for id, item := range t.items {
+		var err error
+		if t.updateExternal {
+			err = item.(*boundExternalTreeItem[T]).setIfChanged((*t.val)[id])
+		} else {
+			err = item.(*boundTreeItem[T]).doSet((*t.val)[id])
+		}
+		if err != nil {
+			retErr = err
+		}
+	}
+	return fire, retErr
+}
+
+func treeChildrenEqual(a, b map[string][]string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for parent, children := range a {
+		other, exists := b[parent]
+		if !exists || !slices.Equal(children, other) {
+			return false
+		}
+	}
+	return true
+}
+
+func (t *boundTree[T]) SetValue(id string, v T) error {
+	t.lock.Lock()
+	(*t.val)[id] = v
+	t.lock.Unlock()
+
+	item, err := t.GetItem(id)
+	if err != nil {
+		return err
+	}
+	return item.(Item[T]).Set(v)
+}
+
+func bindTreeItem[T any](v *map[string]T, id string, external bool, comparator func(T, T) bool) Item[T] {
+	if external {
+		ret := &boundExternalTreeItem[T]{old: (*v)[id], comparator: comparator}
+		ret.val = v
+		ret.id = id
+		return ret
+	}
+
+	return &boundTreeItem[T]{id: id, val: v}
+}
+
+type boundTreeItem[T any] struct {
+	base
+
+	val *map[string]T
+	id  string
+}
+
+func (t *boundTreeItem[T]) Get() (T, error) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	v := *t.val
+	if item, ok := v[t.id]; ok {
+		return item, nil
+	}
+
+	return *new(T), errOutOfBounds
+}
+
+func (t *boundTreeItem[T]) Set(val T) error {
+	return t.doSet(val)
+}
+
+func (t *boundTreeItem[T]) doSet(val T) error {
+	t.lock.Lock()
+	(*t.val)[t.id] = val
+	t.lock.Unlock()
+
+	t.trigger()
+	return nil
+}
+
+type boundExternalTreeItem[T any] struct {
+	boundTreeItem[T]
+
+	comparator func(T, T) bool
+	old        T
+}
+
+func (t *boundExternalTreeItem[T]) setIfChanged(val T) error {
+	t.lock.Lock()
+	if t.comparator(val, t.old) {
+		t.lock.Unlock()
+		return nil
+	}
+	(*t.val)[t.id] = val
+	t.old = val
+	t.lock.Unlock()
+
+	t.trigger()
+	return nil
+}

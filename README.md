@@ -1,3 +1,31 @@
+> Для Granio используется идентификатор `io.github.uzer007_admin.granio.flatpak_demo`.
+> Рецепт собирает текущую рабочую копию с согласованным `vendor`; включены
+> нативный Wayland и резервный X11. Требуется SDK с Go не ниже 1.27.1.
+> Фактическая сборка и запуск Flatpak проверяются отдельно.
+
+# granio-flatpak-demo
+
+Компонент независимого проекта **Granio — Гранио**.
+
+**Исходный репозиторий:** [flatpak_demo](https://github.com/fyne-io/flatpak_demo).
+**Цель форка:** Пример упаковки приложения Granio в Flatpak.
+
+История изменений, лицензии и сведения об исходных авторах сохранены.
+Go-модули переведены на собственные пути `github.com/Uzer007-admin/…`;
+минимальная версия Go — **1.27.1**. Ядро и общие API подключаются из
+[`granio/v2`](https://github.com/Uzer007-admin/granio).
+
+Состояние переноса и результаты проверок приведены в
+[реестре экосистемы](https://github.com/Uzer007-admin/granio/blob/dev/granio/docs/ECOSYSTEM.md).
+Наличие форка само по себе не означает проверку всех платформ и сценариев.
+
+---
+
+## Документация исходного проекта
+
+Команды установки и ссылки в сохранённом тексте ниже относятся к исходнику.
+Для Granio используются новые пути модулей, перечисленные выше.
+
 # flatpak_demo
 A demo of a Fyne application packaged as a Flatpak. This project is intended to serve as a starting point to help developers package their Fyne applications using Flatpak.
 

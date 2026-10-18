@@ -1,0 +1,99 @@
+package repository
+
+import (
+	"errors"
+	"net/http"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage/repository"
+)
+
+var _ repository.Repository = (*HTTPRepository)(nil)
+
+type remoteFile struct {
+	*http.Response
+	uri granio.URI
+}
+
+func (f *remoteFile) Close() error {
+	if f.Response == nil {
+		return nil
+	}
+	return f.Body.Close()
+}
+
+func (f *remoteFile) Read(p []byte) (int, error) {
+	if f.Response == nil {
+		return 0, nil
+	}
+	return f.Body.Read(p)
+}
+
+func (f *remoteFile) URI() granio.URI {
+	return f.uri
+}
+
+// HTTPRepository implements a proxy for interacting with remote resources
+// using golang's net/http library.
+//
+// This repository is suitable to handle the http:// and https:// scheme.
+//
+// Since: 2.1
+type HTTPRepository struct{}
+
+// NewHTTPRepository creates a new HTTPRepository instance.
+// The caller needs to call repository.Register() with the result of this function.
+//
+// Since: 2.1
+func NewHTTPRepository() *HTTPRepository {
+	return &HTTPRepository{}
+}
+
+// Exists checks whether the resource at u returns a
+// non "404 NOT FOUND" response header.
+//
+// Since: 2.1
+func (*HTTPRepository) Exists(u granio.URI) (bool, error) {
+	resp, err := http.Head(u.String())
+	if err != nil {
+		return false, err
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+// Reader provides a interface for reading the body of the response received
+// from the request to u.
+//
+// Since: 2.1
+func (*HTTPRepository) Reader(u granio.URI) (granio.URIReadCloser, error) {
+	resp, err := http.Get(u.String())
+	return &remoteFile{Response: resp, uri: u}, err
+}
+
+// CanRead makes a HEAD HTTP request to analyse the headers received
+// from the remote server.
+// Any response status code apart from 2xx is considered to be invalid.
+//
+// Since: 2.1
+func (*HTTPRepository) CanRead(u granio.URI) (bool, error) {
+	resp, err := http.Head(u.String())
+	if err != nil {
+		return false, err
+	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
+		return false, errors.New("remote server did not return a successful response")
+	}
+
+	return true, nil
+}
+
+// Destroy satisfies the repository.Repository interface.
+//
+// Since: 2.1
+func (*HTTPRepository) Destroy(string) {
+	// do nothing
+}

@@ -1,0 +1,17 @@
+go 1.27.1
+
+use (
+	.
+	./deps/dbus
+	./deps/gl
+	./deps/gl-js
+	./deps/glfw-js
+	./deps/glfw/v3.3/glfw
+	./deps/glfw/v3.4/glfw
+	./deps/glfw/v3.5/glfw
+	./deps/glow
+	./deps/image
+	./deps/oksvg
+	./deps/systray
+	./extras/apps
+)

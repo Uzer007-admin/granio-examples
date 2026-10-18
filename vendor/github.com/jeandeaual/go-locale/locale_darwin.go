@@ -1,5 +1,4 @@
 //go:build darwin && !ios
-// +build darwin,!ios
 
 package locale
 
@@ -10,6 +9,9 @@ import (
 	"strings"
 	"syscall"
 )
+
+// Common code between locale_darwin_cgo.go and locale_darwin_nocgo.go
+// GetLocale exported functions are in those files
 
 func execCommand(cmd string, args ...string) (status int, out string, err error) {
 	var bytesOut []byte
@@ -31,8 +33,8 @@ func execCommand(cmd string, args ...string) (status int, out string, err error)
 	return
 }
 
-// GetLocale retrieves the IETF BCP 47 language tag set on the system.
-func GetLocale() (string, error) {
+// getLocaleCli retrieves the IETF BCP 47 language tag set on the system without using CGO to call OS APIs.
+func getLocaleCli() (string, error) {
 	_, output, err := execCommand("defaults", "read", "-g", "AppleLocale")
 	if err != nil {
 		return "", fmt.Errorf("cannot determine locale: %v (output: %s)", err, output)
@@ -52,8 +54,8 @@ func GetLocale() (string, error) {
 // (en, "fr-FR", "ja-JP")
 var appleLanguagesRegex = regexp.MustCompile(`([a-z]{2}(?:-[A-Z]{2})?)`)
 
-// GetLocales retrieves the IETF BCP 47 language tags set on the system.
-func GetLocales() ([]string, error) {
+// getLocalesCli retrieves the IETF BCP 47 language tags set on the system without using CGO to call OS APIs.
+func getLocalesCli() ([]string, error) {
 	_, output, err := execCommand("defaults", "read", "-g", "AppleLanguages")
 	if err != nil {
 		return nil, fmt.Errorf("cannot determine locale: %v (output: %s)", err, output)

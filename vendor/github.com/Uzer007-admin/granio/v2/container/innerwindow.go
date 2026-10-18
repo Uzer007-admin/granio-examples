@@ -1,0 +1,530 @@
+package container
+
+import (
+	"image/color"
+	"runtime"
+
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/internal/goos"
+	intWidget "github.com/Uzer007-admin/granio/v2/internal/widget"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
+)
+
+type titleBarButtonMode int
+
+const (
+	modeClose titleBarButtonMode = iota
+	modeMinimize
+	modeMaximize
+	modeIcon
+
+	sizeDraggableCorner = 16
+)
+
+var _ granio.Widget = (*InnerWindow)(nil)
+
+// InnerWindow defines a container that wraps content in a window border - that can then be placed inside
+// a regular container/canvas.
+//
+// Since: 2.5
+type InnerWindow struct {
+	widget.BaseWidget
+
+	CloseIntercept                                      func()                  `json:"-"`
+	OnDragged, OnResized                                func(*granio.DragEvent) `json:"-"`
+	OnMinimized, OnMaximized, OnTappedBar, OnTappedIcon func()                  `json:"-"`
+	Icon                                                granio.Resource
+
+	// Alignment allows an inner window to specify if the buttons should be on the left
+	// (`ButtonAlignLeading`) or right of the window border.
+	//
+	// Since: 2.6
+	Alignment widget.ButtonAlign
+
+	// Title returns the string that is currently shown in the top of the window border.
+	//
+	// Since: 2.8
+	Title string
+
+	// Content returns the current `CanvasObject` that makes the content of this inner window.
+	//
+	// Since: 2.8
+	Content *granio.Container
+
+	maximized, inactive bool
+}
+
+// NewInnerWindow creates a new window border around the given `content`, displaying the `title` along the top.
+// This will behave like a normal contain and will probably want to be added to a `MultipleWindows` parent.
+//
+// Since: 2.5
+func NewInnerWindow(title string, content granio.CanvasObject) *InnerWindow {
+	w := &InnerWindow{Title: title, Content: NewPadded(content)}
+	w.ExtendBaseWidget(w)
+	return w
+}
+
+// Close closes the window by hiding it.
+func (w *InnerWindow) Close() {
+	w.Hide()
+}
+
+// Cursor returns the default cursor so that objects behind the window cannot set their own.
+//
+// Since: 2.9
+func (*InnerWindow) Cursor() desktop.Cursor {
+	return desktop.DefaultCursor
+}
+
+// MouseIn catches mouse-in events not handled by the window’s content. It does nothing.
+//
+// Since: 2.9
+func (*InnerWindow) MouseIn(*desktop.MouseEvent) {
+}
+
+// MouseMoved catches mouse-moved events not handled by the window’s content. It does nothing.
+//
+// Since: 2.9
+func (*InnerWindow) MouseMoved(*desktop.MouseEvent) {
+}
+
+// MouseOut catches mouse-out events not handled by the window’s content. It does nothing.
+//
+// Since: 2.9
+func (*InnerWindow) MouseOut() {
+}
+
+// CreateRenderer implements the [granio.Widget] interface.
+func (w *InnerWindow) CreateRenderer() granio.WidgetRenderer {
+	w.ExtendBaseWidget(w)
+	th := w.Theme()
+	v := granio.CurrentApp().Settings().ThemeVariant()
+
+	buttonMin := newBorderButton(theme.WindowMinimizeIcon(), modeMinimize, th, w.OnMinimized)
+	if w.OnMinimized == nil {
+		buttonMin.Disable()
+	}
+	buttonMax := newBorderButton(theme.WindowMaximizeIcon(), modeMaximize, th, func() {
+		w.maximized = !w.maximized
+		w.Refresh()
+
+		if fn := w.OnMaximized; fn != nil {
+			fn()
+		}
+	})
+	if w.OnMaximized == nil {
+		buttonMax.Disable()
+	}
+
+	buttonClose := newBorderButton(theme.WindowCloseIcon(), modeClose, th, func() {
+		if f := w.CloseIntercept; f != nil {
+			f()
+		} else {
+			w.Close()
+		}
+	})
+	buttons := NewCenter(NewHBox(buttonClose, buttonMin, buttonMax))
+
+	borderIcon := newBorderButton(w.Icon, modeIcon, th, func() {
+		if f := w.OnTappedIcon; f != nil {
+			f()
+		}
+	})
+	if w.OnTappedIcon == nil {
+		borderIcon.Disable()
+	}
+
+	if w.Icon == nil {
+		borderIcon.Hide()
+	}
+	title := newDraggableLabel(w.Title, w)
+	title.Truncation = granio.TextTruncateEllipsis
+
+	height := w.Theme().Size(theme.SizeNameWindowTitleBarHeight)
+	off := (height - title.labelMinSize().Height) / 2
+	barMid := New(layout.NewCustomPaddedLayout(off, 0, 0, 0), title)
+	if w.buttonPosition() == widget.ButtonAlignTrailing {
+		buttons = NewCenter(NewHBox(buttonMin, buttonMax, buttonClose))
+	}
+
+	bg := canvas.NewRectangle(th.Color(theme.ColorNameInnerWindowBorder, v))
+	bg.CornerRadius = th.Size(theme.SizeNameInnerWindowRadius)
+	configureShadow(bg, false, th, v)
+
+	intWidget.ApplyShadowForLevel(&bg.Shadow, intWidget.PopUpLevel, th.Color(theme.ColorNameShadow, v))
+	contentBG := canvas.NewRectangle(th.Color(theme.ColorNameBackground, v))
+	corner := newDraggableCorner(w)
+	bar := New(&titleBarLayout{buttons: buttons, icon: borderIcon, title: barMid, win: w},
+		buttons, borderIcon, barMid)
+
+	if w.Content == nil {
+		w.Content = NewPadded(canvas.NewRectangle(color.Transparent))
+	}
+	objects := []granio.CanvasObject{bg, contentBG, bar, w.Content, corner}
+	r := &innerWindowRenderer{
+		BaseRenderer: intWidget.NewBaseRenderer(objects),
+		win:          w, bar: bar, buttonBox: buttons, buttons: []*borderButton{buttonClose, buttonMin, buttonMax}, bg: bg,
+		corner: corner, contentBG: contentBG, icon: borderIcon,
+	}
+	r.Layout(w.Size())
+	return r
+}
+
+// SetActive tells the window whether it is the currently active (top) window.
+// A new window is assumed to be active.
+//
+// Since: 2.8
+func (w *InnerWindow) SetActive(active bool) {
+	w.inactive = !active
+	w.Refresh()
+}
+
+// SetContent replaces the first [granio.CanvasObject] of thw window’s content with the specified one.
+// The window must have a non-empty content.
+func (w *InnerWindow) SetContent(obj granio.CanvasObject) {
+	w.Content.Objects[0] = obj
+
+	w.Content.Refresh()
+}
+
+// SetMaximized tells the window if the maximized state should be set or not.
+//
+// Since: 2.6
+func (w *InnerWindow) SetMaximized(maximized bool) {
+	w.maximized = maximized
+	w.Refresh()
+}
+
+// SetPadded allows applications to specify whether the window should have inner padding.
+func (w *InnerWindow) SetPadded(pad bool) {
+	if pad {
+		w.Content.Layout = layout.NewPaddedLayout()
+	} else {
+		w.Content.Layout = layout.NewStackLayout()
+	}
+	w.Content.Refresh()
+}
+
+// SetTitle updates the current title of the window.
+func (w *InnerWindow) SetTitle(title string) {
+	w.Title = title
+	w.Refresh()
+}
+
+func (w *InnerWindow) buttonPosition() widget.ButtonAlign {
+	if w.Alignment != widget.ButtonAlignCenter {
+		return w.Alignment
+	}
+
+	if runtime.GOOS == goos.Windows || runtime.GOOS == goos.Linux || goos.IsBSD(runtime.GOOS) {
+		return widget.ButtonAlignTrailing
+	}
+	// macOS
+	return widget.ButtonAlignLeading
+}
+
+var _ granio.WidgetRenderer = (*innerWindowRenderer)(nil)
+
+type innerWindowRenderer struct {
+	intWidget.BaseRenderer
+
+	win            *InnerWindow
+	bar, buttonBox *granio.Container
+	buttons        []*borderButton
+	icon           *borderButton
+	bg, contentBG  *canvas.Rectangle
+	corner         granio.CanvasObject
+}
+
+func (i *innerWindowRenderer) Layout(size granio.Size) {
+	th := i.win.Theme()
+	pad := th.Size(theme.SizeNamePadding)
+
+	i.bg.Resize(size)
+	i.bg.Move(granio.Position{})
+
+	barHeight := i.win.Theme().Size(theme.SizeNameWindowTitleBarHeight)
+	i.bar.Move(granio.NewPos(pad, 0))
+	i.bar.Resize(granio.NewSize(size.Width-pad*2, barHeight))
+
+	innerPos := granio.NewPos(pad, barHeight)
+	innerSize := granio.NewSize(size.Width-pad*2, size.Height-pad-barHeight)
+	i.contentBG.Move(innerPos)
+	i.contentBG.Resize(innerSize)
+	i.win.Content.Move(innerPos)
+	i.win.Content.Resize(innerSize)
+
+	cornerSize := i.corner.MinSize()
+	i.corner.Move(granio.NewPos(size.Components()).Subtract(cornerSize).AddXY(1, 1))
+	i.corner.Resize(cornerSize)
+}
+
+func (i *innerWindowRenderer) MinSize() granio.Size {
+	th := i.win.Theme()
+	pad := th.Size(theme.SizeNamePadding)
+	contentMin := i.win.Content.MinSize()
+	barHeight := th.Size(theme.SizeNameWindowTitleBarHeight)
+
+	innerWidth := max(i.bar.MinSize().Width, contentMin.Width)
+
+	return granio.NewSize(innerWidth+pad*2, contentMin.Height+pad+barHeight)
+}
+
+func (i *innerWindowRenderer) Refresh() {
+	th := i.win.Theme()
+	v := granio.CurrentApp().Settings().ThemeVariant()
+	i.bg.FillColor = th.Color(theme.ColorNameInnerWindowBorder, v)
+	if i.win.inactive {
+		col := th.Color(theme.ColorNameInnerWindowBorderInactive, v)
+		r, g, b, a := col.RGBA()
+		if r != 0 || g != 0 || b != 0 || a != 0 {
+			i.bg.FillColor = col
+		}
+	}
+	i.bg.CornerRadius = th.Size(theme.SizeNameInnerWindowRadius)
+	i.bg.Shadow.Color = th.Color(theme.ColorNameShadow, v)
+	configureShadow(i.bg, !i.win.inactive, th, v)
+	i.bg.Refresh()
+	i.contentBG.FillColor = th.Color(theme.ColorNameBackground, v)
+	i.contentBG.Refresh()
+
+	if i.win.buttonPosition() == widget.ButtonAlignTrailing {
+		i.buttonBox.Objects[0].(*granio.Container).Objects = []granio.CanvasObject{i.buttons[1], i.buttons[2], i.buttons[0]}
+	} else {
+		i.buttonBox.Objects[0].(*granio.Container).Objects = []granio.CanvasObject{i.buttons[0], i.buttons[1], i.buttons[2]}
+	}
+	for _, b := range i.buttons {
+		b.setTheme(th)
+	}
+	i.icon.setTheme(th)
+	i.bar.Refresh()
+
+	if i.win.OnMinimized == nil {
+		i.buttons[1].Disable()
+	} else {
+		i.buttons[1].SetOnTapped(i.win.OnMinimized)
+		i.buttons[1].Enable()
+	}
+
+	maximize := i.buttons[2]
+	if i.win.OnMaximized == nil {
+		i.buttons[2].Disable()
+	} else {
+		maximize.Enable()
+	}
+	if i.win.maximized {
+		maximize.b.SetIcon(theme.ViewRestoreIcon())
+	} else {
+		maximize.b.SetIcon(theme.WindowMaximizeIcon())
+	}
+
+	title, _ := i.bar.Objects[2].(*granio.Container).Objects[0].(*draggableLabel)
+	title.SetText(i.win.Title)
+	if i.win.OnTappedIcon == nil {
+		i.icon.Disable()
+	} else {
+		i.icon.Enable()
+	}
+	if i.win.Icon != nil {
+		i.icon.b.SetIcon(i.win.Icon)
+		i.icon.Show()
+	} else {
+		i.icon.Hide()
+	}
+}
+
+type draggableLabel struct {
+	widget.Label
+	win *InnerWindow
+}
+
+func newDraggableLabel(title string, win *InnerWindow) *draggableLabel {
+	d := &draggableLabel{win: win}
+	d.ExtendBaseWidget(d)
+	d.Text = title
+	return d
+}
+
+func (d *draggableLabel) Dragged(ev *granio.DragEvent) {
+	if f := d.win.OnDragged; f != nil {
+		f(ev)
+	}
+}
+
+func (*draggableLabel) DragEnd() {
+}
+
+func (d *draggableLabel) MinSize() granio.Size {
+	width := d.Label.MinSize().Width
+	height := d.Label.Theme().Size(theme.SizeNameWindowButtonHeight)
+	return granio.NewSize(width, height)
+}
+
+func (d *draggableLabel) Tapped(_ *granio.PointEvent) {
+	if f := d.win.OnTappedBar; f != nil {
+		f()
+	}
+}
+
+func (d *draggableLabel) labelMinSize() granio.Size {
+	return d.Label.MinSize()
+}
+
+type draggableCorner struct {
+	widget.BaseWidget
+	win *InnerWindow
+}
+
+func newDraggableCorner(w *InnerWindow) *draggableCorner {
+	d := &draggableCorner{win: w}
+	d.ExtendBaseWidget(d)
+	return d
+}
+
+func (*draggableCorner) CreateRenderer() granio.WidgetRenderer {
+	prop := canvas.NewImageFromResource(granio.CurrentApp().Settings().Theme().Icon(theme.IconNameDragCornerIndicator))
+	prop.SetMinSize(granio.NewSquareSize(sizeDraggableCorner))
+	return widget.NewSimpleRenderer(prop)
+}
+
+func (*draggableCorner) Cursor() desktop.Cursor {
+	return desktop.NWSEResizeCursor
+}
+
+func (c *draggableCorner) Dragged(ev *granio.DragEvent) {
+	if f := c.win.OnResized; f != nil {
+		c.win.OnResized(ev)
+	}
+}
+
+func (*draggableCorner) DragEnd() {
+}
+
+type borderButton struct {
+	widget.BaseWidget
+
+	b    *widget.Button
+	c    *ThemeOverride
+	mode titleBarButtonMode
+}
+
+func newBorderButton(icon granio.Resource, mode titleBarButtonMode, th granio.Theme, fn func()) *borderButton {
+	buttonImportance := widget.MediumImportance
+	if mode == modeIcon {
+		buttonImportance = widget.LowImportance
+	}
+	b := &widget.Button{Icon: icon, Importance: buttonImportance, OnTapped: fn}
+	c := NewThemeOverride(b, &buttonTheme{Theme: th, mode: mode})
+
+	ret := &borderButton{b: b, c: c, mode: mode}
+	ret.ExtendBaseWidget(ret)
+	return ret
+}
+
+func (b *borderButton) CreateRenderer() granio.WidgetRenderer {
+	return widget.NewSimpleRenderer(b.c)
+}
+
+func (b *borderButton) Disable() {
+	b.b.Disable()
+}
+
+func (b *borderButton) Enable() {
+	b.b.Enable()
+}
+
+func (b *borderButton) SetOnTapped(fn func()) {
+	b.b.OnTapped = fn
+}
+
+func (b *borderButton) MinSize() granio.Size {
+	height := b.Theme().Size(theme.SizeNameWindowButtonHeight)
+	return granio.NewSquareSize(height)
+}
+
+func (b *borderButton) setTheme(th granio.Theme) {
+	b.c.Theme = &buttonTheme{Theme: th, mode: b.mode}
+}
+
+type buttonTheme struct {
+	granio.Theme
+	mode titleBarButtonMode
+}
+
+func (b *buttonTheme) Color(n granio.ThemeColorName, v granio.ThemeVariant) color.Color {
+	if n == theme.ColorNameHover && b.mode == modeClose {
+		n = theme.ColorNameError
+	}
+	return b.Theme.Color(n, v)
+}
+
+func (b *buttonTheme) Size(n granio.ThemeSizeName) float32 {
+	switch n {
+	case theme.SizeNameButtonRadius:
+		if b.mode == modeIcon {
+			return 0
+		}
+		n = theme.SizeNameWindowButtonRadius
+	case theme.SizeNameInlineIcon:
+		n = theme.SizeNameWindowButtonIcon
+	}
+
+	return b.Theme.Size(n)
+}
+
+type titleBarLayout struct {
+	win                  *InnerWindow
+	buttons, icon, title granio.CanvasObject
+}
+
+func (t *titleBarLayout) Layout(_ []granio.CanvasObject, s granio.Size) {
+	buttonMinWidth := t.buttons.MinSize().Width
+	t.buttons.Resize(granio.NewSize(buttonMinWidth, s.Height))
+	t.icon.Resize(granio.NewSquareSize(s.Height))
+	usedWidth := buttonMinWidth
+	if t.icon.Visible() {
+		usedWidth += s.Height
+	}
+	t.title.Resize(granio.NewSize(s.Width-usedWidth, s.Height))
+
+	if t.win.buttonPosition() == widget.ButtonAlignTrailing {
+		t.buttons.Move(granio.NewPos(s.Width-buttonMinWidth, 0))
+		t.icon.Move(granio.Position{})
+		if t.icon.Visible() {
+			t.title.Move(granio.NewPos(s.Height, 0))
+		} else {
+			t.title.Move(granio.Position{})
+		}
+	} else {
+		t.buttons.Move(granio.NewPos(0, 0))
+		t.icon.Move(granio.NewPos(s.Width-s.Height, 0))
+		t.title.Move(granio.NewPos(buttonMinWidth, 0))
+	}
+}
+
+func (t *titleBarLayout) MinSize(_ []granio.CanvasObject) granio.Size {
+	buttonMin := t.buttons.MinSize()
+	iconMin := t.icon.MinSize()
+	titleMin := t.title.MinSize() // can truncate
+
+	return granio.NewSize(buttonMin.Width+iconMin.Width+titleMin.Width,
+		max(buttonMin.Height, iconMin.Height, titleMin.Height))
+}
+
+func configureShadow(bg *canvas.Rectangle, active bool, th granio.Theme, v granio.ThemeVariant) {
+	var radius float32
+	if active {
+		radius = th.Size(theme.SizeNameWindowShadowActiveRadius)
+	} else {
+		radius = th.Size(theme.SizeNameWindowShadowRadius)
+	}
+
+	bg.Shadow.Color = th.Color(theme.ColorNameShadow, v)
+	bg.Shadow.Offset = granio.NewPos(radius/8, radius/4)
+	bg.Shadow.Spread = radius / 2
+	bg.Shadow.BlurRadius = radius
+}
