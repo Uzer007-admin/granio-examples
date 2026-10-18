@@ -44,6 +44,10 @@ go run -tags migrated_fynedo .
 | 7GUIs: CRUD | Редактирование набора данных | `go run ./7guis/crud` |
 | Учебные проекты | Первое окно, тестирование, упаковка, трей | `go run ./tutorials/started/hello` |
 | Практические занятия | Привязки данных и собственные виджеты | `go run ./workshops/GoLab2024/more/bind` |
+| Терминал | PTY/ConPTY, вкладки и работа с оболочкой | `go run ./terminal` |
+| Дополнительные виджеты | Карты, календарь, диаграммы и адаптивная компоновка | `go run ./extensions/calendar_demo` |
+| Локаль | Получение системного языка | `go run ./localization/getlocale` |
+| Облачные настройки | Подключение провайдера и пользовательские настройки | `go run ./cloud` |
 | Flatpak | Пакет для Linux, Wayland и резервный X11 | [Рецепт](packaging/flatpak/README.md) |
 | WebAssembly | Сборка браузерной демонстрации | [Рецепт](packaging/web/README.md) |
 
@@ -64,7 +68,7 @@ go build -tags migrated_fynedo ./...
 Утилита упаковки устанавливается отдельно:
 
 ```sh
-go install github.com/Uzer007-admin/granio-tools/cmd/granio@v1.7.4-0.20261018003122-f078fb2d381a
+go install github.com/Uzer007-admin/granio-tools/cmd/granio@v1.7.4-0.20261018065601-9286299481ee
 cd calculator
 granio package --release --target windows
 ```

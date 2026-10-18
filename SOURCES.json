@@ -98,6 +98,55 @@
       "history_merged": false,
       "license_files": [],
       "previous_repository": null
+    },
+    {
+      "source": "https://github.com/fyne-io/terminal",
+      "prepared_commit": "574c4ff0f8e6c69c4abfe184a1393bd42720ac20",
+      "path": "terminal",
+      "history_merged": true,
+      "previous_repository": "https://github.com/Uzer007-admin/granio-terminal",
+      "previous_repository_deleted": false,
+      "library_repository": "granio-x",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "source": "https://github.com/fyne-io/cloud",
+      "prepared_commit": "3d634a4219c9164bfb605a423a3ba8b773c6ab2a",
+      "path": "cloud",
+      "history_merged": true,
+      "previous_repository": "https://github.com/Uzer007-admin/granio-cloud",
+      "previous_repository_deleted": false,
+      "library_repository": "granio-x",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "source": "https://github.com/fyne-io/go-locale",
+      "prepared_commit": "f28f8175f09fceba681537562ed44ecbcbe0d2a3",
+      "path": "localization",
+      "history_merged": true,
+      "previous_repository": "https://github.com/Uzer007-admin/granio-locale",
+      "previous_repository_deleted": false,
+      "library_repository": "granio-x",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "source": "https://github.com/fyne-io/fyne-x",
+      "prepared_commit": "c5b034111a1801306b02518af866c8753027a89a",
+      "path": "extensions",
+      "history_merged": true,
+      "previous_repository": "https://github.com/Uzer007-admin/granio-x",
+      "previous_repository_deleted": false,
+      "library_repository": "granio-x",
+      "license_files": [
+        "LICENSE",
+        "AUTHORS"
+      ]
     }
   ]
 }
