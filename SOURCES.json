@@ -10,7 +10,8 @@
         "AUTHORS",
         "LICENSE"
       ],
-      "previous_repository": "https://github.com/Uzer007-admin/granio-calculator"
+      "previous_repository": "https://github.com/Uzer007-admin/granio-calculator",
+      "previous_repository_deleted": true
     },
     {
       "source": "https://github.com/fyne-io/life",
@@ -50,7 +51,8 @@
       "license_files": [
         "LICENSE"
       ],
-      "previous_repository": "https://github.com/Uzer007-admin/granio-demo"
+      "previous_repository": "https://github.com/Uzer007-admin/granio-demo",
+      "previous_repository_deleted": true
     },
     {
       "source": "https://github.com/fyne-io/7guis",
@@ -58,7 +60,8 @@
       "path": "7guis",
       "history_merged": true,
       "license_files": [],
-      "previous_repository": "https://github.com/Uzer007-admin/granio-7guis"
+      "previous_repository": "https://github.com/Uzer007-admin/granio-7guis",
+      "previous_repository_deleted": true
     },
     {
       "source": "https://github.com/fyne-io/tutorials",
@@ -66,7 +69,8 @@
       "path": "tutorials",
       "history_merged": true,
       "license_files": [],
-      "previous_repository": "https://github.com/Uzer007-admin/granio-tutorials"
+      "previous_repository": "https://github.com/Uzer007-admin/granio-tutorials",
+      "previous_repository_deleted": true
     },
     {
       "source": "https://github.com/fyne-io/workshops",
@@ -84,7 +88,8 @@
       "license_files": [
         "LICENSE"
       ],
-      "previous_repository": "https://github.com/Uzer007-admin/granio-flatpak-demo"
+      "previous_repository": "https://github.com/Uzer007-admin/granio-flatpak-demo",
+      "previous_repository_deleted": true
     },
     {
       "source": "https://github.com/fyne-io/demo.fyne.io",
