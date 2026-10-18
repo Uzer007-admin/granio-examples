@@ -4,9 +4,9 @@
 package main
 
 import (
-	"fyne.io/fyne/v2/driver"
+	"github.com/Uzer007-admin/granio/v2/driver"
 
-	"github.com/fyne-io/go-locale"
+	"github.com/Uzer007-admin/granio-locale"
 )
 
 func init() {

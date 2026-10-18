@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fyne-io/go-locale"
+	"github.com/Uzer007-admin/granio-locale"
 )
 
 func main() {

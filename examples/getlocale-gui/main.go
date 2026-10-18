@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/fyne-io/go-locale"
+	"github.com/Uzer007-admin/granio-locale"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
 )
