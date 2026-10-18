@@ -3,7 +3,7 @@ module github.com/Uzer007-admin/granio-locale
 go 1.27.1
 
 require (
-	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1
+	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/sys v0.49.0
