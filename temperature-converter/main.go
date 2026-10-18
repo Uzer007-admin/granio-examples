@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -16,9 +16,9 @@ func main() {
 	valueF := celsiusToFarenheit(valueC)
 
 	entryC := widget.NewEntryWithData(binding.FloatToString(valueC))
-	entryC.Wrapping = fyne.TextWrapOff
+	entryC.Wrapping = granio.TextWrapOff
 	entryF := widget.NewEntryWithData(binding.FloatToString(valueF))
-	entryF.Wrapping = fyne.TextWrapOff
+	entryF.Wrapping = granio.TextWrapOff
 	w.SetContent(container.NewGridWithColumns(4,
 		entryC, widget.NewLabel("Celsius ="),
 		entryF, widget.NewLabel("Fahrenheit")))

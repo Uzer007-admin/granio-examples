@@ -3,10 +3,10 @@ package main
 import (
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type gui struct {
@@ -70,9 +70,9 @@ func (g *gui) createFilter() *widget.Entry {
 func (g *gui) createList() *widget.List {
 	l := widget.NewList(func() int {
 		return len(g.filtered)
-	}, func() fyne.CanvasObject {
+	}, func() granio.CanvasObject {
 		return widget.NewLabel("")
-	}, func(id widget.ListItemID, o fyne.CanvasObject) {
+	}, func(id widget.ListItemID, o granio.CanvasObject) {
 		o.(*widget.Label).SetText(people[g.filtered[id]].String())
 	})
 
