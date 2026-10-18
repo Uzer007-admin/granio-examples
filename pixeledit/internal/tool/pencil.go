@@ -4,8 +4,8 @@ import (
 	"github.com/Uzer007-admin/granio/v2"
 	"github.com/Uzer007-admin/granio/v2/canvas"
 
-	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
-	"github.com/Uzer007-admin/granio-pixeledit/internal/data"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/data"
 )
 
 // Pencil is a pixel setting tool

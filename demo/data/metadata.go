@@ -1,4 +1,4 @@
-//go:generate fyne bundle -o metadata_bundled.go -package data -name resourceAuthors ../../../AUTHORS
+//go:generate granio bundle -o metadata_bundled.go -package data -name resourceAuthors ../../../AUTHORS
 
 package data
 

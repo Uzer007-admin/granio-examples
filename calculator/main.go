@@ -1,6 +1,6 @@
 // Package main launches the calculator app
 //
-//go:generate fyne bundle -o data.go Icon.png
+//go:generate granio bundle -o data.go Icon.png
 package main
 
 import "github.com/Uzer007-admin/granio/v2/app"

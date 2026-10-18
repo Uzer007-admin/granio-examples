@@ -8,8 +8,8 @@ import (
 	"github.com/Uzer007-admin/granio/v2/app"
 	"github.com/Uzer007-admin/granio/v2/storage"
 
-	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
-	"github.com/Uzer007-admin/granio-pixeledit/internal/ui"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/ui"
 )
 
 func loadFileArgs(e api.Editor) {

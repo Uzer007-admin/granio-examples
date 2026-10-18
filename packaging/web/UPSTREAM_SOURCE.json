@@ -1,0 +1,10 @@
+{
+  "source": "https://github.com/Uzer007-admin/granio-demo",
+  "source_commit": "53f190115906cc856870e4e3fae5c7f4efdd95ad",
+  "tool": "github.com/Uzer007-admin/granio-tools/cmd/granio",
+  "tool_version": "v1.7.4-0.20261018003122-f078fb2d381a",
+  "core_version": "v2.8.2-0.20261018000600-86cc66cfefa1",
+  "go": "go version go1.27.2 windows/amd64",
+  "sha256": "31604d0cfa6ff073e4ed59a9984a6f9cd168b6e14a817b191f7f4f8b11ec5470",
+  "validation": "Упаковка WebAssembly выполнена; браузерная приёмка и развёртывание отдельно."
+}

@@ -7,7 +7,7 @@ import (
 	"github.com/Uzer007-admin/granio/v2/theme"
 	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/Uzer007-admin/granio-solitaire/faces"
+	"github.com/Uzer007-admin/granio-examples/solitaire/faces"
 )
 
 const (

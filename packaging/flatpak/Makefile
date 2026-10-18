@@ -1,9 +1,12 @@
-# This is just a Makefile to simplify running some of the commands mentioned in the README.
+.PHONY: vendor build install run
 
-build:
+vendor:
+	cd ../.. && GOWORK=off go mod vendor
+
+build: vendor
 	flatpak-builder --user --force-clean build-dir io.github.uzer007_admin.granio.flatpak_demo.yml
 
-install:
+install: vendor
 	flatpak-builder --user --install --force-clean build-dir io.github.uzer007_admin.granio.flatpak_demo.yml
 
 run:

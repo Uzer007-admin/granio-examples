@@ -5,7 +5,7 @@ import (
 
 	"github.com/Uzer007-admin/granio/v2"
 
-	"github.com/Uzer007-admin/granio-solitaire/faces"
+	"github.com/Uzer007-admin/granio-examples/solitaire/faces"
 )
 
 // Suit encodes one of the four possible suits for a playing card

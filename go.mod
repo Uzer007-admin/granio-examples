@@ -3,8 +3,11 @@ module github.com/Uzer007-admin/granio-examples
 go 1.27.1
 
 require (
-	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1
+	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778
+	github.com/alecthomas/chroma/v2 v2.15.0
+	github.com/casbin/govaluate v1.10.0
 	github.com/stretchr/testify v1.12.1
+	golang.org/x/image v0.47.0
 )
 
 require (
@@ -20,6 +23,7 @@ require (
 	github.com/Uzer007-admin/granio-systray v1.12.3-0.20261017235015-fd45fbf4dbbd // indirect
 	github.com/anthonynsimon/bild v0.17.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/go-text/render v0.2.1 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
@@ -34,7 +38,6 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/yuin/goldmark v1.8.6 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect

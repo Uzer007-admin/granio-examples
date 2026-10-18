@@ -2,3 +2,12 @@
 .DS_Store
 
 examples
+
+# Общие результаты сборки
+/vendor/
+/demo/wasm/
+/packaging/web/site/
+/packaging/flatpak/build-dir/
+/packaging/flatpak/.flatpak-builder/
+coverage.out
+*.exe

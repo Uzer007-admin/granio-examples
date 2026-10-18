@@ -3,8 +3,8 @@ package tool
 import (
 	"github.com/Uzer007-admin/granio/v2"
 
-	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
-	"github.com/Uzer007-admin/granio-pixeledit/internal/data"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/data"
 )
 
 // Picker allows setting the current image colors from a pixel in an image

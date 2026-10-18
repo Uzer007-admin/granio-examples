@@ -1,4 +1,4 @@
-//go:generate fyne bundle --package=faces --prefix=card -o bundled.go .
+//go:generate granio bundle --package=faces --prefix=card -o bundled.go .
 
 package faces
 

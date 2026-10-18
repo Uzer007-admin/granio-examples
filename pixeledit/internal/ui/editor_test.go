@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/api"
 )
 
 func uriForTestFile(name string) granio.URI {

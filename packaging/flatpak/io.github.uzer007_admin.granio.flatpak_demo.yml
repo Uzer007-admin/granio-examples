@@ -21,22 +21,22 @@ finish-args:
 
 build-options:
   env:
-    - GOBIN=/app/bin
-    - GOROOT=/usr/lib/sdk/golang
+    GOBIN: /app/bin
+    GOROOT: /usr/lib/sdk/golang
 
 modules:
     - name: flatpak_demo
       buildsystem: simple
       build-commands:
-        - $GOROOT/bin/go build -trimpath -o flatpak_demo
+        - $GOROOT/bin/go build -mod=vendor -tags=migrated_fynedo -trimpath -o flatpak_demo ./packaging/flatpak
         - install -Dm00755 flatpak_demo $FLATPAK_DEST/bin/flatpak_demo
-        - install -Dm00644 Icon.png $FLATPAK_DEST/share/icons/hicolor/256x256/apps/$FLATPAK_ID.png
-        - install -Dm00644 $FLATPAK_ID.desktop $FLATPAK_DEST/share/applications/$FLATPAK_ID.desktop
-        - install -Dm00644 $FLATPAK_ID.appdata.xml $FLATPAK_DEST/share/appdata/$FLATPAK_ID.appdata.xml
+        - install -Dm00644 packaging/flatpak/Icon.png $FLATPAK_DEST/share/icons/hicolor/256x256/apps/$FLATPAK_ID.png
+        - install -Dm00644 packaging/flatpak/$FLATPAK_ID.desktop $FLATPAK_DEST/share/applications/$FLATPAK_ID.desktop
+        - install -Dm00644 packaging/flatpak/$FLATPAK_ID.appdata.xml $FLATPAK_DEST/share/appdata/$FLATPAK_ID.appdata.xml
       sources:
         - type: dir
-          path: .
+          path: ../..
           skip:
             - .git
-            - build-dir
-            - .flatpak-builder
+            - packaging/flatpak/build-dir
+            - packaging/flatpak/.flatpak-builder

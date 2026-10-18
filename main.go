@@ -1,4 +1,4 @@
-//go:generate fyne bundle -o data.go Icon.png
+//go:generate granio bundle -o data.go Icon.png
 
 package main
 
@@ -38,7 +38,7 @@ func main() {
 	a.SetIcon(resourceIconPng)
 
 	content := container.NewStack()
-	w := a.NewWindow("Examples")
+	w := a.NewWindow("Примеры Granio")
 
 	apps[4].icon = theme.RadioButtonIcon() // lazy load Fyne resource to avoid error
 	appList := widget.NewList(

@@ -1,0 +1,98 @@
+{
+  "base_source": "https://github.com/fyne-io/examples",
+  "sources": [
+    {
+      "source": "https://github.com/fyne-io/calculator",
+      "prepared_commit": "cdc5ca53442c3ab3d1bd47127e566ab2575e917e",
+      "path": "calculator",
+      "history_merged": true,
+      "license_files": [
+        "AUTHORS",
+        "LICENSE"
+      ],
+      "previous_repository": "https://github.com/Uzer007-admin/granio-calculator"
+    },
+    {
+      "source": "https://github.com/fyne-io/life",
+      "prepared_commit": "2c99ce0d0fe73d480a6e367e3e16ffba6eb622b8",
+      "path": "life",
+      "history_merged": true,
+      "license_files": [
+        "AUTHORS",
+        "LICENSE"
+      ],
+      "previous_repository": null
+    },
+    {
+      "source": "https://github.com/fyne-io/solitaire",
+      "prepared_commit": "385e96ef6a1d7909dd95a7fad4c64c3a386d1cbd",
+      "path": "solitaire",
+      "history_merged": true,
+      "license_files": [
+        "AUTHORS",
+        "LICENSE"
+      ],
+      "previous_repository": null
+    },
+    {
+      "source": "https://github.com/fyne-io/pixeledit",
+      "prepared_commit": "0189edbbe102cd4dba86557d90983d75bc85e85f",
+      "path": "pixeledit",
+      "history_merged": true,
+      "license_files": [],
+      "previous_repository": null
+    },
+    {
+      "source": "https://github.com/fyne-io/demo",
+      "prepared_commit": "53f190115906cc856870e4e3fae5c7f4efdd95ad",
+      "path": "demo",
+      "history_merged": true,
+      "license_files": [
+        "LICENSE"
+      ],
+      "previous_repository": "https://github.com/Uzer007-admin/granio-demo"
+    },
+    {
+      "source": "https://github.com/fyne-io/7guis",
+      "prepared_commit": "49433f460fbcc4d826e5889038f3cbd2b1695aad",
+      "path": "7guis",
+      "history_merged": true,
+      "license_files": [],
+      "previous_repository": "https://github.com/Uzer007-admin/granio-7guis"
+    },
+    {
+      "source": "https://github.com/fyne-io/tutorials",
+      "prepared_commit": "e3999d5eae60bb8ed1568937491e2c9a184958fb",
+      "path": "tutorials",
+      "history_merged": true,
+      "license_files": [],
+      "previous_repository": "https://github.com/Uzer007-admin/granio-tutorials"
+    },
+    {
+      "source": "https://github.com/fyne-io/workshops",
+      "prepared_commit": "90fae103b216034f2b5446673a7f928bd51c17db",
+      "path": "workshops",
+      "history_merged": true,
+      "license_files": [],
+      "previous_repository": null
+    },
+    {
+      "source": "https://github.com/fyne-io/flatpak_demo",
+      "prepared_commit": "7f9c83bafadda1f8e0aed06610eb4a3a755ebd8d",
+      "path": "packaging/flatpak",
+      "history_merged": true,
+      "license_files": [
+        "LICENSE"
+      ],
+      "previous_repository": "https://github.com/Uzer007-admin/granio-flatpak-demo"
+    },
+    {
+      "source": "https://github.com/fyne-io/demo.fyne.io",
+      "prepared_commit": "54b902587230e44e130248e9ff8058df7d56b684",
+      "path": "packaging/web",
+      "history_merged": false,
+      "license_files": [],
+      "previous_repository": null
+    }
+  ]
+}

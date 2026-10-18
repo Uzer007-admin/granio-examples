@@ -12,7 +12,7 @@ import (
 	"github.com/Uzer007-admin/granio/v2/theme"
 	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/Uzer007-admin/granio-demo/data"
+	"github.com/Uzer007-admin/granio-examples/demo/data"
 )
 
 // containerScreen loads a tab panel for containers

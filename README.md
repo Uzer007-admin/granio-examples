@@ -1,95 +1,74 @@
-# granio-examples
+# Примеры Granio — Гранио
 
-Компонент независимого проекта **Granio — Гранио**.
+Общий репозиторий демонстраций, учебных проектов и небольших приложений Granio.
+Все Go-примеры используют **один `go.mod`**, Go **1.27.1+** и согласованные зависимости.
 
-**Исходный репозиторий:** [examples](https://github.com/fyne-io/examples).
-**Цель форка:** Рабочие примеры приложений Granio.
+**Основной исходник:** [fyne-io/examples](https://github.com/fyne-io/examples).
+**Цель форка:** собрать примеры независимого фреймворка Granio в одном месте,
+упростить их запуск, сопровождение и проверку на разных платформах.
+Дополнительные источники, коммиты и лицензионные файлы перечислены в
+[SOURCES.json](SOURCES.json). Истории девяти наборов объединены в Git.
+Файлы LICENSE и AUTHORS сохранены рядом с соответствующими примерами.
 
-История изменений, лицензии и сведения об исходных авторах сохранены.
-Go-модули переведены на собственные пути `github.com/Uzer007-admin/…`;
-минимальная версия Go — **1.27.1**. Ядро и общие API подключаются из
-[`granio/v2`](https://github.com/Uzer007-admin/granio).
+## Начало работы
 
-Состояние переноса и результаты проверок приведены в
-[реестре экосистемы](https://github.com/Uzer007-admin/granio/blob/dev/granio/docs/ECOSYSTEM.md).
-Наличие форка само по себе не означает проверку всех платформ и сценариев.
-
----
-
-## Документация исходного проекта
-
-Команды установки и ссылки в сохранённом тексте ниже относятся к исходнику.
-Для Granio используются новые пути модулей, перечисленные выше.
-
-<p align="center">
-  <a href="https://goreportcard.com/report/github.com/fyne-io/examples"><img src="https://goreportcard.com/badge/github.com/fyne-io/examples" alt="Code Status" /></a>
-  <a href='http://gophers.slack.com/messages/fyne'><img src='https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=blue' alt='Join us on Slack' /></a>
-  <a href='https://fossfi.sh/support-fyneio'><img src='https://img.shields.io/badge/$-support_us-orange.svg?labelWidth=20&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAkCAYAAADPRbkKAAAABmJLR0QA7wAyAD/CTveyAAAACXBIWXMAAA9hAAAPYQGoP6dpAAAAB3RJTUUH4wMVCQ4LeuPReAAABDFJREFUWMPVmX9oVWUYxz/3tr5jbX9oYiZWSmNgoYYlUVqraYvIamlCg8pqUBTZr38qMhZZ0A8oIqKIiLJoJtEIsR+zki1mGqQwZTYkImtlgk5Wy7jPnbv90XPgcD3n3Lvdy731wOGc+77nec73Oe/zfp/nOTeVy+WolphZC3CVH9N9OAsMAzuBLkkHkmykKu2AmQGsAjYAC4pQ+QJ4WNJg1R0ws3pgI3DTJFVPAM8AGyRNVMUBB98DLCvBzLtAh6QTwUC6gmGzuUTwAGuBR8MD6QpFzwPAypi5v4HXgRXAEg+vLQm2njSzCyoWQmbWAPwAzIqY/gm4UdJAhN5qoAuojdCbAD4BVlViBdbGgJ8A2gPwZtZsZvea2XwASd1AZ4zNNHA90FgJB9ri6FHStw7+WaAPeA3YbWaBzovAiF/nfMUC+QD4sRIOLIkZ73Hws4BHQuOneY7A2aY/CHdgL3AtsBhYD9TVVMCB0+O2h59nRJBJfej6WOj6Bj8C2VcpFoqSC/38PbArb24zQDabBWhOsFFbNAuZ2UygxZcvcHwPsEPScILecaAuYmoUaJR01MymAU8AFzm7vCxp3MxagW0xpv8EzinogLPC40A7cGpMKHQB6yX9FqE/ACyKMb8VWC0pG6E3D+gF5sbo9km6Ml0A/N3Ad8BtMeABBNwB9JrZ7Ij5PQmPuA7YZWZXmFnan1ljZrf65p2boDuQmInNrAN4I29DJUmT02C+bCtiL/QCo2Y2BIwB7wFzCuj1xGZiM7vcb9gOTAMunUTZMVPSkZCtJuBAmQngIHCupImaCPApoBVokvSrj7UDm4o0Pg84Evo97EkoVUYHXgjK6pNWwB1I5dfdZtbtjUghWSppZ0ivDvirjA4MAosCfCeFhaRcPvhQLV6QbYGhvLHZZQRvwO1hfJNJZFu9qkySNyUdyxu7pkzgc8BDknZPuSMzs8XA58AZEdPbgTZJY3ld2GABOixWXpH0YMk9sZlN96zZ6hn2F+AdYFM4IZlZLfBRQiMzGXlaUmdFmnpPSC3A814alCJjwDpJG+NuqCkC0HzgLi+L651RvgTeAu4ELnHazAJnedkwpwzvoh+4RdLPid+FMpnMDElHY8CvAd4GGiKmR4A1DvwpYHkZabLTO7KCkgYeiwG/3Iu0hoQ6fwvwh6QVwFKn2tEpgB4BPgSaJS0oFnywAnuB5yR15bHNV6HPfUnyqaSVIV0BlwEXe51zNtAYehGHgMNOyfu9F+iXND6V5UplMplXgfuAj4HPgIXAPcXsj5CcKelwNbqiVCaTOd/jrhRZJumbajiQlrQf6OZ/KkEpsQ74vQQ7w1V1QNIh4Gbg+BRs9BXi6kqsAJK+Bq52hihWxoH7/wshFDixw786vF9kmm+TtK+aDsTWQma2EOjg379/zgNO8akh73NfknSw2pv4H3Ayg0FmbTMRAAAAAElFTkSuQmCC' alt='Support Fyne.io' /></a>
-
-  <br />
-  <a href="https://travis-ci.com/github/fyne-io/examples"><img src="https://travis-ci.com/github/fyne-io/examples.svg" alt="Build Status" /></a>
-  <a href='https://coveralls.io/github/fyne-io/examples?branch=develop'><img src='https://coveralls.io/repos/github/fyne-io/examples/badge.svg?branch=develop' alt='Coverage Status' /></a>
-</p>
-
-# Fyne Examples
-
-Here we will gather example apps that use the [Fyne](http://fyne.io) toolkit.
-
-You can start the main example app that links to all the others by running
-
-```bash 
-go run .
+```sh
+git clone https://github.com/Uzer007-admin/granio-examples.git
+cd granio-examples
+go run -tags migrated_fynedo .
 ```
 
-All these examples are fully scalable - try setting the `FYNE_SCALE`
-environment variable to override the detection of your screen's density.
-Many also respond to the current theme (this is default behaviour for
-apps built using Fyne widgets) - you can try setting `FYNE_THEME=light`
-to change from the default dark theme.
+Для настольного запуска нужны компилятор C и системные библиотеки OpenGL.
+В Linux нужны также заголовки X11/Wayland и libxkbcommon, как для ядра Granio.
+При работе внутри другого workspace задайте `GOWORK=off`.
 
-## Widget based examples
+## Каталог
 
-The following examples use mostly built in widgets making applications
-trivial to build :).
+Команды выполняются из корня репозитория. Приложения открываются отдельно.
+При миграции существующих проектов можно добавить `-tags migrated_fynedo`,
+как в команде выше.
 
-### Calculator
+| Пример | Назначение | Запуск |
+| --- | --- | --- |
+| Базовый каталог | Мины, часы, фракталы, крестики-нолики и XKCD | `go run .` |
+| Калькулятор | Ввод и проверка арифметических выражений | `go run ./calculator` |
+| Жизнь | Клеточный автомат | `go run ./life` |
+| Пасьянс | Карты, перетаскивание и игровая логика | `go run ./solitaire` |
+| Редактор пикселей | Рисование и работа с изображениями | `go run ./pixeledit` |
+| Компоненты | Деревья, списки, ввод и оформление | `go run ./demo` |
+| 7GUIs: счётчик | Состояние и обработчики | `go run ./7guis/counter` |
+| 7GUIs: температура | Пересчёт единиц и проверка ввода | `go run ./7guis/temperature-converter` |
+| 7GUIs: CRUD | Редактирование набора данных | `go run ./7guis/crud` |
+| Учебные проекты | Первое окно, тестирование, упаковка, трей | `go run ./tutorials/started/hello` |
+| Практические занятия | Привязки данных и собственные виджеты | `go run ./workshops/GoLab2024/more/bind` |
+| Flatpak | Пакет для Linux, Wayland и резервный X11 | [Рецепт](packaging/flatpak/README.md) |
+| WebAssembly | Сборка браузерной демонстрации | [Рецепт](packaging/web/README.md) |
 
-Moved to [calculator repository](https://github.com/fyne-io/calculator/)
+Независимые занятия `bind`, `custom` и `extend` находятся в отдельных каталогах
+`workshops/GoLab2024/more/`, чтобы весь набор собирался одной командой.
 
-### Bugs game (like MineSweeper)
+## Проверка и упаковка
 
-Hunt the squares to reveal everything apart from the bugs!
+```sh
+go test -race -tags migrated_fynedo,ci ./...
+go build -tags migrated_fynedo ./...
+```
 
-![](img/bugs.png)
+`ci` включает программную отрисовку для автоматических тестов. Нативный запуск
+проверяет оконную систему и OpenGL. Системная тема, прозрачность и размытие
+зависят от возможностей ОС и композитора.
 
-### XKCD
+Утилита упаковки устанавливается отдельно:
 
-An XKCD comic browser with random and lookup features.
+```sh
+go install github.com/Uzer007-admin/granio-tools/cmd/granio@v1.7.4-0.20261018003122-f078fb2d381a
+cd calculator
+granio package --release --target windows
+```
 
-![](img/xkcd.png)
+Первоначальные README, модули и workflow сохранены как материалы источников.
+Активные тесты выполняются корневыми workflow; зависимости описывает корневой
+`go.mod`. Для автономного Flatpak общая копия `vendor` создаётся по рецепту упаковки.
 
-## Graphics based examples
-
-These examples use the Fyne canvas API to draw primitive shapes,
-text and images to create custom user interfaces.
-
-### Clock
-
-A simple analog clock that matches the current theme.
-
-![](img/clock-dark.png) &nbsp; ![](img/clock-light.png)
-
-### Fractal
-
-A fractal viewer that can be panned and zoomed
-
-![](img/fractal.png)
-
-### Solitaire
-
-Moved to [solitaire repository](https://github.com/fyne-io/solitaire/)
-
-### Life
-
-Moved to [life repository](https://github.com/fyne-io/life/)
-
+[Ядро Granio](https://github.com/Uzer007-admin/granio) ·
+[Реестр экосистемы](https://github.com/Uzer007-admin/granio/blob/dev/granio/docs/ECOSYSTEM.md)

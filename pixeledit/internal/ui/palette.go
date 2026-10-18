@@ -8,8 +8,8 @@ import (
 	"github.com/Uzer007-admin/granio/v2/theme"
 	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"github.com/Uzer007-admin/granio-pixeledit/internal/api"
-	"github.com/Uzer007-admin/granio-pixeledit/internal/tool"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/api"
+	"github.com/Uzer007-admin/granio-examples/pixeledit/internal/tool"
 )
 
 type palette struct {

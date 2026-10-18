@@ -1,4 +1,4 @@
-//go:generate fyne bundle -o data.go Icon.png
+//go:generate granio bundle -o data.go Icon.png
 
 // Package main launches the life app
 package main

@@ -7,7 +7,7 @@ import (
 	"github.com/Uzer007-admin/granio/v2/canvas"
 	"github.com/Uzer007-admin/granio/v2/container"
 
-	"github.com/Uzer007-admin/granio-demo/data"
+	"github.com/Uzer007-admin/granio-examples/demo/data"
 )
 
 func rgbGradient(x, y, w, h int) color.Color {
