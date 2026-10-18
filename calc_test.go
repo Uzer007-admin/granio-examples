@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -134,13 +134,13 @@ func TestKeyboard_Buttons(t *testing.T) {
 	calc.loadUI(test.NewApp())
 
 	test.TypeOnCanvas(calc.window.Canvas(), "1+1")
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyReturn})
 	assert.Equal(t, "2", calc.output.Text)
 
 	test.TypeOnCanvas(calc.window.Canvas(), "c")
 
 	test.TypeOnCanvas(calc.window.Canvas(), "1+1")
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyEnter})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyEnter})
 	assert.Equal(t, "2", calc.output.Text)
 }
 
@@ -148,17 +148,17 @@ func TestKeyboard_Backspace(t *testing.T) {
 	calc := newCalculator()
 	calc.loadUI(test.NewApp())
 
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyBackspace})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyBackspace})
 	assert.Equal(t, "", calc.output.Text)
 
 	test.TypeOnCanvas(calc.window.Canvas(), "1/2")
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyBackspace})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyBackspace})
 	assert.Equal(t, "1/", calc.output.Text)
 
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyEnter})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyEnter})
 	assert.Equal(t, "error", calc.output.Text)
 
-	calc.onTypedKey(&fyne.KeyEvent{Name: fyne.KeyBackspace})
+	calc.onTypedKey(&granio.KeyEvent{Name: granio.KeyBackspace})
 	assert.Equal(t, "", calc.output.Text)
 }
 
@@ -188,16 +188,16 @@ func TestShortcuts(t *testing.T) {
 	clipboard := app.Clipboard()
 
 	test.TypeOnCanvas(calc.window.Canvas(), "720 + 80")
-	calc.onCopyShortcut(&fyne.ShortcutCopy{Clipboard: clipboard})
+	calc.onCopyShortcut(&granio.ShortcutCopy{Clipboard: clipboard})
 	assert.Equal(t, clipboard.Content(), calc.output.Text)
 
 	test.TypeOnCanvas(calc.window.Canvas(), "+")
 	clipboard.SetContent("50")
-	calc.onPasteShortcut(&fyne.ShortcutPaste{Clipboard: clipboard})
+	calc.onPasteShortcut(&granio.ShortcutPaste{Clipboard: clipboard})
 	test.TypeOnCanvas(calc.window.Canvas(), "=")
 	assert.Equal(t, "850", calc.output.Text)
 
 	clipboard.SetContent("not a valid number")
-	calc.onPasteShortcut(&fyne.ShortcutPaste{Clipboard: clipboard})
+	calc.onPasteShortcut(&granio.ShortcutPaste{Clipboard: clipboard})
 	assert.Equal(t, "850", calc.output.Text)
 }

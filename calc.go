@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
 	"github.com/casbin/govaluate"
 )
@@ -19,7 +19,7 @@ type calc struct {
 
 	output  *widget.Label
 	buttons map[string]*widget.Button
-	window  fyne.Window
+	window  granio.Window
 }
 
 func (c *calc) display(newtext string) {
@@ -109,17 +109,17 @@ func (c *calc) onTypedRune(r rune) {
 	}
 }
 
-func (c *calc) onTypedKey(ev *fyne.KeyEvent) {
+func (c *calc) onTypedKey(ev *granio.KeyEvent) {
 	switch ev.Name {
-	case fyne.KeyReturn, fyne.KeyEnter:
+	case granio.KeyReturn, granio.KeyEnter:
 		c.evaluate()
-	case fyne.KeyBackspace:
+	case granio.KeyBackspace:
 		c.backspace()
 	}
 }
 
-func (c *calc) onPasteShortcut(shortcut fyne.Shortcut) {
-	content := shortcut.(*fyne.ShortcutPaste).Clipboard.Content()
+func (c *calc) onPasteShortcut(shortcut granio.Shortcut) {
+	content := shortcut.(*granio.ShortcutPaste).Clipboard.Content()
 	if _, err := strconv.ParseFloat(content, 64); err != nil {
 		return
 	}
@@ -127,12 +127,12 @@ func (c *calc) onPasteShortcut(shortcut fyne.Shortcut) {
 	c.display(c.equation + content)
 }
 
-func (c *calc) onCopyShortcut(shortcut fyne.Shortcut) {
-	shortcut.(*fyne.ShortcutCopy).Clipboard.SetContent(c.equation)
+func (c *calc) onCopyShortcut(shortcut granio.Shortcut) {
+	shortcut.(*granio.ShortcutCopy).Clipboard.SetContent(c.equation)
 }
 
-func (c *calc) loadUI(app fyne.App) {
-	c.output = &widget.Label{Alignment: fyne.TextAlignTrailing}
+func (c *calc) loadUI(app granio.App) {
+	c.output = &widget.Label{Alignment: granio.TextAlignTrailing}
 	c.output.TextStyle.Monospace = true
 
 	equals := c.addButton("=", c.evaluate)
@@ -174,9 +174,9 @@ func (c *calc) loadUI(app fyne.App) {
 	canvas := c.window.Canvas()
 	canvas.SetOnTypedRune(c.onTypedRune)
 	canvas.SetOnTypedKey(c.onTypedKey)
-	canvas.AddShortcut(&fyne.ShortcutCopy{}, c.onCopyShortcut)
-	canvas.AddShortcut(&fyne.ShortcutPaste{}, c.onPasteShortcut)
-	c.window.Resize(fyne.NewSize(200, 300))
+	canvas.AddShortcut(&granio.ShortcutCopy{}, c.onCopyShortcut)
+	canvas.AddShortcut(&granio.ShortcutPaste{}, c.onPasteShortcut)
+	c.window.Resize(granio.NewSize(200, 300))
 	c.window.Show()
 }
 

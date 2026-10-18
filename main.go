@@ -3,7 +3,7 @@
 //go:generate fyne bundle -o data.go Icon.png
 package main
 
-import "fyne.io/fyne/v2/app"
+import "github.com/Uzer007-admin/granio/v2/app"
 
 func main() {
 	app := app.New()
