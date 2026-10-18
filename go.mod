@@ -3,7 +3,7 @@ module github.com/Uzer007-admin/granio-calculator
 go 1.27.1
 
 require (
-	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1
+	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778
 	github.com/casbin/govaluate v1.10.0
 	github.com/stretchr/testify v1.12.1
 )

@@ -18,8 +18,8 @@ github.com/Uzer007-admin/granio-oksvg v0.2.1-0.20261017234852-ddb3049db67c h1:8O
 github.com/Uzer007-admin/granio-oksvg v0.2.1-0.20261017234852-ddb3049db67c/go.mod h1:b3+B3NTwuoevVgA8aXJPC+JgPH9pvCR7nn8iqNHOGVw=
 github.com/Uzer007-admin/granio-systray v1.12.3-0.20261017235015-fd45fbf4dbbd h1:U7iahQP0s0XM6NUChCBE8dg+XA5GQAq25Q7K8oQa5ok=
 github.com/Uzer007-admin/granio-systray v1.12.3-0.20261017235015-fd45fbf4dbbd/go.mod h1:Kgo0zBqk3+H5YtZHWH5Ig9dT6bIXTsogHYXcv8XfTDc=
-github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1 h1:uJMzmIjtuSB+a8FhGSqLk9tfjizcAIBOTozdUWjes4I=
-github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018000600-86cc66cfefa1/go.mod h1:ryLXLfIrMHLho4LwHQd3bUQHNE6f/mpU5uoKtBlODuA=
+github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778 h1:Q3SvFfoAqv4DAWI+NMqmjU7s1slxwIacZ5U94Ta+URg=
+github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018003528-057d685c0778/go.mod h1:ryLXLfIrMHLho4LwHQd3bUQHNE6f/mpU5uoKtBlODuA=
 github.com/anthonynsimon/bild v0.17.1 h1:CVcoR+jxUx++UBXpVJHTjt7RmfEbsnhtlqPR5utSfiU=
 github.com/anthonynsimon/bild v0.17.1/go.mod h1:eUfWJXV5GGXA2Gobz4osvpJdkdEVZpXwDSJi/PAXnpA=
 github.com/casbin/govaluate v1.10.0 h1:ffGw51/hYH3w3rZcxO/KcaUIDOLP84w7nsidMVgaDG0=
