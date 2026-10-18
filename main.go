@@ -23,9 +23,9 @@ const preferenceCurrentTutorial = "currentTutorial"
 var topWindow granio.Window
 
 func main() {
-	a := app.NewWithID("io.fyne.demo")
+	a := app.NewWithID("io.github.uzer007_admin.granio.demo")
 	a.SetIcon(data.FyneLogo)
-	w := a.NewWindow("Fyne Demo")
+	w := a.NewWindow("Granio Demo")
 	makeTray(a, w)
 	logLifecycle(a)
 	topWindow = w
@@ -119,14 +119,14 @@ func makeMenu(a granio.App, w granio.Window) *granio.MainMenu {
 	)
 
 	openSettings := func() {
-		w := a.NewWindow("Fyne Settings")
+		w := a.NewWindow("Настройки Granio")
 		w.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
 		w.Resize(granio.NewSize(440, 520))
 		w.Show()
 	}
 	showAbout := func() {
 		w := a.NewWindow("About")
-		w.SetContent(widget.NewLabel("About Fyne Demo app..."))
+		w.SetContent(widget.NewLabel("Демонстрация компонентов Granio."))
 		w.Show()
 	}
 	aboutItem := granio.NewMenuItem("About", showAbout)
@@ -161,16 +161,16 @@ func makeMenu(a granio.App, w granio.Window) *granio.MainMenu {
 
 	helpMenu := granio.NewMenu("Help",
 		granio.NewMenuItem("Documentation", func() {
-			u, _ := url.Parse("https://developer.fyne.io")
+			u, _ := url.Parse("https://github.com/Uzer007-admin/granio-docs")
 			_ = a.OpenURL(u)
 		}),
 		granio.NewMenuItem("Support", func() {
-			u, _ := url.Parse("https://fyne.io/support/")
+			u, _ := url.Parse("https://github.com/Uzer007-admin/granio/issues")
 			_ = a.OpenURL(u)
 		}),
 		granio.NewMenuItemSeparator(),
-		granio.NewMenuItem("Sponsor", func() {
-			u, _ := url.Parse("https://fyne.io/sponsor/")
+		granio.NewMenuItem("Исходный проект Fyne", func() {
+			u, _ := url.Parse("https://github.com/fyne-io/fyne")
 			_ = a.OpenURL(u)
 		}))
 

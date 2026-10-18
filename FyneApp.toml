@@ -1,7 +1,7 @@
 [Details]
 Icon = "Icon.png"
-Name = "Fyne Demo"
-ID = "io.fyne.demo"
+Name = "Granio Demo"
+ID = "io.github.uzer007_admin.granio.demo"
 Version = "2.8.0"
 Build = 34
 
@@ -12,13 +12,13 @@ HelperText = "This binary was built with debug symbols"
 HelperText = "This binary was built without debug symbols"
 
 [Source]
-Repo = "https://github.com/fyne-io/demo"
+Repo = "https://github.com/Uzer007-admin/granio-demo"
 
 [LinuxAndBSD]
 GenericName = "Toolkit Demo"
 Categories = ["Development"]
-Comment = "A demo of Fyne and its capabilities."
-Keywords = ["demo", "fyne"]
+Comment = "Демонстрация компонентов и возможностей Granio."
+Keywords = ["demo", "granio"]
 
 [Migrations]
 fyneDo = true
