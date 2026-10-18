@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 const template = `
@@ -18,7 +18,7 @@ const template = `
 		title: "%s",
 		content: %#v,
 
-		code: []func() fyne.CanvasObject{
+		code: []func() granio.CanvasObject{
 			%s
 		},
 	},
@@ -34,10 +34,10 @@ import (
 	"image/color"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 var tutorials = map[string]GeneratedTutorial{`)
@@ -49,7 +49,7 @@ var tutorials = map[string]GeneratedTutorial{`)
 	cmd := exec.Command("go", "fmt", "data_gen.go")
 	err := cmd.Run()
 	if err != nil {
-		fyne.LogError("failed to tidy output", err)
+		granio.LogError("failed to tidy output", err)
 	}
 }
 
@@ -59,7 +59,7 @@ func processDirectories(w io.Writer) {
 	for _, dir := range dirs {
 		files, err := os.ReadDir(dir)
 		if err != nil {
-			fyne.LogError("Failed to list directory", err)
+			granio.LogError("Failed to list directory", err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func processFile(path string, w io.Writer) {
 
 		code := str
 		varName := strings.Split(code, " ")[0]
-		codes += fmt.Sprintf(`	func() fyne.CanvasObject {
+		codes += fmt.Sprintf(`	func() granio.CanvasObject {
 		%s
 		return %s
 	},
@@ -93,7 +93,7 @@ func processFile(path string, w io.Writer) {
 func parseMarkdown(path string) (title string, sections []string) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		fyne.LogError("Failed to parse tutorial: "+path, err)
+		granio.LogError("Failed to parse tutorial: "+path, err)
 		return "", []string{}
 	}
 

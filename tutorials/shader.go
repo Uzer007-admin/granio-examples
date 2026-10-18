@@ -1,7 +1,7 @@
 package tutorials
 
 import (
-	"fyne.io/fyne/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/canvas"
 )
 
 // cubeShaderSource renders a spinning 3D cube by ray marching a box signed

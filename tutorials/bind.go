@@ -3,13 +3,13 @@ package tutorials
 import (
 	"fmt"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func bindingScreen(_ fyne.Window) fyne.CanvasObject {
+func bindingScreen(_ granio.Window) granio.CanvasObject {
 	f := 0.2
 	data := binding.BindFloat(&f)
 	label := widget.NewLabelWithData(binding.FloatToStringWithFormat(data, "Float value: %0.2f"))
@@ -48,16 +48,16 @@ func bindingScreen(_ fyne.Window) fyne.CanvasObject {
 	})
 
 	list := widget.NewListWithData(dataList,
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return container.NewBorder(nil, nil, nil, widget.NewButton("+", nil),
 				widget.NewLabel("item x.y"))
 		},
-		func(item binding.DataItem, obj fyne.CanvasObject) {
+		func(item binding.DataItem, obj granio.CanvasObject) {
 			f := item.(binding.Float)
-			text := obj.(*fyne.Container).Objects[0].(*widget.Label)
+			text := obj.(*granio.Container).Objects[0].(*widget.Label)
 			text.Bind(binding.FloatToStringWithFormat(f, "item %0.1f"))
 
-			btn := obj.(*fyne.Container).Objects[1].(*widget.Button)
+			btn := obj.(*granio.Container).Objects[1].(*widget.Button)
 			btn.OnTapped = func() {
 				val, _ := f.Get()
 				_ = f.Set(val + 1)
@@ -93,7 +93,7 @@ func newFormWithData(data binding.DataMap) *widget.Form {
 	return widget.NewForm(items...)
 }
 
-func createBoundItem(v binding.DataItem) fyne.CanvasObject {
+func createBoundItem(v binding.DataItem) granio.CanvasObject {
 	switch val := v.(type) {
 	case binding.Bool:
 		return widget.NewCheckWithData("", val)

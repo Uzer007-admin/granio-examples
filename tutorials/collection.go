@@ -4,24 +4,24 @@ import (
 	"fmt"
 	"strconv"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // collectionScreen loads a tab panel for collection widgets
-func collectionScreen(_ fyne.Window) fyne.CanvasObject {
+func collectionScreen(_ granio.Window) granio.CanvasObject {
 	content := container.NewVBox(
-		widget.NewLabelWithStyle("func Length() int", fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}),
-		widget.NewLabelWithStyle("func CreateItem() fyne.CanvasObject", fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}),
-		widget.NewLabelWithStyle("func UpdateItem(ListItemID, fyne.CanvasObject)", fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}),
-		widget.NewLabelWithStyle("func OnSelected(ListItemID)", fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}),
-		widget.NewLabelWithStyle("func OnUnselected(ListItemID)", fyne.TextAlignLeading, fyne.TextStyle{Monospace: true}))
+		widget.NewLabelWithStyle("func Length() int", granio.TextAlignLeading, granio.TextStyle{Monospace: true}),
+		widget.NewLabelWithStyle("func CreateItem() granio.CanvasObject", granio.TextAlignLeading, granio.TextStyle{Monospace: true}),
+		widget.NewLabelWithStyle("func UpdateItem(ListItemID, granio.CanvasObject)", granio.TextAlignLeading, granio.TextStyle{Monospace: true}),
+		widget.NewLabelWithStyle("func OnSelected(ListItemID)", granio.TextAlignLeading, granio.TextStyle{Monospace: true}),
+		widget.NewLabelWithStyle("func OnUnselected(ListItemID)", granio.TextAlignLeading, granio.TextStyle{Monospace: true}))
 	return container.NewCenter(content)
 }
 
-func makeGridWrapTab(_ fyne.Window) fyne.CanvasObject {
+func makeGridWrapTab(_ granio.Window) granio.CanvasObject {
 	data := make([]string, 1000)
 	for i := range data {
 		data[i] = "Test Item " + strconv.Itoa(i)
@@ -35,13 +35,13 @@ func makeGridWrapTab(_ fyne.Window) fyne.CanvasObject {
 		func() int {
 			return len(data)
 		},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			text := widget.NewLabel("Template Object")
-			text.Alignment = fyne.TextAlignCenter
+			text.Alignment = granio.TextAlignCenter
 			return container.NewVBox(container.NewPadded(widget.NewIcon(theme.DocumentIcon())), text)
 		},
-		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id])
+		func(id widget.ListItemID, item granio.CanvasObject) {
+			item.(*granio.Container).Objects[1].(*widget.Label).SetText(data[id])
 		},
 	)
 	grid.OnSelected = func(id widget.ListItemID) {
@@ -59,7 +59,7 @@ func makeGridWrapTab(_ fyne.Window) fyne.CanvasObject {
 	return split
 }
 
-func makeListTab(_ fyne.Window) fyne.CanvasObject {
+func makeListTab(_ granio.Window) granio.CanvasObject {
 	data := make([]string, 1000)
 	for i := range data {
 		data[i] = "Test Item " + strconv.Itoa(i)
@@ -73,14 +73,14 @@ func makeListTab(_ fyne.Window) fyne.CanvasObject {
 		func() int {
 			return len(data)
 		},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
 		},
-		func(id widget.ListItemID, item fyne.CanvasObject) {
+		func(id widget.ListItemID, item granio.CanvasObject) {
 			if id == 5 || id == 6 {
-				item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id] + "\ntaller")
+				item.(*granio.Container).Objects[1].(*widget.Label).SetText(data[id] + "\ntaller")
 			} else {
-				item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id])
+				item.(*granio.Container).Objects[1].(*widget.Label).SetText(data[id])
 			}
 		},
 	)
@@ -99,13 +99,13 @@ func makeListTab(_ fyne.Window) fyne.CanvasObject {
 	return container.NewHSplit(list, container.NewCenter(hbox))
 }
 
-func makeTableTab(_ fyne.Window) fyne.CanvasObject {
+func makeTableTab(_ granio.Window) granio.CanvasObject {
 	t := widget.NewTableWithHeaders(
 		func() (int, int) { return 500, 150 },
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			return widget.NewLabel("Cell 000, 000")
 		},
-		func(id widget.TableCellID, cell fyne.CanvasObject) {
+		func(id widget.TableCellID, cell granio.CanvasObject) {
 			label := cell.(*widget.Label)
 			switch id.Col {
 			case 0:
@@ -119,7 +119,7 @@ func makeTableTab(_ fyne.Window) fyne.CanvasObject {
 	return t
 }
 
-func makeTreeTab(_ fyne.Window) fyne.CanvasObject {
+func makeTreeTab(_ granio.Window) granio.CanvasObject {
 	data := map[string][]string{
 		"":  {"A"},
 		"A": {"B", "D", "H", "J", "L", "O", "P", "S", "V", "Z"},

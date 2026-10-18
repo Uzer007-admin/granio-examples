@@ -8,12 +8,12 @@ import (
 	"github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/styles"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // OnChangeFuncs is a slice of functions that can be registered
@@ -23,14 +23,14 @@ var OnChangeFuncs []func()
 // Tutorial defines the data structure for a tutorial
 type Tutorial struct {
 	Title, Intro string
-	View         func(w fyne.Window) fyne.CanvasObject
+	View         func(w granio.Window) granio.CanvasObject
 }
 
 type GeneratedTutorial struct {
 	title string
 
 	content []string
-	code    []func() fyne.CanvasObject
+	code    []func() granio.CanvasObject
 }
 
 var (
@@ -63,7 +63,7 @@ var (
 			"Containers",
 			"Containers group other widgets and canvas objects, organising according to their layout.\n" +
 				"Standard containers are illustrated in this section, but developers can also provide custom " +
-				"layouts using the fyne.NewContainerWithLayout() constructor.",
+				"layouts using the granio.NewContainerWithLayout() constructor.",
 			containerScreen,
 		},
 		"apptabs": {
@@ -218,11 +218,11 @@ func loadDefinition(title, file string) Tutorial {
 	return Tutorial{
 		title,
 		"",
-		func(fyne.Window) fyne.CanvasObject { return makeNewTutorial(file) },
+		func(granio.Window) granio.CanvasObject { return makeNewTutorial(file) },
 	}
 }
 
-func makeNewTutorial(file string) fyne.CanvasObject {
+func makeNewTutorial(file string) granio.CanvasObject {
 	tutorial := tutorials[file]
 	top := container.NewVBox(
 		widget.NewLabel(tutorial.title), widget.NewSeparator())
@@ -234,7 +234,7 @@ func makeNewTutorial(file string) fyne.CanvasObject {
 		}
 		if i%2 == 0 {
 			text := widget.NewRichTextFromMarkdown(p)
-			text.Wrapping = fyne.TextWrapWord
+			text.Wrapping = granio.TextWrapWord
 
 			details.Add(text)
 			continue
@@ -242,19 +242,19 @@ func makeNewTutorial(file string) fyne.CanvasObject {
 
 		usage := widget.NewTextGridFromString(p + "\n")
 		usage.ShowLineNumbers = true
-		usage.Scroll = fyne.ScrollHorizontalOnly
+		usage.Scroll = granio.ScrollHorizontalOnly
 		highlightTextGrid(usage)
 
 		codeID := (i - 1) / 2
 		preview := tutorial.code[codeID]()
-		propSize := fyne.NewSize(18, 18) // big enough for canvas elements to show, but smaller than most widgets
+		propSize := granio.NewSize(18, 18) // big enough for canvas elements to show, but smaller than most widgets
 
 		tools := widget.NewToolbar(
 			widget.NewToolbarAction(theme.ContentCopyIcon(), func() {
-				fyne.CurrentApp().Clipboard().SetContent(usage.Text())
+				granio.CurrentApp().Clipboard().SetContent(usage.Text())
 			}),
 			widget.NewToolbarAction(theme.MediaPlayIcon(), func() {
-				w := fyne.CurrentApp().NewWindow(tutorial.title + " preview")
+				w := granio.CurrentApp().NewWindow(tutorial.title + " preview")
 				w.Resize(propSize) // at least - next line will expand
 				w.SetContent(tutorial.code[codeID]())
 				w.Show()

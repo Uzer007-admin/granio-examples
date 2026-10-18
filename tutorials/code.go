@@ -8,7 +8,7 @@ import (
 	"github.com/alecthomas/chroma/v2/lexers"
 	"github.com/alecthomas/chroma/v2/styles"
 
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func highlightTextGrid(grid *widget.TextGrid) {

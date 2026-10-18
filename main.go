@@ -6,21 +6,21 @@ import (
 	"log"
 	"net/url"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/cmd/fyne_settings/settings"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/cmd/granio_settings/settings"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"fyne.io/demo/data"
-	"fyne.io/demo/tutorials"
+	"github.com/Uzer007-admin/granio-demo/data"
+	"github.com/Uzer007-admin/granio-demo/tutorials"
 )
 
 const preferenceCurrentTutorial = "currentTutorial"
 
-var topWindow fyne.Window
+var topWindow granio.Window
 
 func main() {
 	a := app.NewWithID("io.fyne.demo")
@@ -36,11 +36,11 @@ func main() {
 	content := container.NewStack()
 	title := widget.NewLabel("Component name")
 	intro := widget.NewLabel("An introduction would probably go\nhere, as well as a")
-	intro.Wrapping = fyne.TextWrapWord
+	intro.Wrapping = granio.TextWrapWord
 
 	top := container.NewVBox(title, widget.NewSeparator(), intro)
 	setTutorial := func(t tutorials.Tutorial) {
-		if fyne.CurrentDevice().IsMobile() {
+		if granio.CurrentDevice().IsMobile() {
 			child := a.NewWindow(t.Title)
 			topWindow = child
 			child.SetContent(t.View(topWindow))
@@ -63,24 +63,24 @@ func main() {
 			top.Show()
 		}
 
-		content.Objects = []fyne.CanvasObject{t.View(w)}
+		content.Objects = []granio.CanvasObject{t.View(w)}
 		content.Refresh()
 	}
 
 	tutorial := container.NewBorder(
 		top, nil, nil, nil, content)
-	if fyne.CurrentDevice().IsMobile() {
+	if granio.CurrentDevice().IsMobile() {
 		w.SetContent(makeNav(setTutorial, false))
 	} else {
 		split := container.NewHSplit(makeNav(setTutorial, true), tutorial)
 		split.Offset = 0.2
 		w.SetContent(split)
 	}
-	w.Resize(fyne.NewSize(640, 460))
+	w.Resize(granio.NewSize(640, 460))
 	w.ShowAndRun()
 }
 
-func logLifecycle(a fyne.App) {
+func logLifecycle(a granio.App) {
 	a.Lifecycle().SetOnStarted(func() {
 		log.Println("Lifecycle: Started")
 	})
@@ -95,24 +95,24 @@ func logLifecycle(a fyne.App) {
 	})
 }
 
-func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
-	newItem := fyne.NewMenuItem("New", nil)
-	checkedItem := fyne.NewMenuItem("Checked", nil)
+func makeMenu(a granio.App, w granio.Window) *granio.MainMenu {
+	newItem := granio.NewMenuItem("New", nil)
+	checkedItem := granio.NewMenuItem("Checked", nil)
 	checkedItem.Checked = true
-	disabledItem := fyne.NewMenuItem("Disabled", nil)
+	disabledItem := granio.NewMenuItem("Disabled", nil)
 	disabledItem.Disabled = true
-	otherItem := fyne.NewMenuItem("Other", nil)
-	mailItem := fyne.NewMenuItem("Mail", func() { fmt.Println("Menu New->Other->Mail") })
+	otherItem := granio.NewMenuItem("Other", nil)
+	mailItem := granio.NewMenuItem("Mail", func() { fmt.Println("Menu New->Other->Mail") })
 	mailItem.Icon = theme.MailComposeIcon()
-	otherItem.ChildMenu = fyne.NewMenu("",
-		fyne.NewMenuItem("Project", func() { fmt.Println("Menu New->Other->Project") }),
+	otherItem.ChildMenu = granio.NewMenu("",
+		granio.NewMenuItem("Project", func() { fmt.Println("Menu New->Other->Project") }),
 		mailItem,
 	)
-	fileItem := fyne.NewMenuItem("File", func() { fmt.Println("Menu New->File") })
+	fileItem := granio.NewMenuItem("File", func() { fmt.Println("Menu New->File") })
 	fileItem.Icon = theme.FileIcon()
-	dirItem := fyne.NewMenuItem("Directory", func() { fmt.Println("Menu New->Directory") })
+	dirItem := granio.NewMenuItem("Directory", func() { fmt.Println("Menu New->Directory") })
 	dirItem.Icon = theme.FolderIcon()
-	newItem.ChildMenu = fyne.NewMenu("",
+	newItem.ChildMenu = granio.NewMenu("",
 		fileItem,
 		dirItem,
 		otherItem,
@@ -121,7 +121,7 @@ func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	openSettings := func() {
 		w := a.NewWindow("Fyne Settings")
 		w.SetContent(settings.NewSettings().LoadAppearanceScreen(w))
-		w.Resize(fyne.NewSize(440, 520))
+		w.Resize(granio.NewSize(440, 520))
 		w.Show()
 	}
 	showAbout := func() {
@@ -129,61 +129,61 @@ func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 		w.SetContent(widget.NewLabel("About Fyne Demo app..."))
 		w.Show()
 	}
-	aboutItem := fyne.NewMenuItem("About", showAbout)
-	settingsItem := fyne.NewMenuItem("Settings", openSettings)
-	settingsShortcut := &desktop.CustomShortcut{KeyName: fyne.KeyComma, Modifier: fyne.KeyModifierShortcutDefault}
+	aboutItem := granio.NewMenuItem("About", showAbout)
+	settingsItem := granio.NewMenuItem("Settings", openSettings)
+	settingsShortcut := &desktop.CustomShortcut{KeyName: granio.KeyComma, Modifier: granio.KeyModifierShortcutDefault}
 	settingsItem.Shortcut = settingsShortcut
-	w.Canvas().AddShortcut(settingsShortcut, func(shortcut fyne.Shortcut) {
+	w.Canvas().AddShortcut(settingsShortcut, func(shortcut granio.Shortcut) {
 		openSettings()
 	})
 
-	cutShortcut := &fyne.ShortcutCut{Clipboard: a.Clipboard()}
-	cutItem := fyne.NewMenuItem("Cut", func() {
+	cutShortcut := &granio.ShortcutCut{Clipboard: a.Clipboard()}
+	cutItem := granio.NewMenuItem("Cut", func() {
 		shortcutFocused(cutShortcut, a.Clipboard(), w.Canvas().Focused())
 	})
 	cutItem.Shortcut = cutShortcut
-	copyShortcut := &fyne.ShortcutCopy{Clipboard: a.Clipboard()}
-	copyItem := fyne.NewMenuItem("Copy", func() {
+	copyShortcut := &granio.ShortcutCopy{Clipboard: a.Clipboard()}
+	copyItem := granio.NewMenuItem("Copy", func() {
 		shortcutFocused(copyShortcut, a.Clipboard(), w.Canvas().Focused())
 	})
 	copyItem.Shortcut = copyShortcut
-	pasteShortcut := &fyne.ShortcutPaste{Clipboard: a.Clipboard()}
-	pasteItem := fyne.NewMenuItem("Paste", func() {
+	pasteShortcut := &granio.ShortcutPaste{Clipboard: a.Clipboard()}
+	pasteItem := granio.NewMenuItem("Paste", func() {
 		shortcutFocused(pasteShortcut, a.Clipboard(), w.Canvas().Focused())
 	})
 	pasteItem.Shortcut = pasteShortcut
 	performFind := func() { fmt.Println("Menu Find") }
-	findItem := fyne.NewMenuItem("Find", performFind)
-	findItem.Shortcut = &desktop.CustomShortcut{KeyName: fyne.KeyF, Modifier: fyne.KeyModifierShortcutDefault | fyne.KeyModifierAlt | fyne.KeyModifierShift | fyne.KeyModifierControl | fyne.KeyModifierSuper}
-	w.Canvas().AddShortcut(findItem.Shortcut, func(shortcut fyne.Shortcut) {
+	findItem := granio.NewMenuItem("Find", performFind)
+	findItem.Shortcut = &desktop.CustomShortcut{KeyName: granio.KeyF, Modifier: granio.KeyModifierShortcutDefault | granio.KeyModifierAlt | granio.KeyModifierShift | granio.KeyModifierControl | granio.KeyModifierSuper}
+	w.Canvas().AddShortcut(findItem.Shortcut, func(shortcut granio.Shortcut) {
 		performFind()
 	})
 
-	helpMenu := fyne.NewMenu("Help",
-		fyne.NewMenuItem("Documentation", func() {
+	helpMenu := granio.NewMenu("Help",
+		granio.NewMenuItem("Documentation", func() {
 			u, _ := url.Parse("https://developer.fyne.io")
 			_ = a.OpenURL(u)
 		}),
-		fyne.NewMenuItem("Support", func() {
+		granio.NewMenuItem("Support", func() {
 			u, _ := url.Parse("https://fyne.io/support/")
 			_ = a.OpenURL(u)
 		}),
-		fyne.NewMenuItemSeparator(),
-		fyne.NewMenuItem("Sponsor", func() {
+		granio.NewMenuItemSeparator(),
+		granio.NewMenuItem("Sponsor", func() {
 			u, _ := url.Parse("https://fyne.io/sponsor/")
 			_ = a.OpenURL(u)
 		}))
 
 	// a quit item will be appended to our first (File) menu
-	file := fyne.NewMenu("File", newItem, checkedItem, disabledItem)
-	device := fyne.CurrentDevice()
+	file := granio.NewMenu("File", newItem, checkedItem, disabledItem)
+	device := granio.CurrentDevice()
 	if !device.IsMobile() && !device.IsBrowser() {
-		file.Items = append(file.Items, fyne.NewMenuItemSeparator(), settingsItem)
+		file.Items = append(file.Items, granio.NewMenuItemSeparator(), settingsItem)
 	}
 	file.Items = append(file.Items, aboutItem)
-	main := fyne.NewMainMenu(
+	main := granio.NewMainMenu(
 		file,
-		fyne.NewMenu("Edit", cutItem, copyItem, pasteItem, fyne.NewMenuItemSeparator(), findItem),
+		granio.NewMenu("Edit", cutItem, copyItem, pasteItem, granio.NewMenuItemSeparator(), findItem),
 		helpMenu,
 	)
 	checkedItem.Action = func() {
@@ -193,11 +193,11 @@ func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	return main
 }
 
-func makeTray(a fyne.App, w fyne.Window) {
+func makeTray(a granio.App, w granio.Window) {
 	if desk, ok := a.(desktop.App); ok {
-		h := fyne.NewMenuItem("Hello", func() {})
+		h := granio.NewMenuItem("Hello", func() {})
 		h.Icon = theme.HomeIcon()
-		menu := fyne.NewMenu("Hello World", h)
+		menu := granio.NewMenu("Hello World", h)
 		h.Action = func() {
 			log.Println("System tray menu tapped")
 			h.Label = "Welcome"
@@ -208,8 +208,8 @@ func makeTray(a fyne.App, w fyne.Window) {
 	}
 }
 
-func makeNav(setTutorial func(tutorial tutorials.Tutorial), loadPrevious bool) fyne.CanvasObject {
-	a := fyne.CurrentApp()
+func makeNav(setTutorial func(tutorial tutorials.Tutorial), loadPrevious bool) granio.CanvasObject {
+	a := granio.CurrentApp()
 
 	tree := &widget.Tree{
 		ChildUIDs: func(uid string) []string {
@@ -220,13 +220,13 @@ func makeNav(setTutorial func(tutorial tutorials.Tutorial), loadPrevious bool) f
 
 			return ok && len(children) > 0
 		},
-		CreateNode: func(branch bool) fyne.CanvasObject {
+		CreateNode: func(branch bool) granio.CanvasObject {
 			return widget.NewLabel("Collection Widgets")
 		},
-		UpdateNode: func(uid string, branch bool, obj fyne.CanvasObject) {
+		UpdateNode: func(uid string, branch bool, obj granio.CanvasObject) {
 			t, ok := tutorials.Tutorials[uid]
 			if !ok {
-				fyne.LogError("Missing tutorial panel: "+uid, nil)
+				granio.LogError("Missing tutorial panel: "+uid, nil)
 				return
 			}
 			obj.(*widget.Label).SetText(t.Title)
@@ -261,16 +261,16 @@ func makeNav(setTutorial func(tutorial tutorials.Tutorial), loadPrevious bool) f
 	return container.NewBorder(nil, themes, nil, nil, tree)
 }
 
-func shortcutFocused(s fyne.Shortcut, cb fyne.Clipboard, f fyne.Focusable) {
+func shortcutFocused(s granio.Shortcut, cb granio.Clipboard, f granio.Focusable) {
 	switch sh := s.(type) {
-	case *fyne.ShortcutCopy:
+	case *granio.ShortcutCopy:
 		sh.Clipboard = cb
-	case *fyne.ShortcutCut:
+	case *granio.ShortcutCut:
 		sh.Clipboard = cb
-	case *fyne.ShortcutPaste:
+	case *granio.ShortcutPaste:
 		sh.Clipboard = cb
 	}
-	if focused, ok := f.(fyne.Shortcutable); ok {
+	if focused, ok := f.(granio.Shortcutable); ok {
 		focused.TypedShortcut(s)
 	}
 }

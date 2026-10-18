@@ -3,49 +3,49 @@ package tutorials
 import (
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func windowScreen(_ fyne.Window) fyne.CanvasObject {
-	var visibilityWindow fyne.Window = nil
+func windowScreen(_ granio.Window) granio.CanvasObject {
+	var visibilityWindow granio.Window = nil
 	var visibilityState bool = false
 
 	windowGroup := container.NewVBox(
 		widget.NewButton("New window", func() {
-			w := fyne.CurrentApp().NewWindow("Hello")
+			w := granio.CurrentApp().NewWindow("Hello")
 			w.SetContent(widget.NewLabel("Hello World!"))
 			w.Show()
 		}),
 		widget.NewButton("Fixed size window", func() {
-			w := fyne.CurrentApp().NewWindow("Fixed")
+			w := granio.CurrentApp().NewWindow("Fixed")
 			w.SetContent(container.NewCenter(widget.NewLabel("Hello World!")))
 
-			w.Resize(fyne.NewSize(240, 180))
+			w.Resize(granio.NewSize(240, 180))
 			w.SetFixedSize(true)
 			w.Show()
 		}),
 		widget.NewButton("Toggle between fixed/not fixed window size", func() {
-			w := fyne.CurrentApp().NewWindow("Toggle fixed size")
+			w := granio.CurrentApp().NewWindow("Toggle fixed size")
 			w.SetContent(container.NewCenter(widget.NewCheck("Fixed size", func(toggle bool) {
 				if toggle {
-					w.Resize(fyne.NewSize(240, 180))
+					w.Resize(granio.NewSize(240, 180))
 				}
 				w.SetFixedSize(toggle)
 			})))
 			w.Show()
 		}),
 		widget.NewButton("Centered window", func() {
-			w := fyne.CurrentApp().NewWindow("Central")
+			w := granio.CurrentApp().NewWindow("Central")
 			w.SetContent(container.NewCenter(widget.NewLabel("Hello World!")))
 
 			w.CenterOnScreen()
 			w.Show()
 		}),
 		widget.NewButton("Always on top window", func() {
-			w := fyne.CurrentApp().NewWindow("On Top")
+			w := granio.CurrentApp().NewWindow("On Top")
 			w.SetContent(container.NewCenter(widget.NewLabel("Hello World!")))
 
 			deskWin, ok := w.(desktop.Window)
@@ -56,7 +56,7 @@ func windowScreen(_ fyne.Window) fyne.CanvasObject {
 		}),
 		widget.NewButton("Show/Hide window", func() {
 			if visibilityWindow == nil {
-				visibilityWindow = fyne.CurrentApp().NewWindow("Hello")
+				visibilityWindow = granio.CurrentApp().NewWindow("Hello")
 				visibilityWindow.SetContent(widget.NewLabel("Hello World!"))
 				visibilityWindow.Show()
 				visibilityWindow.SetOnClosed(func() {
@@ -72,17 +72,17 @@ func windowScreen(_ fyne.Window) fyne.CanvasObject {
 			visibilityState = !visibilityState
 		}))
 
-	drv := fyne.CurrentApp().Driver()
+	drv := granio.CurrentApp().Driver()
 	if drv, ok := drv.(desktop.Driver); ok {
 		windowGroup.Objects = append(windowGroup.Objects,
 			widget.NewButton("Splash Window (only use on start)", func() {
 				w := drv.CreateSplashWindow()
 				w.SetContent(widget.NewLabelWithStyle("Hello World!\n\nMake a splash!",
-					fyne.TextAlignCenter, fyne.TextStyle{Bold: true}))
+					granio.TextAlignCenter, granio.TextStyle{Bold: true}))
 				w.Show()
 
 				time.AfterFunc(3*time.Second, func() {
-					fyne.Do(w.Close)
+					granio.Do(w.Close)
 				})
 			}))
 	}
@@ -90,13 +90,13 @@ func windowScreen(_ fyne.Window) fyne.CanvasObject {
 	otherGroup := widget.NewCard("Other", "",
 		container.NewVBox(
 			widget.NewButton("Notification", func() {
-				fyne.CurrentApp().SendNotification(&fyne.Notification{
+				granio.CurrentApp().SendNotification(&granio.Notification{
 					Title:   "Fyne Demo",
 					Content: "This is a notification",
 				})
 			}),
 			widget.NewButton("Notification in 30 sec", func() {
-				_, _ = fyne.CurrentApp().ScheduleNotification(&fyne.Notification{
+				_, _ = granio.CurrentApp().ScheduleNotification(&granio.Notification{
 					Title:   "Fyne Demo",
 					Content: "A scheduled notification",
 				}, time.Now().Add(time.Second*30))

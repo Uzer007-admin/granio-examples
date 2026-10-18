@@ -3,8 +3,8 @@ package tutorials
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 // customTheme is a simple demonstration of a bespoke theme loaded by a Fyne app.
 type customTheme struct{}
 
-func (customTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
+func (customTheme) Color(c granio.ThemeColorName, _ granio.ThemeVariant) color.Color {
 	switch c {
 	case theme.ColorNameBackground:
 		return purple
@@ -33,15 +33,15 @@ func (customTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color
 	}
 }
 
-func (customTheme) Font(style fyne.TextStyle) fyne.Resource {
+func (customTheme) Font(style granio.TextStyle) granio.Resource {
 	return theme.DefaultTheme().Font(style)
 }
 
-func (customTheme) Icon(n fyne.ThemeIconName) fyne.Resource {
+func (customTheme) Icon(n granio.ThemeIconName) granio.Resource {
 	return theme.DefaultTheme().Icon(n)
 }
 
-func (customTheme) Size(s fyne.ThemeSizeName) float32 {
+func (customTheme) Size(s granio.ThemeSizeName) float32 {
 	switch s {
 	case theme.SizeNamePadding:
 		return 8
@@ -66,6 +66,6 @@ func (customTheme) Size(s fyne.ThemeSizeName) float32 {
 	}
 }
 
-func newCustomTheme() fyne.Theme {
+func newCustomTheme() granio.Theme {
 	return &customTheme{}
 }

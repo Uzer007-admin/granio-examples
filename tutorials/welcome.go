@@ -5,32 +5,32 @@ import (
 	"net/url"
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"fyne.io/demo/data"
+	"github.com/Uzer007-admin/granio-demo/data"
 )
 
 func parseURL(urlStr string) *url.URL {
 	link, err := url.Parse(urlStr)
 	if err != nil {
-		fyne.LogError("Could not parse URL", err)
+		granio.LogError("Could not parse URL", err)
 	}
 
 	return link
 }
 
-func welcomeScreen(_ fyne.Window) fyne.CanvasObject {
+func welcomeScreen(_ granio.Window) granio.CanvasObject {
 	logo := canvas.NewImageFromResource(data.FyneLogoTransparent)
 	logo.FillMode = canvas.ImageFillContain
-	if fyne.CurrentDevice().IsMobile() {
-		logo.SetMinSize(fyne.NewSize(192, 192))
+	if granio.CurrentDevice().IsMobile() {
+		logo.SetMinSize(granio.NewSize(192, 192))
 	} else {
-		logo.SetMinSize(fyne.NewSize(256, 256))
+		logo.SetMinSize(granio.NewSize(256, 256))
 	}
 
 	footer := container.NewHBox(
@@ -45,10 +45,10 @@ func welcomeScreen(_ fyne.Window) fyne.CanvasObject {
 
 	authors := widget.NewRichTextFromMarkdown(formatAuthors(string(data.Authors.Content())))
 	content := container.NewVBox(
-		widget.NewLabelWithStyle("\n\nWelcome to the Fyne toolkit demo app", fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewLabelWithStyle("\n\nWelcome to the Fyne toolkit demo app", granio.TextAlignCenter, granio.TextStyle{Bold: true}),
 		logo,
 		container.NewCenter(authors),
-		widget.NewLabelWithStyle("\nWith great thanks to our many kind sponsors\n", fyne.TextAlignCenter, fyne.TextStyle{Italic: true}))
+		widget.NewLabelWithStyle("\nWith great thanks to our many kind sponsors\n", granio.TextAlignCenter, granio.TextStyle{Italic: true}))
 	scroll := container.NewScroll(content)
 
 	bgColor := withAlpha(theme.Color(theme.ColorNameBackground), 0xe0)
@@ -60,7 +60,7 @@ func welcomeScreen(_ fyne.Window) fyne.CanvasObject {
 	slideBG := container.New(underlayer, underlay)
 	footerBG := canvas.NewRectangle(shadowColor)
 
-	fyne.CurrentApp().Settings().AddListener(func(fyne.Settings) {
+	granio.CurrentApp().Settings().AddListener(func(granio.Settings) {
 		bgColor = withAlpha(theme.Color(theme.ColorNameBackground), 0xe0)
 		bg.FillColor = bgColor
 		bg.Refresh()
@@ -70,8 +70,8 @@ func welcomeScreen(_ fyne.Window) fyne.CanvasObject {
 		footer.Refresh()
 	})
 
-	underlay.Resize(fyne.NewSize(1024, 1024))
-	scroll.OnScrolled = func(p fyne.Position) {
+	underlay.Resize(granio.NewSize(1024, 1024))
+	scroll.OnScrolled = func(p granio.Position) {
 		underlayer.offset = -p.Y / 3
 		underlayer.Layout(slideBG.Objects, slideBG.Size())
 	}
@@ -93,25 +93,25 @@ type underLayout struct {
 	offset float32
 }
 
-func (u underLayout) Layout(objs []fyne.CanvasObject, size fyne.Size) {
+func (u underLayout) Layout(objs []granio.CanvasObject, size granio.Size) {
 	under := objs[0]
 	left := size.Width/2 - under.Size().Width/2
-	under.Move(fyne.NewPos(left, u.offset-50))
+	under.Move(granio.NewPos(left, u.offset-50))
 }
 
-func (u underLayout) MinSize(_ []fyne.CanvasObject) fyne.Size {
-	return fyne.Size{}
+func (u underLayout) MinSize(_ []granio.CanvasObject) granio.Size {
+	return granio.Size{}
 }
 
 type unpad struct {
 	top, bottom bool
 }
 
-func (u unpad) Layout(objs []fyne.CanvasObject, s fyne.Size) {
+func (u unpad) Layout(objs []granio.CanvasObject, s granio.Size) {
 	pad := theme.Padding()
-	var pos fyne.Position
+	var pos granio.Position
 	if u.top {
-		pos = fyne.NewPos(0, -pad)
+		pos = granio.NewPos(0, -pad)
 	}
 	size := s
 	if u.top {
@@ -126,8 +126,8 @@ func (u unpad) Layout(objs []fyne.CanvasObject, s fyne.Size) {
 	}
 }
 
-func (u unpad) MinSize(_ []fyne.CanvasObject) fyne.Size {
-	return fyne.NewSize(100, 100)
+func (u unpad) MinSize(_ []granio.CanvasObject) granio.Size {
+	return granio.NewSize(100, 100)
 }
 
 func formatAuthors(lines string) string {

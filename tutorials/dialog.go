@@ -7,32 +7,32 @@ import (
 	"io"
 	"log"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/validation"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/validation"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func confirmCallback(response bool) {
 	fmt.Println("Responded with", response)
 }
 
-func colorPicked(c color.Color, w fyne.Window) {
+func colorPicked(c color.Color, w granio.Window) {
 	log.Println("Color picked:", c)
 	rectangle := canvas.NewRectangle(c)
 	size := 2 * theme.IconInlineSize()
-	rectangle.SetMinSize(fyne.NewSize(size, size))
+	rectangle.SetMinSize(granio.NewSize(size, size))
 	dialog.ShowCustom("Color Picked", "OK", rectangle, w)
 }
 
 // dialogScreen loads demos of the dialogs we support
-func dialogScreen(win fyne.Window) fyne.CanvasObject {
+func dialogScreen(win granio.Window) granio.CanvasObject {
 	openFile := widget.NewButton("File Open With Filter (.jpg or .png)", func() {
-		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		fd := dialog.NewFileOpen(func(reader granio.URIReadCloser, err error) {
 			if err != nil {
 				dialog.ShowError(err, win)
 				return
@@ -48,7 +48,7 @@ func dialogScreen(win fyne.Window) fyne.CanvasObject {
 		fd.Show()
 	})
 	saveFile := widget.NewButton("File Save", func() {
-		dialog.ShowFileSave(func(writer fyne.URIWriteCloser, err error) {
+		dialog.ShowFileSave(func(writer granio.URIWriteCloser, err error) {
 			if err != nil {
 				dialog.ShowError(err, win)
 				return
@@ -62,7 +62,7 @@ func dialogScreen(win fyne.Window) fyne.CanvasObject {
 		}, win)
 	})
 	openFolder := widget.NewButton("Folder Open", func() {
-		dialog.ShowFolderOpen(func(list fyne.ListableURI, err error) {
+		dialog.ShowFolderOpen(func(list granio.ListableURI, err error) {
 			if err != nil {
 				dialog.ShowError(err, win)
 				return
@@ -82,7 +82,7 @@ func dialogScreen(win fyne.Window) fyne.CanvasObject {
 		}, win)
 	})
 
-	if fyne.CurrentDevice().IsBrowser() {
+	if granio.CurrentDevice().IsBrowser() {
 		openFile.Disable()
 		saveFile.Disable()
 		openFolder.Disable()
@@ -147,7 +147,7 @@ func dialogScreen(win fyne.Window) fyne.CanvasObject {
 	))
 }
 
-func imageOpened(f fyne.URIReadCloser) {
+func imageOpened(f granio.URIReadCloser) {
 	if f == nil {
 		log.Println("Cancelled")
 		return
@@ -157,7 +157,7 @@ func imageOpened(f fyne.URIReadCloser) {
 	showImage(f)
 }
 
-func fileSaved(f fyne.URIWriteCloser, w fyne.Window) {
+func fileSaved(f granio.URIWriteCloser, w granio.Window) {
 	defer f.Close()
 	_, err := f.Write([]byte("Written by Fyne demo\n"))
 	if err != nil {
@@ -170,26 +170,26 @@ func fileSaved(f fyne.URIWriteCloser, w fyne.Window) {
 	log.Println("Saved to...", f.URI())
 }
 
-func loadImage(f fyne.URIReadCloser) *canvas.Image {
+func loadImage(f granio.URIReadCloser) *canvas.Image {
 	data, err := io.ReadAll(f)
 	if err != nil {
-		fyne.LogError("Failed to load image data", err)
+		granio.LogError("Failed to load image data", err)
 		return nil
 	}
-	res := fyne.NewStaticResource(f.URI().Name(), data)
+	res := granio.NewStaticResource(f.URI().Name(), data)
 
 	return canvas.NewImageFromResource(res)
 }
 
-func showImage(f fyne.URIReadCloser) {
+func showImage(f granio.URIReadCloser) {
 	img := loadImage(f)
 	if img == nil {
 		return
 	}
 	img.FillMode = canvas.ImageFillOriginal
 
-	w := fyne.CurrentApp().NewWindow(f.URI().Name())
+	w := granio.CurrentApp().NewWindow(f.URI().Name())
 	w.SetContent(container.NewScroll(img))
-	w.Resize(fyne.NewSize(320, 240))
+	w.Resize(granio.NewSize(320, 240))
 	w.Show()
 }

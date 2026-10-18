@@ -3,16 +3,16 @@ package tutorials
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type iconInfo struct {
 	name string
-	icon fyne.Resource
+	icon granio.Resource
 }
 
 type browser struct {
@@ -34,7 +34,7 @@ func (b *browser) setIcon(index int) {
 }
 
 // iconScreen loads a panel that shows the various icons available in Fyne
-func iconScreen(_ fyne.Window) fyne.CanvasObject {
+func iconScreen(_ granio.Window) granio.CanvasObject {
 	b := &browser{}
 	b.icons = loadIcons()
 
@@ -59,7 +59,7 @@ func iconScreen(_ fyne.Window) fyne.CanvasObject {
 	bar := container.NewBorder(nil, nil, buttons, nil, b.name)
 
 	background := canvas.NewRasterWithPixels(checkerPattern)
-	background.SetMinSize(fyne.NewSize(280, 280))
+	background.SetMinSize(granio.NewSize(280, 280))
 	b.icon = widget.NewIcon(b.icons[b.current].icon)
 
 	return container.NewBorder(bar, nil, nil, nil, background, b.icon)

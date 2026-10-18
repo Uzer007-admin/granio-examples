@@ -4,30 +4,30 @@ import (
 	"strconv"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-func scaleToString(c fyne.Canvas) string {
+func scaleToString(c granio.Canvas) string {
 	return strconv.FormatFloat(float64(c.Scale()), 'f', 2, 32)
 }
 
-func textureScaleToString(c fyne.Canvas) string {
-	pixels, _ := c.PixelCoordinateForPosition(fyne.NewPos(1, 1))
+func textureScaleToString(c granio.Canvas) string {
+	pixels, _ := c.PixelCoordinateForPosition(granio.NewPos(1, 1))
 	texScale := float32(pixels) / c.Scale()
 	return strconv.FormatFloat(float64(texScale), 'f', 2, 32)
 }
 
-func prependTo(g *fyne.Container, s string) {
-	g.Objects = append([]fyne.CanvasObject{widget.NewLabel(s)}, g.Objects...)
+func prependTo(g *granio.Container, s string) {
+	g.Objects = append([]granio.CanvasObject{widget.NewLabel(s)}, g.Objects...)
 	g.Refresh()
 }
 
 // advancedScreen loads a panel that shows details and settings that are a bit
 // more detailed than normally needed.
-func advancedScreen(win fyne.Window) fyne.CanvasObject {
+func advancedScreen(win granio.Window) granio.CanvasObject {
 	scale := widget.NewLabel("")
 	tex := widget.NewLabel("")
 
@@ -39,9 +39,9 @@ func advancedScreen(win fyne.Window) fyne.CanvasObject {
 	ticker := time.NewTicker(time.Second)
 	OnChangeFuncs = append(OnChangeFuncs, ticker.Stop)
 
-	go func(canvas fyne.Canvas) {
+	go func(canvas granio.Canvas) {
 		for range ticker.C {
-			fyne.Do(func() {
+			granio.Do(func() {
 				scale.SetText(scaleToString(canvas))
 				tex.SetText(textureScaleToString(canvas))
 			})
@@ -58,19 +58,19 @@ func advancedScreen(win fyne.Window) fyne.CanvasObject {
 	win.Canvas().SetOnTypedRune(func(r rune) {
 		prependTo(generic, "Rune: "+string(r))
 	})
-	win.Canvas().SetOnTypedKey(func(ev *fyne.KeyEvent) {
+	win.Canvas().SetOnTypedKey(func(ev *granio.KeyEvent) {
 		prependTo(generic, "Key : "+string(ev.Name))
 	})
 	if deskCanvas, ok := win.Canvas().(desktop.Canvas); ok {
-		deskCanvas.SetOnKeyDown(func(ev *fyne.KeyEvent) {
+		deskCanvas.SetOnKeyDown(func(ev *granio.KeyEvent) {
 			prependTo(desk, "KeyDown: "+string(ev.Name))
 		})
-		deskCanvas.SetOnKeyUp(func(ev *fyne.KeyEvent) {
+		deskCanvas.SetOnKeyUp(func(ev *granio.KeyEvent) {
 			prependTo(desk, "KeyUp  : "+string(ev.Name))
 		})
 	}
 
-	buildStatus, ok := fyne.CurrentApp().Metadata().Custom["HelperText"]
+	buildStatus, ok := granio.CurrentApp().Metadata().Custom["HelperText"]
 	if !ok {
 		buildStatus = "No helper text provided at compile time."
 	}
@@ -84,7 +84,7 @@ func advancedScreen(win fyne.Window) fyne.CanvasObject {
 			deskWin.RequestFullScreenSecondary()
 		}
 	})
-	if !ok || !fyne.CurrentApp().Driver().(desktop.Driver).HasSecondaryDisplay() {
+	if !ok || !granio.CurrentApp().Driver().(desktop.Driver).HasSecondaryDisplay() {
 		secondary.Disable()
 	}
 
@@ -92,7 +92,7 @@ func advancedScreen(win fyne.Window) fyne.CanvasObject {
 		container.NewVBox(
 			screen,
 			widget.NewButton("Custom Theme", func() {
-				fyne.CurrentApp().Settings().SetTheme(newCustomTheme())
+				granio.CurrentApp().Settings().SetTheme(newCustomTheme())
 			}),
 			widget.NewButton("Fullscreen", func() {
 				win.SetFullScreen(!win.FullScreen())

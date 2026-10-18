@@ -6,15 +6,15 @@ import (
 	"net/url"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/validation"
-	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/validation"
+	"github.com/Uzer007-admin/granio/v2/driver/mobile"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"fyne.io/demo/data"
+	"github.com/Uzer007-admin/granio-demo/data"
 )
 
 const (
@@ -30,7 +30,7 @@ Mauris erat urna, fermentum et quam rhoncus, fringilla consequat ante. Vivamus c
 Suspendisse id maximus felis. Sed mauris odio, mattis eget mi eu, consequat tempus purus.`
 )
 
-func makeCardTab(_ fyne.Window) fyne.CanvasObject {
+func makeCardTab(_ granio.Window) granio.CanvasObject {
 	card1 := widget.NewCard("Book a table", "Which time suits?",
 		widget.NewRadioGroup([]string{"6:30pm", "7:00pm", "7:45pm"}, func(string) {}))
 	card2 := widget.NewCard("With media", "No content, with image", nil)
@@ -40,7 +40,7 @@ func makeCardTab(_ fyne.Window) fyne.CanvasObject {
 		container.NewVBox(card2))
 }
 
-func makeEntryTab(_ fyne.Window) fyne.CanvasObject {
+func makeEntryTab(_ granio.Window) granio.CanvasObject {
 	entry := widget.NewEntry()
 	entry.SetPlaceHolder("Entry")
 	entryDisabled := widget.NewEntry()
@@ -79,24 +79,24 @@ func makeTextGrid() *widget.TextGrid {
 	return grid
 }
 
-func makeTextTab(_ fyne.Window) fyne.CanvasObject {
+func makeTextTab(_ granio.Window) granio.CanvasObject {
 	label := widget.NewLabel("Label")
 
 	link, err := url.Parse("https://fyne.io/")
 	if err != nil {
-		fyne.LogError("Could not parse URL", err)
+		granio.LogError("Could not parse URL", err)
 	}
 	hyperlink := widget.NewHyperlink("Hyperlink", link)
 
 	entryLoremIpsum := widget.NewMultiLineEntry()
 	entryLoremIpsum.SetText(loremIpsum)
 
-	label.Alignment = fyne.TextAlignLeading
-	hyperlink.Alignment = fyne.TextAlignLeading
+	label.Alignment = granio.TextAlignLeading
+	hyperlink.Alignment = granio.TextAlignLeading
 
-	label.Wrapping = fyne.TextWrapWord
-	hyperlink.Wrapping = fyne.TextWrapWord
-	entryLoremIpsum.Wrapping = fyne.TextWrapWord
+	label.Wrapping = granio.TextWrapWord
+	hyperlink.Wrapping = granio.TextWrapWord
+	entryLoremIpsum.Wrapping = granio.TextWrapWord
 
 	rich := widget.NewRichTextFromMarkdown(`
 # RichText Heading
@@ -118,14 +118,14 @@ This styled row should also wrap as expected, but only *when required*.
 	rich.Scroll = container.ScrollBoth
 
 	radioAlign := widget.NewRadioGroup([]string{"Leading", "Center", "Trailing"}, func(s string) {
-		var align fyne.TextAlign
+		var align granio.TextAlign
 		switch s {
 		case "Leading":
-			align = fyne.TextAlignLeading
+			align = granio.TextAlignLeading
 		case "Center":
-			align = fyne.TextAlignCenter
+			align = granio.TextAlignCenter
 		case "Trailing":
-			align = fyne.TextAlignTrailing
+			align = granio.TextAlignTrailing
 		}
 
 		label.Alignment = align
@@ -149,18 +149,18 @@ This styled row should also wrap as expected, but only *when required*.
 	radioAlign.SetSelected("Leading")
 
 	radioWrap := widget.NewRadioGroup([]string{"Off", "Scroll", "Break", "Word"}, func(s string) {
-		var wrap fyne.TextWrap
+		var wrap granio.TextWrap
 		scroll := container.ScrollBoth
 		switch s {
 		case "Off":
-			wrap = fyne.TextWrapOff
+			wrap = granio.TextWrapOff
 			scroll = container.ScrollNone
 		case "Scroll":
-			wrap = fyne.TextWrapOff
+			wrap = granio.TextWrapOff
 		case "Break":
-			wrap = fyne.TextWrapBreak
+			wrap = granio.TextWrapBreak
 		case "Word":
-			wrap = fyne.TextWrapWord
+			wrap = granio.TextWrapWord
 		}
 
 		label.Wrapping = wrap
@@ -178,14 +178,14 @@ This styled row should also wrap as expected, but only *when required*.
 	radioWrap.SetSelected("Word")
 
 	radioTrunc := widget.NewRadioGroup([]string{"Off", "Clip", "Ellipsis"}, func(s string) {
-		var trunc fyne.TextTruncation
+		var trunc granio.TextTruncation
 		switch s {
 		case "Off":
-			trunc = fyne.TextTruncateOff
+			trunc = granio.TextTruncateOff
 		case "Clip":
-			trunc = fyne.TextTruncateClip
+			trunc = granio.TextTruncateClip
 		case "Ellipsis":
-			trunc = fyne.TextTruncateEllipsis
+			trunc = granio.TextTruncateEllipsis
 		}
 
 		label.Truncation = trunc
@@ -213,7 +213,7 @@ This styled row should also wrap as expected, but only *when required*.
 		container.NewGridWithRows(2, rich, entryLoremIpsum))
 }
 
-func makeInputTab(_ fyne.Window) fyne.CanvasObject {
+func makeInputTab(_ granio.Window) granio.CanvasObject {
 	selectEntry := widget.NewSelectEntry([]string{
 		"Option A",
 		"Option B",
@@ -272,7 +272,7 @@ func makeInputTab(_ fyne.Window) fyne.CanvasObject {
 	)
 }
 
-func makeProgressTab(_ fyne.Window) fyne.CanvasObject {
+func makeProgressTab(_ granio.Window) granio.CanvasObject {
 	progress := widget.NewProgressBar()
 
 	fprogress := widget.NewProgressBar()
@@ -282,8 +282,8 @@ func makeProgressTab(_ fyne.Window) fyne.CanvasObject {
 
 	infProgress := widget.NewProgressBarInfinite()
 
-	progressAnimation := fyne.Animation{
-		Curve:    fyne.AnimationLinear,
+	progressAnimation := granio.Animation{
+		Curve:    granio.AnimationLinear,
 		Duration: 10 * time.Second,
 		Tick: func(percentage float32) {
 			value := float64(percentage)
@@ -302,7 +302,7 @@ func makeProgressTab(_ fyne.Window) fyne.CanvasObject {
 		widget.NewLabel("Infinite"), infProgress)
 }
 
-func makeFormTab(_ fyne.Window) fyne.CanvasObject {
+func makeFormTab(_ granio.Window) granio.CanvasObject {
 	name := widget.NewEntry()
 	name.SetPlaceHolder("John Smith")
 
@@ -328,7 +328,7 @@ func makeFormTab(_ fyne.Window) fyne.CanvasObject {
 		},
 		OnSubmit: func() {
 			fmt.Println("Form submitted")
-			fyne.CurrentApp().SendNotification(&fyne.Notification{
+			granio.CurrentApp().SendNotification(&granio.Notification{
 				Title:   "Form for: " + name.Text,
 				Content: largeText.Text,
 			})
@@ -344,7 +344,7 @@ func makeFormTab(_ fyne.Window) fyne.CanvasObject {
 	return form
 }
 
-func makeToolbarTab(_ fyne.Window) fyne.CanvasObject {
+func makeToolbarTab(_ granio.Window) granio.CanvasObject {
 	t := widget.NewToolbar(widget.NewToolbarAction(theme.MailComposeIcon(), func() { fmt.Println("New") }),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarSpacer(),
@@ -357,7 +357,7 @@ func makeToolbarTab(_ fyne.Window) fyne.CanvasObject {
 }
 
 // widgetScreen shows a panel containing widget demos
-func widgetScreen(_ fyne.Window) fyne.CanvasObject {
+func widgetScreen(_ granio.Window) granio.CanvasObject {
 	content := container.NewVBox(
 		widget.NewLabel("Labels"),
 		widget.NewButtonWithIcon("Icons", theme.HomeIcon(), func() {}),

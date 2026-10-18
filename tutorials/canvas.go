@@ -3,11 +3,11 @@ package tutorials
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
 
-	"fyne.io/demo/data"
+	"github.com/Uzer007-admin/granio-demo/data"
 )
 
 func rgbGradient(x, y, w, h int) color.Color {
@@ -18,8 +18,8 @@ func rgbGradient(x, y, w, h int) color.Color {
 }
 
 // canvasScreen loads a graphics example panel for the demo app
-func canvasScreen(_ fyne.Window) fyne.CanvasObject {
-	return container.NewGridWrap(fyne.NewSize(90, 90),
+func canvasScreen(_ granio.Window) granio.CanvasObject {
+	return container.NewGridWrap(granio.NewSize(90, 90),
 		canvas.NewImageFromResource(data.FyneLogo),
 		&canvas.Rectangle{
 			FillColor:   color.NRGBA{0x80, 0, 0, 0xff},
@@ -40,21 +40,21 @@ func canvasScreen(_ fyne.Window) fyne.CanvasObject {
 			FillColor:   color.NRGBA{G: 0x80, A: 0xff},
 			StrokeColor: color.NRGBA{R: 0x66, G: 0x66, B: 0x66, A: 0xff},
 			StrokeWidth: 4,
-			Points: []fyne.Position{
-				fyne.NewPos(4, 4),
-				fyne.NewPos(4, 84),
-				fyne.NewPos(84, 84),
+			Points: []granio.Position{
+				granio.NewPos(4, 4),
+				granio.NewPos(4, 84),
+				granio.NewPos(84, 84),
 			},
 		},
 		&canvas.ArbitraryPolygon{
 			FillColor: color.NRGBA{R: 0x80, A: 0xff},
-			Points: []fyne.Position{
-				fyne.NewPos(58, 4),
-				fyne.NewPos(86, 32),
-				fyne.NewPos(44, 74),
-				fyne.NewPos(2, 32),
-				fyne.NewPos(30, 4),
-				fyne.NewPos(44, 32),
+			Points: []granio.Position{
+				granio.NewPos(58, 4),
+				granio.NewPos(86, 32),
+				granio.NewPos(44, 74),
+				granio.NewPos(2, 32),
+				granio.NewPos(30, 4),
+				granio.NewPos(44, 32),
 			},
 			CornerRadii: []float32{20, 20, 0, 20, 20, 0},
 		},

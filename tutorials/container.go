@@ -6,27 +6,27 @@ import (
 	"log"
 	"strconv"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	"fyne.io/demo/data"
+	"github.com/Uzer007-admin/granio-demo/data"
 )
 
 // containerScreen loads a tab panel for containers
-func containerScreen(_ fyne.Window) fyne.CanvasObject {
+func containerScreen(_ granio.Window) granio.CanvasObject {
 	content := container.NewBorder(
-		widget.NewLabelWithStyle("Top", fyne.TextAlignCenter, fyne.TextStyle{}),
-		widget.NewLabelWithStyle("Bottom", fyne.TextAlignCenter, fyne.TextStyle{}),
+		widget.NewLabelWithStyle("Top", granio.TextAlignCenter, granio.TextStyle{}),
+		widget.NewLabelWithStyle("Bottom", granio.TextAlignCenter, granio.TextStyle{}),
 		widget.NewLabel("Left"),
 		widget.NewLabel("Right"),
 		widget.NewLabel("Border Container"))
 	return container.NewCenter(content)
 }
 
-func makeAppTabsTab(_ fyne.Window) fyne.CanvasObject {
+func makeAppTabsTab(_ granio.Window) granio.CanvasObject {
 	tabs := container.NewAppTabs(
 		container.NewTabItemWithIcon("Tab 1", theme.HomeIcon(), widget.NewLabel("Content of tab 1")),
 		container.NewTabItemWithIcon("Tab 2 bigger", theme.ComputerIcon(), widget.NewLabel("Content of tab 2")),
@@ -39,17 +39,17 @@ func makeAppTabsTab(_ fyne.Window) fyne.CanvasObject {
 	return container.NewBorder(locations, nil, nil, nil, tabs)
 }
 
-func makeBorderLayout(_ fyne.Window) fyne.CanvasObject {
+func makeBorderLayout(_ granio.Window) granio.CanvasObject {
 	top := makeCell()
 	bottom := makeCell()
 	left := makeCell()
 	right := makeCell()
-	middle := widget.NewLabelWithStyle("BorderLayout", fyne.TextAlignCenter, fyne.TextStyle{})
+	middle := widget.NewLabelWithStyle("BorderLayout", granio.TextAlignCenter, granio.TextStyle{})
 
 	return container.NewBorder(top, bottom, left, right, middle)
 }
 
-func makeBoxLayout(_ fyne.Window) fyne.CanvasObject {
+func makeBoxLayout(_ granio.Window) granio.CanvasObject {
 	top := makeCell()
 	bottom := makeCell()
 	middle := widget.NewLabel("BoxLayout")
@@ -61,8 +61,8 @@ func makeBoxLayout(_ fyne.Window) fyne.CanvasObject {
 	return container.NewHBox(col, center, right)
 }
 
-func makeButtonList(count int) []fyne.CanvasObject {
-	var items []fyne.CanvasObject
+func makeButtonList(count int) []granio.CanvasObject {
+	var items []granio.CanvasObject
 	for i := 1; i <= count; i++ {
 		index := i // capture
 		items = append(items, widget.NewButton("Button "+strconv.Itoa(index), func() {
@@ -73,19 +73,19 @@ func makeButtonList(count int) []fyne.CanvasObject {
 	return items
 }
 
-func makeCell() fyne.CanvasObject {
+func makeCell() granio.CanvasObject {
 	rect := canvas.NewRectangle(&color.NRGBA{128, 128, 128, 255})
-	rect.SetMinSize(fyne.NewSize(30, 30))
+	rect.SetMinSize(granio.NewSize(30, 30))
 	return rect
 }
 
-func makeCenterLayout(_ fyne.Window) fyne.CanvasObject {
+func makeCenterLayout(_ granio.Window) granio.CanvasObject {
 	middle := widget.NewButton("CenterLayout", func() {})
 
 	return container.NewCenter(middle)
 }
 
-func makeDocTabsTab(_ fyne.Window) fyne.CanvasObject {
+func makeDocTabsTab(_ granio.Window) granio.CanvasObject {
 	tabs := container.NewDocTabs(
 		container.NewTabItem("Doc 1", widget.NewLabel("Content of document 1")),
 		container.NewTabItem("Doc 2 bigger", widget.NewLabel("Content of document 2")),
@@ -100,7 +100,7 @@ func makeDocTabsTab(_ fyne.Window) fyne.CanvasObject {
 	return container.NewBorder(locations, nil, nil, nil, tabs)
 }
 
-func makeGridLayout(_ fyne.Window) fyne.CanvasObject {
+func makeGridLayout(_ granio.Window) granio.CanvasObject {
 	box1 := makeCell()
 	box2 := widget.NewLabel("Grid")
 	box3 := makeCell()
@@ -110,7 +110,7 @@ func makeGridLayout(_ fyne.Window) fyne.CanvasObject {
 		box1, box2, box3, box4)
 }
 
-func makeInnerWindowTab(_ fyne.Window) fyne.CanvasObject {
+func makeInnerWindowTab(_ granio.Window) granio.CanvasObject {
 	label := widget.NewLabel("Window content for inner demo")
 	win1 := container.NewInnerWindow("Inner Demo", container.NewVBox(
 		label,
@@ -132,7 +132,7 @@ func makeInnerWindowTab(_ fyne.Window) fyne.CanvasObject {
 	return multi
 }
 
-func makeScrollTab(_ fyne.Window) fyne.CanvasObject {
+func makeScrollTab(_ granio.Window) granio.CanvasObject {
 	hlist := makeButtonList(20)
 	vlist := makeButtonList(50)
 
@@ -144,19 +144,19 @@ func makeScrollTab(_ fyne.Window) fyne.CanvasObject {
 		makeScrollBothTab())
 }
 
-func makeScrollBothTab() fyne.CanvasObject {
+func makeScrollBothTab() granio.CanvasObject {
 	logo := canvas.NewImageFromResource(data.FyneLogo)
-	logo.SetMinSize(fyne.NewSize(800, 800))
+	logo.SetMinSize(granio.NewSize(800, 800))
 
 	scroll := container.NewScroll(logo)
-	scroll.Resize(fyne.NewSize(400, 400))
+	scroll.Resize(granio.NewSize(400, 400))
 
 	return scroll
 }
 
-func makeSplitTab(_ fyne.Window) fyne.CanvasObject {
+func makeSplitTab(_ granio.Window) granio.CanvasObject {
 	left := widget.NewMultiLineEntry()
-	left.Wrapping = fyne.TextWrapWord
+	left.Wrapping = granio.TextWrapWord
 	left.SetText("Long text is looooooooooooooong")
 	right := container.NewVSplit(
 		widget.NewLabel("Label"),
