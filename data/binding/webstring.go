@@ -3,7 +3,7 @@ package binding
 import (
 	"net/http"
 
-	"fyne.io/fyne/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
 
 	"github.com/gorilla/websocket"
 )

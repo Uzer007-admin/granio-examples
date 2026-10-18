@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
-	"fyne.io/x/fyne/layout"
+	"github.com/Uzer007-admin/granio-x/layout"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
 	app := app.New()
 
 	window := app.NewWindow("Responsive")
-	window.Resize(fyne.Size{Width: 320, Height: 480})
+	window.Resize(granio.Size{Width: 320, Height: 480})
 
 	// just a button
 	button := widget.NewButton("Click me", func() {
@@ -51,10 +51,10 @@ func main() {
 }
 
 // winSizeLabel returns a label with the current window size inside
-func winSizeLabel(window fyne.Window) fyne.CanvasObject {
+func winSizeLabel(window granio.Window) granio.CanvasObject {
 	label := widget.NewLabel("")
-	label.Wrapping = fyne.TextWrapWord
-	label.Alignment = fyne.TextAlignCenter
+	label.Wrapping = granio.TextWrapWord
+	label.Alignment = granio.TextAlignCenter
 
 	go func() {
 		// when window is resized, the label will be updated
@@ -63,7 +63,7 @@ func winSizeLabel(window fyne.Window) fyne.CanvasObject {
 		for {
 			time.Sleep(time.Millisecond * 100)
 
-			fyne.Do(func() {
+			granio.Do(func() {
 				newText := ""
 				if canvas.Size().Width <= float32(layout.SMALL) {
 					newText = fmt.Sprintf("Extra small devicce %v <= %v", canvas.Size().Width, layout.SMALL)
@@ -86,10 +86,10 @@ func winSizeLabel(window fyne.Window) fyne.CanvasObject {
 }
 
 // presentation returns a container with a title text in bold / italic
-func presentation() fyne.CanvasObject {
+func presentation() granio.CanvasObject {
 	label := widget.NewLabel("Example of responsive layout")
-	label.TextStyle = fyne.TextStyle{Bold: true, Italic: true}
-	label.Alignment = fyne.TextAlignCenter
+	label.TextStyle = granio.TextStyle{Bold: true, Italic: true}
+	label.Alignment = granio.TextAlignCenter
 	return label
 }
 
@@ -102,21 +102,21 @@ func presentation() fyne.CanvasObject {
 // - be 100% width for small device
 // - be 75% for medium device (100 - 25% from the label)
 // - be 67% for larger device (100 - 33% from the label)
-func fromLayout() fyne.CanvasObject {
+func fromLayout() granio.CanvasObject {
 	title := widget.NewLabel(
 		"This container should be 100% width of small device and 50% for larger.\n" +
 			"The labels are sized to 100% width for small devices, 25% for medium and 33% for larger")
-	title.Alignment = fyne.TextAlignCenter
-	title.Wrapping = fyne.TextWrapWord
+	title.Alignment = granio.TextAlignCenter
+	title.Wrapping = granio.TextWrapWord
 
 	label := widget.NewLabel("Give your name")
-	label.Wrapping = fyne.TextWrapWord
+	label.Wrapping = granio.TextWrapWord
 	entry := widget.NewEntry()
 	label2 := widget.NewLabel("Give your age")
-	label2.Wrapping = fyne.TextWrapWord
+	label2.Wrapping = granio.TextWrapWord
 	entry2 := widget.NewEntry()
 	label3 := widget.NewLabel("Give your email")
-	label3.Wrapping = fyne.TextWrapWord
+	label3.Wrapping = granio.TextWrapWord
 	entry3 := widget.NewEntry()
 
 	labelw := float32(.25)

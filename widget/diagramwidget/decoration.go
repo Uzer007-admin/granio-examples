@@ -3,7 +3,7 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 // To accomplish this, it needs to know the length of the decoration along the reference axis
 // so that it can adjust the position of the next decoration appropriately.
 type Decoration interface {
-	fyne.Widget
+	granio.Widget
 	setLink(link *BaseDiagramLink)
 	// setBaseAngle sets the angle of the reference axis
 	setBaseAngle(angle float64) // Angle in radians

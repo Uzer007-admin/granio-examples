@@ -5,12 +5,12 @@ import (
 	"image/color"
 	"time"
 
-	"fyne.io/x/fyne/widget/diagramwidget"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 var forceticks int = 0
@@ -19,7 +19,7 @@ func forceanim(diagramWidget *diagramwidget.DiagramWidget) {
 
 	for {
 		if forceticks > 0 {
-			fyne.Do(func() {
+			granio.Do(func() {
 				diagramwidget.StepForceLayout(diagramWidget, 300)
 				diagramWidget.Refresh()
 			})
@@ -45,55 +45,55 @@ func main() {
 	// Node 0
 	node0Label := widget.NewLabel("Node0")
 	node0 := diagramwidget.NewDiagramNode(diagramWidget, node0Label, "Node0")
-	node0.Move(fyne.NewPos(300, 0))
+	node0.Move(granio.NewPos(300, 0))
 
 	// Node 1
 	node1Button := widget.NewButton("Node1 Button", func() { fmt.Printf("tapped Node1!\n") })
 	node1 := diagramwidget.NewDiagramNode(diagramWidget, node1Button, "Node1")
-	node1.Move(fyne.Position{X: 100, Y: 100})
+	node1.Move(granio.Position{X: 100, Y: 100})
 
 	// Node 2
 	node2 := diagramwidget.NewDiagramNode(diagramWidget, nil, "Node2")
 	node2Container := container.NewVBox(
 		widget.NewLabel("Node2 - with structure"),
 		widget.NewButton("Up", func() {
-			node2.GetDiagram().DisplaceNode(node2, fyne.Position{X: 0, Y: -10})
+			node2.GetDiagram().DisplaceNode(node2, granio.Position{X: 0, Y: -10})
 			node2.Refresh()
 		}),
 		widget.NewButton("Down", func() {
-			node2.GetDiagram().DisplaceNode(node2, fyne.Position{X: 0, Y: 10})
+			node2.GetDiagram().DisplaceNode(node2, granio.Position{X: 0, Y: 10})
 			node2.Refresh()
 		}),
 		container.NewHBox(
 			widget.NewButton("Left", func() {
-				node2.GetDiagram().DisplaceNode(node2, fyne.Position{X: -10, Y: 0})
+				node2.GetDiagram().DisplaceNode(node2, granio.Position{X: -10, Y: 0})
 				node2.Refresh()
 			}),
 			widget.NewButton("Right", func() {
-				node2.GetDiagram().DisplaceNode(node2, fyne.Position{X: 10, Y: 0})
+				node2.GetDiagram().DisplaceNode(node2, granio.Position{X: 10, Y: 0})
 				node2.Refresh()
 			}),
 		),
 	)
 	node2.SetInnerObject(node2Container)
-	node2.Move(fyne.Position{X: 100, Y: 300})
+	node2.Move(granio.Position{X: 100, Y: 300})
 
 	// Node 3
 	node3 := diagramwidget.NewDiagramNode(diagramWidget, widget.NewButton("Node3: Force layout step", func() {
 		diagramwidget.StepForceLayout(diagramWidget, 300)
 		diagramWidget.Refresh()
 	}), "Node3")
-	node3.Move(fyne.Position{X: 400, Y: 100})
+	node3.Move(granio.Position{X: 400, Y: 100})
 
 	// Node 4
 	node4 := diagramwidget.NewDiagramNode(diagramWidget, widget.NewButton("Node4: auto layout", func() {
 		forceticks += 100
 		diagramWidget.Refresh()
 	}), "Node4")
-	node4.Move(fyne.Position{X: 400, Y: 400})
+	node4.Move(granio.Position{X: 400, Y: 400})
 
 	node5 := diagramwidget.NewDiagramNode(diagramWidget, widget.NewLabel("Node5"), "Node5")
-	node5.Move(fyne.NewPos(600, 200))
+	node5.Move(granio.NewPos(600, 200))
 
 	// Link0
 	link0 := diagramwidget.NewDiagramLink(diagramWidget, "Link0")
@@ -149,12 +149,12 @@ func main() {
 
 	w.SetContent(scrollContainer)
 
-	w.Resize(fyne.NewSize(600, 400))
+	w.Resize(granio.NewSize(600, 400))
 	w.ShowAndRun()
 }
 
 func createTriangleDecoration() diagramwidget.Decoration {
-	points := []fyne.Position{
+	points := []granio.Position{
 		{X: 0, Y: 15},
 		{X: 15, Y: 0},
 		{X: 0, Y: -15},
@@ -164,7 +164,7 @@ func createTriangleDecoration() diagramwidget.Decoration {
 }
 
 func createDiamondDecoration() diagramwidget.Decoration {
-	points := []fyne.Position{
+	points := []granio.Position{
 		{X: 0, Y: 0},
 		{X: 8, Y: 4},
 		{X: 16, Y: 0},
@@ -175,7 +175,7 @@ func createDiamondDecoration() diagramwidget.Decoration {
 }
 
 func createHalfArrowDecoration() diagramwidget.Decoration {
-	points := []fyne.Position{
+	points := []granio.Position{
 		{X: 0, Y: 0},
 		{X: 16, Y: 8},
 		{X: 16, Y: 0},

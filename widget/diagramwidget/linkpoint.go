@@ -1,8 +1,8 @@
 package diagramwidget
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // LinkPoint identifies the point at which a link end is connected to another diagram element's connection pad
@@ -20,7 +20,7 @@ func NewLinkPoint(link DiagramLink) *LinkPoint {
 }
 
 // CreateRenderer creates the renderere for a LinkPoint
-func (lp *LinkPoint) CreateRenderer() fyne.WidgetRenderer {
+func (lp *LinkPoint) CreateRenderer() granio.WidgetRenderer {
 	lpr := &linkPointRenderer{}
 	return lpr
 }
@@ -44,16 +44,16 @@ func (lpr *linkPointRenderer) Destroy() {
 
 }
 
-func (lpr *linkPointRenderer) Layout(size fyne.Size) {
+func (lpr *linkPointRenderer) Layout(size granio.Size) {
 
 }
 
-func (lpr *linkPointRenderer) MinSize() fyne.Size {
-	return fyne.NewSize(1, 1)
+func (lpr *linkPointRenderer) MinSize() granio.Size {
+	return granio.NewSize(1, 1)
 }
 
-func (lpr *linkPointRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{}
+func (lpr *linkPointRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{}
 	return obj
 }
 

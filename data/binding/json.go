@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"fyne.io/fyne/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
 
 	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
 )

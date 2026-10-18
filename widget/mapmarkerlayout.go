@@ -1,14 +1,14 @@
 package widget
 
 import (
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 type mapMarkerLayout struct {
-	getPosFromLatLon func(lat, lon float64) fyne.Position
+	getPosFromLatLon func(lat, lon float64) granio.Position
 }
 
-func (l *mapMarkerLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
+func (l *mapMarkerLayout) MinSize(objects []granio.CanvasObject) granio.Size {
 	w, h := float32(0), float32(0)
 	for _, o := range objects {
 		childSize := o.MinSize()
@@ -19,10 +19,10 @@ func (l *mapMarkerLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 			childSize.Height = h
 		}
 	}
-	return fyne.NewSize(w, h)
+	return granio.NewSize(w, h)
 }
 
-func (l *mapMarkerLayout) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
+func (l *mapMarkerLayout) Layout(objects []granio.CanvasObject, containerSize granio.Size) {
 	for _, o := range objects {
 		marker, ok := o.(*mapMarker)
 		if !ok {

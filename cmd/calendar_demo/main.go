@@ -3,11 +3,11 @@ package main
 import (
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-	xwidget "fyne.io/x/fyne/widget"
+	xwidget "github.com/Uzer007-admin/granio-x/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
@@ -15,9 +15,9 @@ func main() {
 	w := a.NewWindow("Calendar")
 
 	i := widget.NewLabel("Please Choose a Date")
-	i.Alignment = fyne.TextAlignCenter
+	i.Alignment = granio.TextAlignCenter
 	l := widget.NewLabel("")
-	l.Alignment = fyne.TextAlignCenter
+	l.Alignment = granio.TextAlignCenter
 	d := &date{instruction: i, dateChosen: l}
 
 	// Defines which date you would like the calendar to start

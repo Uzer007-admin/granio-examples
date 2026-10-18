@@ -3,10 +3,10 @@ package main
 import (
 	"net/url"
 
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-	"fyne.io/x/fyne/dialog"
+	"github.com/Uzer007-admin/granio-x/dialog"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {

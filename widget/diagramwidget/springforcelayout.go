@@ -3,9 +3,9 @@ package diagramwidget
 import (
 	"math"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 )
 
 // adjacent returns true if there is at least one edge between n1 and n2
@@ -76,7 +76,7 @@ func StepForceLayout(dw *DiagramWidget, targetLength float64) {
 
 	// flip into current state
 	for k, nk := range dw.GetDiagramNodes() {
-		dw.DisplaceNode(nk, fyne.Position{X: float32(deltas[k].X), Y: float32(deltas[k].Y)})
+		dw.DisplaceNode(nk, granio.Position{X: float32(deltas[k].X), Y: float32(deltas[k].Y)})
 	}
 
 }

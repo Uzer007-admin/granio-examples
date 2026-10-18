@@ -4,7 +4,7 @@ package binding
 import (
 	"io"
 
-	"fyne.io/fyne/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
 )
 
 // StringCloser is an extension of the String interface that allows resources to be freed

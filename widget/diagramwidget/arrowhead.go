@@ -4,12 +4,12 @@ import (
 	"image/color"
 	"math"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 const (
@@ -24,7 +24,7 @@ type Arrowhead struct {
 	widget.BaseWidget
 	link *BaseDiagramLink
 	// baseAngle is used to define direction in which the arrowhead points
-	// Base fyne.Position
+	// Base granio.Position
 	baseAngle float64
 	// Position() is the point at which the tip of the arrow will be placed.
 	// StrokeWidth is the width of the arrowhead lines
@@ -57,7 +57,7 @@ func NewArrowhead() *Arrowhead {
 }
 
 // CreateRenderer creates a renderer for the Arrowhead
-func (a *Arrowhead) CreateRenderer() fyne.WidgetRenderer {
+func (a *Arrowhead) CreateRenderer() granio.WidgetRenderer {
 	ar := arrowheadRenderer{
 		arrowhead: a,
 		left:      canvas.NewLine(a.link.properties.ForegroundColor),
@@ -72,10 +72,10 @@ func (a *Arrowhead) GetReferenceLength() float32 {
 }
 
 // LeftPoint returns the position of the end of the left half of the arrowhead
-func (a *Arrowhead) LeftPoint() fyne.Position {
+func (a *Arrowhead) LeftPoint() granio.Position {
 	leftAngle := r2.AddAngles(a.baseAngle, -a.Theta)
 	// We have to change the sign of Y because the window coordinate Y axis goes down rather than up
-	leftPosition := fyne.Position{
+	leftPosition := granio.Position{
 		X: float32(float64(a.Length) * math.Cos(leftAngle)),
 		Y: -float32(float64(a.Length) * math.Sin(leftAngle)),
 	}
@@ -83,12 +83,12 @@ func (a *Arrowhead) LeftPoint() fyne.Position {
 }
 
 // MinSize returns the minimum size which is the actual size of the arrowhead
-func (a *Arrowhead) MinSize() fyne.Size {
+func (a *Arrowhead) MinSize() granio.Size {
 	return a.Size()
 }
 
 // Resize scales the arrowhead
-func (a *Arrowhead) Resize(s fyne.Size) {
+func (a *Arrowhead) Resize(s granio.Size) {
 	// We get the current size and scale the length based on the difference between sizes
 	currentSize := a.Size()
 	currentLengthVector := r2.V2(float64(currentSize.Width), float64(currentSize.Height))
@@ -99,10 +99,10 @@ func (a *Arrowhead) Resize(s fyne.Size) {
 }
 
 // RightPoint returns the position of the end of the right half of the arrowhead
-func (a *Arrowhead) RightPoint() fyne.Position {
+func (a *Arrowhead) RightPoint() granio.Position {
 	rightAngle := r2.AddAngles(a.baseAngle, a.Theta)
 	// We have to change the sign of Y because the window coordinate Y axis goes down rather than up
-	rightPosition := fyne.Position{
+	rightPosition := granio.Position{
 		X: float32(float64(a.Length) * math.Cos(rightAngle)),
 		Y: -float32(float64(a.Length) * math.Sin(rightAngle)),
 	}
@@ -139,7 +139,7 @@ func (a *Arrowhead) SetStrokeWidth(strokeWidth float32) {
 }
 
 // Size returns the size of the arrowhead
-func (a *Arrowhead) Size() fyne.Size {
+func (a *Arrowhead) Size() granio.Size {
 	lp := a.LeftPoint()
 	rp := a.RightPoint()
 	points := []r2.Vec2{
@@ -149,7 +149,7 @@ func (a *Arrowhead) Size() fyne.Size {
 	}
 
 	bounding := r2.BoundingBox(points)
-	return fyne.Size{
+	return granio.Size{
 		Width:  float32(bounding.Width()),
 		Height: float32(bounding.Height()),
 	}
@@ -164,19 +164,19 @@ type arrowheadRenderer struct {
 func (ar *arrowheadRenderer) Destroy() {
 }
 
-func (ar *arrowheadRenderer) MinSize() fyne.Size {
+func (ar *arrowheadRenderer) MinSize() granio.Size {
 	return ar.arrowhead.Size()
 }
 
-func (ar *arrowheadRenderer) Layout(size fyne.Size) {
-	ar.left.Position1 = fyne.Position{X: 0, Y: 0}
+func (ar *arrowheadRenderer) Layout(size granio.Size) {
+	ar.left.Position1 = granio.Position{X: 0, Y: 0}
 	ar.left.Position2 = ar.arrowhead.LeftPoint()
-	ar.right.Position1 = fyne.Position{X: 0, Y: 0}
+	ar.right.Position1 = granio.Position{X: 0, Y: 0}
 	ar.right.Position2 = ar.arrowhead.RightPoint()
 }
 
-func (ar *arrowheadRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (ar *arrowheadRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		ar.left,
 		ar.right,
 	}
@@ -188,9 +188,9 @@ func (ar *arrowheadRenderer) Refresh() {
 	ar.right.StrokeWidth = ar.arrowhead.StrokeWidth
 	ar.left.StrokeColor = ar.arrowhead.StrokeColor
 	ar.right.StrokeColor = ar.arrowhead.StrokeColor
-	ar.left.Position1 = fyne.Position{X: 0, Y: 0}
+	ar.left.Position1 = granio.Position{X: 0, Y: 0}
 	ar.left.Position2 = ar.arrowhead.LeftPoint()
-	ar.right.Position1 = fyne.Position{X: 0, Y: 0}
+	ar.right.Position1 = granio.Position{X: 0, Y: 0}
 	ar.right.Position2 = ar.arrowhead.RightPoint()
 	ar.left.Refresh()
 	ar.right.Refresh()

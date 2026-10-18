@@ -8,8 +8,8 @@ It takes the colors from the Adwaita page: https://gnome.pages.gitlab.gnome.org/
 and the icons from the Adwaita icon theme: https://gitlab.gnome.org/GNOME/adwaita-icon-theme
 
 There are 2 outputs:
-- adwaita_colors.go: the colors for the theme as map[fyne.ThemeColorName]color.Color
-- adwaita_icons.go: the icons for the theme as fyne.Resource (themed for symbolic icons)
+- adwaita_colors.go: the colors for the theme as map[granio.ThemeColorName]color.Color
+- adwaita_icons.go: the icons for the theme as granio.Resource (themed for symbolic icons)
 
 Usage:
 go generate ./theme/...
@@ -33,7 +33,7 @@ import (
 	"strings"
 	"text/template"
 
-	"fyne.io/fyne/v2"
+	"github.com/Uzer007-admin/granio/v2"
 )
 
 const (
@@ -54,17 +54,17 @@ const (
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
-var adwaitaDarkScheme = map[fyne.ThemeColorName]color.Color{
+var adwaitaDarkScheme = map[granio.ThemeColorName]color.Color{
 {{- range $key, $value := .DarkScheme }}
     {{ $key }}: {{ printf "color.NRGBA{R: 0x%02x, G: 0x%02x, B: 0x%02x, A: 0x%02x}" $value.Col.R $value.Col.G $value.Col.B $value.Col.A }}, // Adwaita color name @{{$value.AdwName}}
 {{- end }}
 }
 
-var adwaitaLightScheme = map[fyne.ThemeColorName]color.Color{
+var adwaitaLightScheme = map[granio.ThemeColorName]color.Color{
 {{- range $key, $value := .LightScheme }}
     {{ $key }}: {{ printf "color.NRGBA{R: 0x%02x, G: 0x%02X, B: 0x%02x, A: 0x%02x}" $value.Col.R $value.Col.G $value.Col.B $value.Col.A }}, // Adwaita color name @{{$value.AdwName}}
 {{- end }}
@@ -82,19 +82,19 @@ var adwaitaLightScheme = map[fyne.ThemeColorName]color.Color{
 // See: https://gitlab.gnome.org/GNOME/adwaita-icon-theme/-/blob/master/COPYING_CCBYSA3
 
 import (
-    "fyne.io/fyne/v2"
-    "fyne.io/fyne/v2/theme"
+    "github.com/Uzer007-admin/granio/v2"
+    "github.com/Uzer007-admin/granio/v2/theme"
 )
 
-var adwaitaIcons = map[fyne.ThemeIconName]fyne.Resource{
+var adwaitaIcons = map[granio.ThemeIconName]granio.Resource{
 {{range $name, $icon := .Icons}}
 {{ if contains $icon.StaticName "symbolic" }}
-    theme.{{$name}}: theme.NewThemedResource(&fyne.StaticResource{
+    theme.{{$name}}: theme.NewThemedResource(&granio.StaticResource{
         StaticName: "{{$icon.StaticName}}",
         StaticContent: []byte({{ printf "%q" $icon.Content}}),
     }),
 {{else}}
-    theme.{{$name}}: &fyne.StaticResource{
+    theme.{{$name}}: &granio.StaticResource{
         StaticName: "{{$icon.StaticName}}",
         StaticContent: []byte({{ printf "%q" $icon.Content}}),
     },
@@ -471,7 +471,7 @@ func generateIcons() error {
 			iconPath = strings.TrimSuffix(iconPath, ".svg") + ".png"
 		}
 
-		res, err := fyne.LoadResourceFromPath(iconPath)
+		res, err := granio.LoadResourceFromPath(iconPath)
 		if err != nil {
 			log.Println("Error bundeling", name, "from", iconPath, ":", err)
 			continue

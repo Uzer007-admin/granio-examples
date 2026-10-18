@@ -5,13 +5,13 @@ import (
 	"image/color"
 	"math"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 	"github.com/srwiley/rasterx"
 	"golang.org/x/image/math/fixed"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 var _ Decoration = (*Polygon)(nil)
@@ -31,7 +31,7 @@ type Polygon struct {
 	widget.BaseWidget
 	link *BaseDiagramLink
 	// baseAngle is used to define the rotation of the polygon from the nominal position
-	// Base fyne.Position
+	// Base granio.Position
 	baseAngle float64
 	// StrokeWidth is the width of the polygon perimeter line
 	StrokeWidth float32
@@ -41,13 +41,13 @@ type Polygon struct {
 	// no fill
 	FillColor      color.Color
 	visible        bool
-	definingPoints []fyne.Position
+	definingPoints []granio.Position
 	closed         bool
 	solid          bool
 }
 
 // NewPolygon creates a Polygon as defined by the supplied points
-func NewPolygon(definingPoints []fyne.Position) *Polygon {
+func NewPolygon(definingPoints []granio.Position) *Polygon {
 	p := &Polygon{
 		StrokeWidth:    defaultStrokeWidth,
 		StrokeColor:    color.Black,
@@ -62,7 +62,7 @@ func NewPolygon(definingPoints []fyne.Position) *Polygon {
 }
 
 // CreateRenderer creates an instance of the renderer for the Polygon
-func (p *Polygon) CreateRenderer() fyne.WidgetRenderer {
+func (p *Polygon) CreateRenderer() granio.WidgetRenderer {
 	pr := polygonRenderer{
 		polygon: p,
 		image:   *canvas.NewImageFromImage(nil),
@@ -87,7 +87,7 @@ func (p *Polygon) GetReferenceLength() float32 {
 // so that the reference point on the defining points (the 0,0 coordinate) will align with the
 // position of the polygon. Thus the rendered polygon will appear on the link with the correct
 // orientation and position.
-func (p *Polygon) getRenderingData() ([]fyne.Position, fyne.Position) {
+func (p *Polygon) getRenderingData() ([]granio.Position, granio.Position) {
 	rotatedPoints := p.getRotatedPoints()
 	var xMin, yMin float64
 	for i, point := range rotatedPoints {
@@ -108,22 +108,22 @@ func (p *Polygon) getRenderingData() ([]fyne.Position, fyne.Position) {
 	// We have to further shift coordinates by the stroke width so that the points render
 	// at the correct positions in a pixmap. We have to add the stroke width as well
 	normalizationVectorWithStrokeOfset := r2.MakeVec2(float64(-xMin)+float64(p.StrokeWidth/2), float64(-yMin)+float64(p.StrokeWidth/2))
-	renderingPoints := []fyne.Position{}
+	renderingPoints := []granio.Position{}
 	for _, point := range rotatedPoints {
 		pointVector := r2.MakeVec2(float64(point.X), float64(point.Y))
 		normalizedPointVector := pointVector.Add(normalizationVectorWithStrokeOfset)
-		normalizedPoint := fyne.Position{X: float32(normalizedPointVector.X), Y: float32(normalizedPointVector.Y)}
+		normalizedPoint := granio.Position{X: float32(normalizedPointVector.X), Y: float32(normalizedPointVector.Y)}
 		renderingPoints = append(renderingPoints, normalizedPoint)
 	}
 	// The offset vector is the inverse of the normalization vector without the stroke width
-	offsetVector := fyne.Position{X: float32(xMin), Y: float32(yMin)}
+	offsetVector := granio.Position{X: float32(xMin), Y: float32(yMin)}
 	return renderingPoints, offsetVector
 }
 
 // getRotatedPoints returns the points after the nominal points
 // have been rotated by the reference angle
-func (p *Polygon) getRotatedPoints() []fyne.Position {
-	rotatedPoints := []fyne.Position{}
+func (p *Polygon) getRotatedPoints() []granio.Position {
+	rotatedPoints := []granio.Position{}
 	var rotX float32
 	var rotY float32
 	for _, point := range p.definingPoints {
@@ -138,7 +138,7 @@ func (p *Polygon) getRotatedPoints() []fyne.Position {
 			rotX = float32(math.Cos(rotAng) * len)
 			rotY = -float32(math.Sin(rotAng) * len)
 		}
-		rotatedPoint := fyne.Position{
+		rotatedPoint := granio.Position{
 			X: rotX,
 			Y: rotY,
 		}
@@ -148,7 +148,7 @@ func (p *Polygon) getRotatedPoints() []fyne.Position {
 }
 
 // MinSize returns the minimum size based on nominal polygon points, base angle, and stroke width
-func (p *Polygon) MinSize() fyne.Size {
+func (p *Polygon) MinSize() granio.Size {
 	// // The origin is always one of the points regardless of whether the polygon uses that point
 	// points := []r2.Vec2{{X: 0.0, Y: 0.0}}
 	points := []r2.Vec2{}
@@ -156,7 +156,7 @@ func (p *Polygon) MinSize() fyne.Size {
 		points = append(points, r2.Vec2{X: float64(point.X), Y: float64(point.Y)})
 	}
 	bounding := r2.BoundingBox(points)
-	return fyne.Size{
+	return granio.Size{
 		Width:  float32(bounding.Width()) + p.StrokeWidth,
 		Height: float32(bounding.Height()) + p.StrokeWidth,
 	}
@@ -211,16 +211,16 @@ type polygonRenderer struct {
 func (pr *polygonRenderer) Destroy() {
 }
 
-func (pr *polygonRenderer) MinSize() fyne.Size {
+func (pr *polygonRenderer) MinSize() granio.Size {
 	return pr.polygon.Size()
 }
 
 // Layout is a noop for the Polygon
-func (pr *polygonRenderer) Layout(size fyne.Size) {
+func (pr *polygonRenderer) Layout(size granio.Size) {
 }
 
-func (pr *polygonRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (pr *polygonRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		&pr.image,
 	}
 	return obj

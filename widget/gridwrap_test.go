@@ -3,9 +3,9 @@ package widget
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func TestGridWrap_OffsetChange(t *testing.T) {
 
 	assert.Equal(t, float32(0), g.offsetY)
 
-	g.scroller.Scrolled(&fyne.ScrollEvent{Scrolled: fyne.NewDelta(0, -280)})
+	g.scroller.Scrolled(&granio.ScrollEvent{Scrolled: granio.NewDelta(0, -280)})
 
 	assert.NotEqual(t, 0, g.offsetY)
 }
@@ -34,7 +34,7 @@ func TestGridWrap_ScrollTo(t *testing.T) {
 	// override update item to keep track of greatest item rendered
 	oldUpdateFunc := g.UpdateItem
 	var greatest GridWrapItemID = -1
-	g.UpdateItem = func(id GridWrapItemID, item fyne.CanvasObject) {
+	g.UpdateItem = func(id GridWrapItemID, item granio.CanvasObject) {
 		if id > greatest {
 			greatest = id
 		}
@@ -60,7 +60,7 @@ func TestGridWrap_ScrollToTop(t *testing.T) {
 }
 
 func createGridWrap(items int) *GridWrap {
-	data := make([]fyne.Resource, items)
+	data := make([]granio.Resource, items)
 	for i := 0; i < items; i++ {
 		switch i % 10 {
 		case 0:
@@ -90,15 +90,15 @@ func createGridWrap(items int) *GridWrap {
 		func() int {
 			return len(data)
 		},
-		func() fyne.CanvasObject {
+		func() granio.CanvasObject {
 			icon := widget.NewIcon(theme.DocumentIcon())
 			return icon
 		},
-		func(id GridWrapItemID, item fyne.CanvasObject) {
+		func(id GridWrapItemID, item granio.CanvasObject) {
 			item.(*widget.Icon).SetResource(data[id])
 		},
 	)
-	list.Resize(fyne.NewSize(200, 400))
+	list.Resize(granio.NewSize(200, 400))
 	return list
 }
 
@@ -107,6 +107,6 @@ func TestGridWrap_IndexIsInt(t *testing.T) {
 
 	// Both of these should be allowed to match widget.List behaviour.
 	// It allows the same update item function to be shared between both widgets if necessary.
-	gw.UpdateItem = func(id GridWrapItemID, item fyne.CanvasObject) {}
-	gw.UpdateItem = func(id int, item fyne.CanvasObject) {}
+	gw.UpdateItem = func(id GridWrapItemID, item granio.CanvasObject) {}
+	gw.UpdateItem = func(id int, item granio.CanvasObject) {}
 }

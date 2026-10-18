@@ -3,10 +3,10 @@ package diagramwidget
 import (
 	"math"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/twpayne/go-geom"
 	"github.com/twpayne/go-geom/xy"
 )
@@ -16,13 +16,13 @@ type LinkSegment struct {
 	widget.BaseWidget
 	link *BaseDiagramLink
 	// p1 and p2 are coordinates in the link's coordinate space
-	p1                fyne.Position
-	p2                fyne.Position
-	mouseDownPosition fyne.Position
+	p1                granio.Position
+	p2                granio.Position
+	mouseDownPosition granio.Position
 }
 
 // NewLinkSegment returns a LinkSegment belonging to the indicated Link
-func NewLinkSegment(link *BaseDiagramLink, p1 fyne.Position, p2 fyne.Position) *LinkSegment {
+func NewLinkSegment(link *BaseDiagramLink, p1 granio.Position, p2 granio.Position) *LinkSegment {
 	ls := &LinkSegment{
 		link: link,
 		p1:   p1,
@@ -34,7 +34,7 @@ func NewLinkSegment(link *BaseDiagramLink, p1 fyne.Position, p2 fyne.Position) *
 }
 
 // CreateRenderer creates the renderer for the LinkSegment
-func (ls *LinkSegment) CreateRenderer() fyne.WidgetRenderer {
+func (ls *LinkSegment) CreateRenderer() granio.WidgetRenderer {
 	lsr := &linkSegmentRenderer{
 		ls:   ls,
 		line: canvas.NewLine(ls.link.GetForegroundColor()),
@@ -69,7 +69,7 @@ func (ls *LinkSegment) MouseUp(event *desktop.MouseEvent) {
 }
 
 // SetPoints sets the endpoints of the LinkSegment
-func (ls *LinkSegment) SetPoints(p1 fyne.Position, p2 fyne.Position) {
+func (ls *LinkSegment) SetPoints(p1 granio.Position, p2 granio.Position) {
 	ls.p1 = p1
 	ls.p2 = p2
 	ls.Refresh()
@@ -85,15 +85,15 @@ func (lsr *linkSegmentRenderer) Destroy() {
 
 }
 
-func (lsr *linkSegmentRenderer) Layout(size fyne.Size) {
+func (lsr *linkSegmentRenderer) Layout(size granio.Size) {
 }
 
-func (lsr *linkSegmentRenderer) MinSize() fyne.Size {
-	return fyne.NewSize(float32(math.Abs(float64(lsr.ls.p1.X-lsr.ls.p2.X))), float32(math.Abs(float64(lsr.ls.p1.Y-lsr.ls.p2.Y))))
+func (lsr *linkSegmentRenderer) MinSize() granio.Size {
+	return granio.NewSize(float32(math.Abs(float64(lsr.ls.p1.X-lsr.ls.p2.X))), float32(math.Abs(float64(lsr.ls.p1.Y-lsr.ls.p2.Y))))
 }
 
-func (lsr *linkSegmentRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (lsr *linkSegmentRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		lsr.line,
 	}
 	return obj
@@ -102,7 +102,7 @@ func (lsr *linkSegmentRenderer) Objects() []fyne.CanvasObject {
 func (lsr *linkSegmentRenderer) Refresh() {
 	minX := math.Min(float64(lsr.ls.p1.X), float64(lsr.ls.p2.X))
 	minY := math.Min(float64(lsr.ls.p1.Y), float64(lsr.ls.p2.Y))
-	widgetPosition := fyne.NewPos(float32(minX), float32(minY))
+	widgetPosition := granio.NewPos(float32(minX), float32(minY))
 	lsr.ls.Move(widgetPosition)
 	lsr.ls.Resize(lsr.MinSize())
 	lsr.line.Position1 = lsr.ls.p1.AddXY(-widgetPosition.X, -widgetPosition.Y)

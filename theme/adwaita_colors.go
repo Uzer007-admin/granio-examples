@@ -9,11 +9,11 @@ package theme
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
-var adwaitaDarkScheme = map[fyne.ThemeColorName]color.Color{
+var adwaitaDarkScheme = map[granio.ThemeColorName]color.Color{
 	theme.ColorBlue:                  color.NRGBA{R: 0x35, G: 0x84, B: 0xe4, A: 0xff}, // Adwaita color name @blue_3
 	theme.ColorBrown:                 color.NRGBA{R: 0x98, G: 0x6a, B: 0x44, A: 0xff}, // Adwaita color name @brown_3
 	theme.ColorGray:                  color.NRGBA{R: 0x5e, G: 0x5c, B: 0x64, A: 0xff}, // Adwaita color name @dark_2
@@ -37,7 +37,7 @@ var adwaitaDarkScheme = map[fyne.ThemeColorName]color.Color{
 	theme.ColorYellow:                color.NRGBA{R: 0xf6, G: 0xd3, B: 0x2d, A: 0xff}, // Adwaita color name @yellow_3
 }
 
-var adwaitaLightScheme = map[fyne.ThemeColorName]color.Color{
+var adwaitaLightScheme = map[granio.ThemeColorName]color.Color{
 	theme.ColorBlue:                  color.NRGBA{R: 0x35, G: 0x84, B: 0xe4, A: 0xff}, // Adwaita color name @blue_3
 	theme.ColorBrown:                 color.NRGBA{R: 0x98, G: 0x6A, B: 0x44, A: 0xff}, // Adwaita color name @brown_3
 	theme.ColorGray:                  color.NRGBA{R: 0x5e, G: 0x5C, B: 0x64, A: 0xff}, // Adwaita color name @dark_2

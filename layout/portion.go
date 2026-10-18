@@ -3,11 +3,11 @@ package layout
 import (
 	"log"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
 )
 
-var _ fyne.Layout = (*HPortion)(nil)
+var _ granio.Layout = (*HPortion)(nil)
 
 // HPortion allows the canvas objects to be divided into portions of the width.
 // The length of the Portions slice needs to be equal to the amount of canvas objects.
@@ -16,7 +16,7 @@ type HPortion struct {
 }
 
 // Layout sets the size and position of the canvas objects.
-func (p *HPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+func (p *HPortion) Layout(objects []granio.CanvasObject, size granio.Size) {
 	if len(p.Portions) != len(objects) {
 		log.Println("Mismatch between partitions and objects")
 		return
@@ -33,8 +33,8 @@ func (p *HPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
 
 	for i, child := range objects {
 		width := float32(p.Portions[i]/sum) * width
-		child.Resize(fyne.NewSize(width, size.Height))
-		child.Move(fyne.NewPos(xpos, 0))
+		child.Resize(granio.NewSize(width, size.Height))
+		child.Move(granio.NewPos(xpos, 0))
 
 		xpos += width + padding
 	}
@@ -42,14 +42,14 @@ func (p *HPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
 
 // MinSize calculates the minimum required size to fit all objects.
 // It is equal to the largest width MinSize divided by the corresponding portion.
-func (p *HPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
+func (p *HPortion) MinSize(objects []granio.CanvasObject) granio.Size {
 	if len(p.Portions) != len(objects) {
 		log.Println("Mismatch between partitions and objects")
-		return fyne.NewSize(0, 0)
+		return granio.NewSize(0, 0)
 	}
 
 	if len(objects) == 0 {
-		return fyne.NewSize(0, 0)
+		return granio.NewSize(0, 0)
 	}
 
 	sum := float64(0)
@@ -63,7 +63,7 @@ func (p *HPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
 
 	for i := 0; i < len(objects); i++ {
 		min := objects[i].MinSize()
-		height = fyne.Max(height, min.Height)
+		height = granio.Max(height, min.Height)
 
 		if min.Width > maxMinWidth {
 			maxMinWidth = min.Width
@@ -72,7 +72,7 @@ func (p *HPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	}
 
 	totalPadding := float32(len(objects)-1) * theme.Padding()
-	return fyne.NewSize(maxMinWidth/float32(p.Portions[maxIndex]/sum)+totalPadding, height)
+	return granio.NewSize(maxMinWidth/float32(p.Portions[maxIndex]/sum)+totalPadding, height)
 }
 
 // NewHPortion creates a layout that partitions objects horizontally taking up
@@ -82,7 +82,7 @@ func NewHPortion(Portions []float64) *HPortion {
 	return &HPortion{Portions: Portions}
 }
 
-var _ fyne.Layout = (*VPortion)(nil)
+var _ granio.Layout = (*VPortion)(nil)
 
 // VPortion allows the canvas objects to be divided into portions of the height.
 // The length of the Portions slice needs to be equal to the amount of canvas objects.
@@ -91,7 +91,7 @@ type VPortion struct {
 }
 
 // Layout sets the size and position of the canvas objects.
-func (p *VPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+func (p *VPortion) Layout(objects []granio.CanvasObject, size granio.Size) {
 	if len(p.Portions) != len(objects) {
 		log.Println("Mismatch between partitions and objects")
 		return
@@ -108,8 +108,8 @@ func (p *VPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
 
 	for i, child := range objects {
 		height := float32(p.Portions[i]/sum) * height
-		child.Resize(fyne.NewSize(size.Width, height))
-		child.Move(fyne.NewPos(0, ypos))
+		child.Resize(granio.NewSize(size.Width, height))
+		child.Move(granio.NewPos(0, ypos))
 
 		ypos += height + padding
 	}
@@ -117,14 +117,14 @@ func (p *VPortion) Layout(objects []fyne.CanvasObject, size fyne.Size) {
 
 // MinSize calculates the minimum required size to fit all objects.
 // It is equal to the largest height MinSize divided by the corresponding portion.
-func (p *VPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
+func (p *VPortion) MinSize(objects []granio.CanvasObject) granio.Size {
 	if len(p.Portions) != len(objects) {
 		log.Println("Mismatch between partitions and objects")
-		return fyne.NewSize(0, 0)
+		return granio.NewSize(0, 0)
 	}
 
 	if len(objects) == 0 {
-		return fyne.NewSize(0, 0)
+		return granio.NewSize(0, 0)
 	}
 
 	sum := float64(0)
@@ -138,7 +138,7 @@ func (p *VPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
 
 	for i := 0; i < len(objects); i++ {
 		min := objects[i].MinSize()
-		width = fyne.Max(width, min.Width)
+		width = granio.Max(width, min.Width)
 
 		if min.Height > maxMinHeight {
 			maxMinHeight = min.Height
@@ -147,7 +147,7 @@ func (p *VPortion) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	}
 
 	totalPadding := float32(len(objects)-1) * theme.Padding()
-	return fyne.NewSize(width, maxMinHeight/float32(p.Portions[maxIndex]/sum)+totalPadding)
+	return granio.NewSize(width, maxMinHeight/float32(p.Portions[maxIndex]/sum)+totalPadding)
 }
 
 // NewVPortion creates a layout that partitions objects verticaly taking up

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"unicode"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/driver/mobile"
-	"fyne.io/fyne/v2/lang"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/driver/mobile"
+	"github.com/Uzer007-admin/granio/v2/lang"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -108,14 +108,14 @@ func (e *NumericalEntry) SetText(text string) {
 	if e.Validator == nil {
 		e.Validator = e.validateText
 	}
-	s := e.getValidText("", text)
+	s := e.getValidText("", strings.TrimSpace(text))
 	e.Entry.SetText(s)
 	e.Refresh()
 }
 
 // TypedRune is called when this item receives a char event.
 //
-// Implements: fyne.Focusable
+// Implements: granio.Focusable
 func (e *NumericalEntry) TypedRune(r rune) {
 	if e.Validator == nil {
 		e.Validator = e.validateText
@@ -153,13 +153,13 @@ func (e *NumericalEntry) TypedRune(r rune) {
 
 // TypedShortcut handles the registered shortcuts.
 //
-// Implements: fyne.Shortcutable
-func (e *NumericalEntry) TypedShortcut(shortcut fyne.Shortcut) {
+// Implements: granio.Shortcutable
+func (e *NumericalEntry) TypedShortcut(shortcut granio.Shortcut) {
 	if e.Validator == nil {
 		e.Validator = e.validateText
 	}
 	runes := []rune(e.Text)
-	_, ok := shortcut.(*fyne.ShortcutPaste)
+	_, ok := shortcut.(*granio.ShortcutPaste)
 	if ok && len(runes) > 0 && e.CursorColumn == 0 && runes[0] == e.minus {
 		return
 	}
@@ -334,7 +334,7 @@ func (e *NumericalEntry) setup() {
 func (e *NumericalEntry) setupRunes(locale string) {
 	lang, err := language.Parse(locale)
 	if err != nil {
-		fyne.LogError("Language parse error: ", err)
+		granio.LogError("Language parse error: ", err)
 		lang = language.English // Fallback to English
 		locale = "en-US"
 	}
@@ -388,7 +388,7 @@ func (e *NumericalEntry) updateFromData() {
 	}
 	val, err := e.data.Get()
 	if err != nil {
-		fyne.LogError("Error getting current data value", err)
+		granio.LogError("Error getting current data value", err)
 		return
 	}
 
@@ -415,7 +415,7 @@ func (e *NumericalEntry) writeData(_ string) {
 	}
 	dVal, err := e.data.Get()
 	if err != nil {
-		fyne.LogError("Error getting float value: ", err)
+		granio.LogError("Error getting float value: ", err)
 		return
 	}
 
@@ -424,7 +424,7 @@ func (e *NumericalEntry) writeData(_ string) {
 	}
 
 	if err := e.data.Set(val); err != nil {
-		fyne.LogError("Error setting float value: ", err)
+		granio.LogError("Error setting float value: ", err)
 	}
 }
 

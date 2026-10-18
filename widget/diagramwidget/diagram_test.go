@@ -3,8 +3,8 @@ package diagramwidget
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,10 +14,10 @@ func TestDependencies(t *testing.T) {
 	diagram := NewDiagramWidget("Diagram1")
 	node1ID := "Node1"
 	node1 := NewDiagramNode(diagram, nil, node1ID)
-	node1.Move(fyne.NewPos(100, 100))
+	node1.Move(granio.NewPos(100, 100))
 	node2ID := "Node2"
 	node2 := NewDiagramNode(diagram, nil, node2ID)
-	node2.Move(fyne.NewPos(200, 100))
+	node2.Move(granio.NewPos(200, 100))
 	assert.Equal(t, 0, len(diagram.diagramElementLinkDependencies))
 	linkID := "Link1"
 	link := NewDiagramLink(diagram, linkID)

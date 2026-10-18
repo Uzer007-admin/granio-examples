@@ -5,18 +5,18 @@ import (
 	"log"
 	"math"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-// responsive layout provides a fyne.Layout that is responsive to the window size.
-// All fyne.CanvasObject are resized and positionned following the rules you decide.
+// responsive layout provides a granio.Layout that is responsive to the window size.
+// All granio.CanvasObject are resized and positionned following the rules you decide.
 //
 // It is strongly inspired by Bootstrap's grid system. But instead of using 12 columns,
 // we use width ratio.
-// By default, a standard fyne.CanvasObject will always be width to 1 * containerSize and place in vertical.
+// By default, a standard granio.CanvasObject will always be width to 1 * containerSize and place in vertical.
 // If you want to change the behavior, you can use Responsive() function that registers the layout configuration.
 //
 // Example:
@@ -103,28 +103,28 @@ type ResponsiveLayout struct{}
 
 // Layout will place the size and place the objects following the configured reponsive rules.
 //
-// Implements: fyne.Layout
-func (resp *ResponsiveLayout) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
+// Implements: granio.Layout
+func (resp *ResponsiveLayout) Layout(objects []granio.CanvasObject, containerSize granio.Size) {
 	// yes, it may happen
 	if len(objects) == 0 || objects[0] == nil {
 		return
 	}
 
 	// Responsive is based on the window size, so we need to get it
-	window := fyne.CurrentApp().Driver().CanvasForObject(objects[0])
+	window := granio.CurrentApp().Driver().CanvasForObject(objects[0])
 	if window == nil {
 		return
 	}
 
 	// this will be updatad for each element to know where to place
 	// the next object.
-	pos := fyne.NewPos(0, 0)
+	pos := granio.NewPos(0, 0)
 
 	// to calculate the next pos.Y when a new line is needed
 	maxHeight := float32(0)
 
 	// objects in a line
-	line := []fyne.CanvasObject{}
+	line := []granio.CanvasObject{}
 
 	// cast windowSize.Width to responsiveBreakpoint (uint16)
 	ww := responsiveBreakpoint(window.Size().Width)
@@ -161,7 +161,7 @@ func (resp *ResponsiveLayout) Layout(objects []fyne.CanvasObject, containerSize 
 		o.Move(pos)
 
 		// next element X position
-		pos = pos.Add(fyne.NewPos(size.Width+theme.Padding(), 0))
+		pos = pos.Add(granio.NewPos(size.Width+theme.Padding(), 0))
 
 		maxHeight = resp.maxFloat32(maxHeight, size.Height)
 
@@ -169,7 +169,7 @@ func (resp *ResponsiveLayout) Layout(objects []fyne.CanvasObject, containerSize 
 		if pos.X >= containerSize.Width-theme.Padding() {
 			// we now know the number of object in a line, fix padding
 			resp.fixPaddingOnLine(line)
-			line = []fyne.CanvasObject{}
+			line = []granio.CanvasObject{}
 			pos.X = 0          // back to left
 			pos.Y += maxHeight // move to the next line
 			maxHeight = 0
@@ -180,10 +180,10 @@ func (resp *ResponsiveLayout) Layout(objects []fyne.CanvasObject, containerSize 
 
 // MinSize return the minimum size ot the layout.
 //
-// Implements: fyne.Layout
-func (resp *ResponsiveLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
+// Implements: granio.Layout
+func (resp *ResponsiveLayout) MinSize(objects []granio.CanvasObject) granio.Size {
 	if len(objects) == 0 {
-		return fyne.NewSize(0, 0)
+		return granio.NewSize(0, 0)
 	}
 
 	var h, w, maxHeight float32
@@ -205,11 +205,11 @@ func (resp *ResponsiveLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
 		maxHeight = resp.maxFloat32(maxHeight, o.MinSize().Height)
 	}
 	h += maxHeight + theme.Padding()
-	return fyne.NewSize(w, h)
+	return granio.NewSize(w, h)
 }
 
 // fixPaddingOnLine fix the space between the objects in a line.
-func (resp *ResponsiveLayout) fixPaddingOnLine(line []fyne.CanvasObject) {
+func (resp *ResponsiveLayout) fixPaddingOnLine(line []granio.CanvasObject) {
 	if len(line) <= 1 {
 		return
 	}
@@ -241,10 +241,10 @@ func (resp *ResponsiveLayout) maxFloat32(a, b float32) float32 {
 //	    label2,                         // this will be placed and resized with default behaviors
 //	                                    // => 1, 1, 1
 //	)
-func NewResponsiveLayout(o ...fyne.CanvasObject) *fyne.Container {
+func NewResponsiveLayout(o ...granio.CanvasObject) *granio.Container {
 	r := &ResponsiveLayout{}
 
-	objects := []fyne.CanvasObject{}
+	objects := []granio.CanvasObject{}
 	for _, unknowObject := range o {
 		if _, ok := unknowObject.(*responsiveWidget); !ok {
 			unknowObject = Responsive(unknowObject)
@@ -258,11 +258,11 @@ func NewResponsiveLayout(o ...fyne.CanvasObject) *fyne.Container {
 type responsiveWidget struct {
 	widget.BaseWidget
 
-	render           fyne.CanvasObject
+	render           granio.CanvasObject
 	responsiveConfig responsiveConfig
 }
 
-var _ fyne.Widget = (*responsiveWidget)(nil)
+var _ granio.Widget = (*responsiveWidget)(nil)
 
 // Responsive register the object with a responsive configuration.
 // The optional ratios must
@@ -272,13 +272,13 @@ var _ fyne.Widget = (*responsiveWidget)(nil)
 //
 // They are set to previous value if a value is not passed, or 1.0 if there is no previous value.
 // The returned object is not modified.
-func Responsive(object fyne.CanvasObject, breakpointRatio ...float32) fyne.CanvasObject {
+func Responsive(object granio.CanvasObject, breakpointRatio ...float32) granio.CanvasObject {
 	ro := &responsiveWidget{render: object, responsiveConfig: newResponsiveConf(breakpointRatio...)}
 	ro.ExtendBaseWidget(ro)
 	return ro
 }
 
-func (ro *responsiveWidget) CreateRenderer() fyne.WidgetRenderer {
+func (ro *responsiveWidget) CreateRenderer() granio.WidgetRenderer {
 	if ro.render == nil {
 		return nil
 	}

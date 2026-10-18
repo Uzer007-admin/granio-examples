@@ -1,10 +1,10 @@
 package widget
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type mapMarkerItem struct {
@@ -19,7 +19,7 @@ func newMapMarkerItem(fn func()) *mapMarkerItem {
 	return item
 }
 
-func (m *mapMarkerItem) Tapped(ev *fyne.PointEvent) {
+func (m *mapMarkerItem) Tapped(ev *granio.PointEvent) {
 	if m.fn == nil {
 		return
 	}
@@ -32,10 +32,10 @@ func (m *mapMarkerItem) setup() {
 	}
 	res := theme.NewColoredResource(resourceMapmarkerSvg, theme.ColorNamePrimary)
 	m.img = canvas.NewImageFromResource(res)
-	m.img.SetMinSize(fyne.NewSize(50, 50))
+	m.img.SetMinSize(granio.NewSize(50, 50))
 }
 
-func (m *mapMarkerItem) CreateRenderer() fyne.WidgetRenderer {
+func (m *mapMarkerItem) CreateRenderer() granio.WidgetRenderer {
 	m.setup()
 	return widget.NewSimpleRenderer(m.img)
 }

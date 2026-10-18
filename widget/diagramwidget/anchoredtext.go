@@ -3,13 +3,13 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // AnchoredText provides a text annotation for a path that is anchored to one
@@ -21,7 +21,7 @@ type AnchoredText struct {
 	widget.BaseWidget
 	link                 *BaseDiagramLink
 	offset               r2.Vec2
-	referencePosition    fyne.Position
+	referencePosition    granio.Position
 	displayedTextBinding binding.String
 	ForegroundColor      color.Color
 	textEntry            *widget.Entry
@@ -34,13 +34,13 @@ func NewAnchoredText(text string) *AnchoredText {
 	at := &AnchoredText{
 		offset:            r2.MakeVec2(0, 0),
 		ForegroundColor:   theme.Color(theme.ColorNameForeground),
-		referencePosition: fyne.Position{X: 0, Y: 0},
+		referencePosition: granio.Position{X: 0, Y: 0},
 	}
 	at.displayedTextBinding = binding.NewString()
 	at.displayedTextBinding.Set(text)
 	at.textEntry = widget.NewEntryWithData(at.displayedTextBinding)
 	at.displayedTextBinding.AddListener(at)
-	at.textEntry.Wrapping = fyne.TextWrapOff
+	at.textEntry.Wrapping = granio.TextWrapOff
 	at.textEntry.Scroll = container.ScrollNone
 	at.textEntry.Validator = nil
 	at.ExtendBaseWidget(at)
@@ -48,7 +48,7 @@ func NewAnchoredText(text string) *AnchoredText {
 }
 
 // CreateRenderer is the required method for a widget extension
-func (at *AnchoredText) CreateRenderer() fyne.WidgetRenderer {
+func (at *AnchoredText) CreateRenderer() granio.WidgetRenderer {
 	atr := &anchoredTextRenderer{
 		widget: at,
 	}
@@ -63,7 +63,7 @@ func (at *AnchoredText) DataChanged() {
 }
 
 // Displace moves the anchored text relative to its reference position.
-func (at *AnchoredText) Displace(delta fyne.Position) {
+func (at *AnchoredText) Displace(delta granio.Position) {
 	at.Move(at.Position().Add(delta))
 }
 
@@ -74,8 +74,8 @@ func (at *AnchoredText) DragEnd() {
 
 // Dragged is the required method for a draggable widget. It moves the anchored text
 // relative to its reference position
-func (at *AnchoredText) Dragged(event *fyne.DragEvent) {
-	delta := fyne.Position{X: event.Dragged.DX, Y: event.Dragged.DY}
+func (at *AnchoredText) Dragged(event *granio.DragEvent) {
+	delta := granio.Position{X: event.Dragged.DX, Y: event.Dragged.DY}
 	at.Move(at.Position().Add(delta))
 	at.Refresh()
 }
@@ -91,9 +91,9 @@ func (at *AnchoredText) GetTextEntry() *widget.Entry {
 }
 
 // MinSize returns the size of the entry widget plus a one-pixel border
-func (at *AnchoredText) MinSize() fyne.Size {
+func (at *AnchoredText) MinSize() granio.Size {
 	textEntryMinSize := at.textEntry.MinSize()
-	minSize := fyne.NewSize(textEntryMinSize.Width+10, textEntryMinSize.Height+10)
+	minSize := granio.NewSize(textEntryMinSize.Width+10, textEntryMinSize.Height+10)
 	return minSize
 }
 
@@ -112,7 +112,7 @@ func (at *AnchoredText) MouseOut() {
 
 // Move overrides the BaseWidget's Move method. It updates the anchored text's offset
 // and then calls the normal BaseWidget.Move method.
-func (at *AnchoredText) Move(position fyne.Position) {
+func (at *AnchoredText) Move(position granio.Position) {
 	delta := r2.MakeVec2(float64(position.X-at.Position().X), float64(position.Y-at.Position().Y))
 	at.offset = at.offset.Add(delta)
 	at.BaseWidget.Move(position)
@@ -126,8 +126,8 @@ func (at *AnchoredText) SetForegroundColor(fc color.Color) {
 
 // SetReferencePosition sets the reference position of the anchored text and calls
 // the BaseWidget.Move() method to actually move the displayed text
-func (at *AnchoredText) SetReferencePosition(position fyne.Position) {
-	delta := fyne.Delta{DX: float32(position.X - at.referencePosition.X), DY: float32(position.Y - at.referencePosition.Y)}
+func (at *AnchoredText) SetReferencePosition(position granio.Position) {
+	delta := granio.Delta{DX: float32(position.X - at.referencePosition.X), DY: float32(position.Y - at.referencePosition.Y)}
 	// We don't want to change the offset here, so we call the BaseWidget.Move directly
 	at.BaseWidget.Move(at.Position().Add(delta))
 	at.referencePosition = position
@@ -142,15 +142,15 @@ func (atr *anchoredTextRenderer) Destroy() {
 
 }
 
-func (atr *anchoredTextRenderer) Layout(size fyne.Size) {
+func (atr *anchoredTextRenderer) Layout(size granio.Size) {
 }
 
-func (atr *anchoredTextRenderer) MinSize() fyne.Size {
+func (atr *anchoredTextRenderer) MinSize() granio.Size {
 	return atr.widget.textEntry.MinSize()
 }
 
-func (atr *anchoredTextRenderer) Objects() []fyne.CanvasObject {
-	canvasObjects := []fyne.CanvasObject{
+func (atr *anchoredTextRenderer) Objects() []granio.CanvasObject {
+	canvasObjects := []granio.CanvasObject{
 		atr.widget.textEntry,
 	}
 	return canvasObjects
@@ -159,6 +159,6 @@ func (atr *anchoredTextRenderer) Objects() []fyne.CanvasObject {
 func (atr *anchoredTextRenderer) Refresh() {
 	atr.widget.Resize(atr.widget.MinSize())
 	atr.widget.textEntry.Resize(atr.widget.textEntry.MinSize())
-	atr.widget.textEntry.Move(fyne.NewPos(5, 5))
+	atr.widget.textEntry.Move(granio.NewPos(5, 5))
 	atr.widget.textEntry.Refresh()
 }

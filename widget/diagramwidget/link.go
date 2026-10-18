@@ -3,13 +3,13 @@ package diagramwidget
 import (
 	"math"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
 )
 
-// var _ fyne.Tappable = (*BaseDiagramLink)(nil)
+// var _ granio.Tappable = (*BaseDiagramLink)(nil)
 var _ desktop.Hoverable = (*BaseDiagramLink)(nil)
 var _ DiagramElement = (*BaseDiagramLink)(nil)
 
@@ -122,7 +122,7 @@ func InitializeBaseDiagramLink(diagramLink DiagramLink, diagram *DiagramWidget, 
 }
 
 // CreateRenderer creates the WidgetRenderer for a DiagramLink
-func (bdl *BaseDiagramLink) CreateRenderer() fyne.WidgetRenderer {
+func (bdl *BaseDiagramLink) CreateRenderer() granio.WidgetRenderer {
 	dlr := diagramLinkRenderer{
 		link: bdl,
 	}
@@ -226,11 +226,11 @@ func (bdl *BaseDiagramLink) GetMidPad() ConnectionPad {
 	return bdl.pads["default"]
 }
 
-func (bdl *BaseDiagramLink) getMidPosition() fyne.Position {
+func (bdl *BaseDiagramLink) getMidPosition() granio.Position {
 	// TODO update when additional points are introduced
 	sourcePoint := bdl.linkPoints[0].Position()
 	targetPoint := bdl.linkPoints[len(bdl.linkPoints)-1].Position()
-	midPoint := fyne.NewPos((sourcePoint.X+targetPoint.X)/2, (sourcePoint.Y+targetPoint.Y)/2)
+	midPoint := granio.NewPos((sourcePoint.X+targetPoint.X)/2, (sourcePoint.Y+targetPoint.Y)/2)
 	return midPoint
 }
 
@@ -259,7 +259,7 @@ func (bdl *BaseDiagramLink) GetSourcePad() ConnectionPad {
 	return bdl.sourcePad
 }
 
-func (bdl *BaseDiagramLink) getSourcePosition() fyne.Position {
+func (bdl *BaseDiagramLink) getSourcePosition() granio.Position {
 	return bdl.linkPoints[0].Position()
 }
 
@@ -273,11 +273,11 @@ func (bdl *BaseDiagramLink) GetTargetPad() ConnectionPad {
 	return bdl.targetPad
 }
 
-func (bdl *BaseDiagramLink) getTargetPosition() fyne.Position {
+func (bdl *BaseDiagramLink) getTargetPosition() granio.Position {
 	return bdl.linkPoints[len(bdl.linkPoints)-1].Position()
 }
 
-func (bdl *BaseDiagramLink) handleDragged(handle *Handle, event *fyne.DragEvent) {
+func (bdl *BaseDiagramLink) handleDragged(handle *Handle, event *granio.DragEvent) {
 	handleKey := bdl.getHandleKey(handle)
 	var linkPoint *LinkPoint
 	var pad ConnectionPad
@@ -306,7 +306,7 @@ func (bdl *BaseDiagramLink) handleDragged(handle *Handle, event *fyne.DragEvent)
 		return
 	}
 	currentPosition := linkPoint.Position()
-	newPosition := fyne.NewPos(currentPosition.X+event.Dragged.DX, currentPosition.Y+event.Dragged.DY)
+	newPosition := granio.NewPos(currentPosition.X+event.Dragged.DX, currentPosition.Y+event.Dragged.DY)
 	linkPoint.Move(newPosition)
 	bdl.Refresh()
 }
@@ -441,7 +441,7 @@ func (bdl *BaseDiagramLink) SetTargetPad(pad ConnectionPad) {
 }
 
 // // Tapped handles tap events
-// func (bdl *BaseDiagramLink) Tapped(event *fyne.PointEvent) {
+// func (bdl *BaseDiagramLink) Tapped(event *granio.PointEvent) {
 // }
 
 // diagramLinkRenderer
@@ -452,7 +452,7 @@ type diagramLinkRenderer struct {
 func (dlr *diagramLinkRenderer) Destroy() {
 }
 
-func (dlr *diagramLinkRenderer) MinSize() fyne.Size {
+func (dlr *diagramLinkRenderer) MinSize() granio.Size {
 	var xMin, xMax, yMin, yMax float32
 	for i, point := range dlr.link.linkPoints {
 		if i == 0 {
@@ -467,14 +467,14 @@ func (dlr *diagramLinkRenderer) MinSize() fyne.Size {
 			yMax = float32(math.Max(float64(yMax), float64(point.Position().Y)))
 		}
 	}
-	return fyne.Size{Width: float32(math.Abs(float64(xMax - xMin))), Height: float32(math.Abs(float64(yMax - yMin)))}
+	return granio.Size{Width: float32(math.Abs(float64(xMax - xMin))), Height: float32(math.Abs(float64(yMax - yMin)))}
 }
 
-func (dlr *diagramLinkRenderer) Layout(size fyne.Size) {
+func (dlr *diagramLinkRenderer) Layout(size granio.Size) {
 }
 
-func (dlr *diagramLinkRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{}
+func (dlr *diagramLinkRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{}
 	for i := 0; i < len(dlr.link.linkSegments); i++ {
 		obj = append(obj, dlr.link.linkSegments[i])
 	}
@@ -515,10 +515,10 @@ func (dlr *diagramLinkRenderer) Refresh() {
 	// The pads to which the link is connected can be nil during a connection transaction, in which case we leave the end points
 	// at their present location. Note that the initial computations are done in diagram coordinates,
 	// then link coordinates
-	var sourceDiagramCoordinateReferencePoint fyne.Position
-	var targetDiagramCoordinateReferencePoint fyne.Position
-	var sourceDiagramCoordinatePosition fyne.Position
-	var targetDiagramCoordinatePosition fyne.Position
+	var sourceDiagramCoordinateReferencePoint granio.Position
+	var targetDiagramCoordinateReferencePoint granio.Position
+	var sourceDiagramCoordinatePosition granio.Position
+	var targetDiagramCoordinatePosition granio.Position
 	currentSourceDiagramCoordinatePosition := dlr.link.getSourcePosition().Add(dlr.link.Position())
 	currentTargetDiagramCoordinatePosition := dlr.link.getTargetPosition().Add(dlr.link.Position())
 	if dlr.link.sourcePad != nil {
@@ -544,7 +544,7 @@ func (dlr *diagramLinkRenderer) Refresh() {
 		targetDiagramCoordinatePosition = currentTargetDiagramCoordinatePosition
 	}
 	// The Position of the link is the upper left hand corner of a bounding box surrounding the source and target positions
-	linkPosition := fyne.NewPos(float32(math.Min(float64(sourceDiagramCoordinatePosition.X), float64(targetDiagramCoordinatePosition.X))),
+	linkPosition := granio.NewPos(float32(math.Min(float64(sourceDiagramCoordinatePosition.X), float64(targetDiagramCoordinatePosition.X))),
 		float32(math.Min(float64(sourceDiagramCoordinatePosition.Y), float64(targetDiagramCoordinatePosition.Y))))
 	dlr.link.Move(linkPosition)
 
@@ -572,7 +572,7 @@ func (dlr *diagramLinkRenderer) Refresh() {
 	}
 	sourceOffset := 0.0
 	for _, decoration := range dlr.link.SourceDecorations {
-		decorationReferencePoint := fyne.Position{
+		decorationReferencePoint := granio.Position{
 			X: float32(float64(dlr.link.linkPoints[0].Position().X) + math.Cos(sourceAngle)*sourceOffset),
 			Y: float32(float64(dlr.link.linkPoints[0].Position().Y) - math.Sin(sourceAngle)*sourceOffset),
 		}
@@ -586,7 +586,7 @@ func (dlr *diagramLinkRenderer) Refresh() {
 
 	midOffset := 0.0
 	for _, decoration := range dlr.link.MidpointDecorations {
-		decorationReferencePoint := fyne.Position{
+		decorationReferencePoint := granio.Position{
 			X: float32(float64(dlr.link.getMidPosition().X) + math.Cos(targetAngle)*midOffset),
 			Y: float32(float64(dlr.link.getMidPosition().Y) - math.Sin(targetAngle)*midOffset),
 		}
@@ -596,12 +596,12 @@ func (dlr *diagramLinkRenderer) Refresh() {
 	}
 	defaultPadPosition := dlr.link.getMidPosition().AddXY(-pointPadSize/2, -pointPadSize/2)
 	dlr.link.pads["default"].Move(defaultPadPosition)
-	dlr.link.pads["default"].Resize(fyne.NewSize(pointPadSize, pointPadSize))
+	dlr.link.pads["default"].Resize(granio.NewSize(pointPadSize, pointPadSize))
 	dlr.link.pads["default"].Refresh()
 
 	targetOffset := 0.0
 	for _, decoration := range dlr.link.TargetDecorations {
-		decorationReferencePoint := fyne.Position{
+		decorationReferencePoint := granio.Position{
 			X: float32(float64(dlr.link.linkPoints[len(dlr.link.linkPoints)-1].Position().X) + math.Cos(targetAngle)*targetOffset),
 			Y: float32(float64(dlr.link.linkPoints[len(dlr.link.linkPoints)-1].Position().Y) - math.Sin(targetAngle)*targetOffset),
 		}
@@ -650,7 +650,7 @@ func (dlr *diagramLinkRenderer) Refresh() {
 		case TARGET.ToString():
 			handle.Move(dlr.link.linkPoints[len(dlr.link.linkPoints)-1].Position())
 		}
-		handle.Resize(fyne.NewSize(handle.handleSize, handle.handleSize))
+		handle.Resize(granio.NewSize(handle.handleSize, handle.handleSize))
 		handle.Refresh()
 	}
 
@@ -662,12 +662,12 @@ type ConnectionTransaction struct {
 	LinkPoint       *LinkPoint
 	Link            DiagramLink
 	InitialPad      ConnectionPad
-	InitialPosition fyne.Position
+	InitialPosition granio.Position
 	PendingPad      ConnectionPad
 }
 
 // NewConnectionTransaction returns an instance of ConnectionTransaction
-func NewConnectionTransaction(linkPoint *LinkPoint, link DiagramLink, initialPad ConnectionPad, initialPosition fyne.Position) *ConnectionTransaction {
+func NewConnectionTransaction(linkPoint *LinkPoint, link DiagramLink, initialPad ConnectionPad, initialPosition granio.Position) *ConnectionTransaction {
 	ct := &ConnectionTransaction{
 		LinkPoint:       linkPoint,
 		Link:            link,

@@ -4,8 +4,8 @@ package menu
 import (
 	"path/filepath"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
 )
 
 const (
@@ -17,21 +17,21 @@ const (
 // The list is ordered by recency and saved in the app preferences so that it is
 // available the next time the app is run.
 type Recents struct {
-	item     *fyne.MenuItem
-	uris     []fyne.URI
-	onOpen   func(fyne.URI)
-	getLabel func(fyne.URI) string
+	item     *granio.MenuItem
+	uris     []granio.URI
+	onOpen   func(granio.URI)
+	getLabel func(granio.URI) string
 }
 
 // NewRecents creates a new recent items manager that will show a menu item with the given label.
 // The onOpen callback is called with the URI of a recent item when the user chooses it from the menu.
 // The list of items is loaded from the preferences of the current app, so the app must have a unique ID.
-func NewRecents(label string, onOpen func(fyne.URI)) *Recents {
+func NewRecents(label string, onOpen func(granio.URI)) *Recents {
 	r := &Recents{onOpen: onOpen}
-	r.item = fyne.NewMenuItem(label, nil)
-	r.item.ChildMenu = fyne.NewMenu("")
+	r.item = granio.NewMenuItem(label, nil)
+	r.item.ChildMenu = granio.NewMenu("")
 
-	for _, s := range fyne.CurrentApp().Preferences().StringList(recentsKey) {
+	for _, s := range granio.CurrentApp().Preferences().StringList(recentsKey) {
 		u, err := storage.ParseURI(s)
 		if err != nil {
 			continue
@@ -49,12 +49,12 @@ func NewRecents(label string, onOpen func(fyne.URI)) *Recents {
 // Add marks the given URI as the most recently used item.
 // If the item was already in the list it is moved to the top instead of being duplicated,
 // and only the most recent items are kept. The updated list is saved to the app preferences.
-func (r *Recents) Add(u fyne.URI) {
+func (r *Recents) Add(u granio.URI) {
 	if u == nil {
 		return
 	}
 
-	uris := []fyne.URI{u}
+	uris := []granio.URI{u}
 	for _, old := range r.uris {
 		if old.String() == u.String() {
 			continue
@@ -70,7 +70,7 @@ func (r *Recents) Add(u fyne.URI) {
 	for i, u := range uris {
 		saved[i] = u.String()
 	}
-	fyne.CurrentApp().Preferences().SetStringList(recentsKey, saved)
+	granio.CurrentApp().Preferences().SetStringList(recentsKey, saved)
 
 	r.update()
 	r.refresh()
@@ -78,13 +78,13 @@ func (r *Recents) Add(u fyne.URI) {
 
 // MenuItem returns the menu item that should be added to a menu to display the recent items.
 // It contains a child menu listing each of the items and is disabled when there are none.
-func (r *Recents) MenuItem() *fyne.MenuItem {
+func (r *Recents) MenuItem() *granio.MenuItem {
 	return r.item
 }
 
 // SetItemLabel sets a function used to generate the label for each recent item.
 // By default the name of the URI is used, with parent directories added when two names match.
-func (r *Recents) SetItemLabel(fn func(fyne.URI) string) {
+func (r *Recents) SetItemLabel(fn func(granio.URI) string) {
 	r.getLabel = fn
 
 	r.update()
@@ -92,12 +92,12 @@ func (r *Recents) SetItemLabel(fn func(fyne.URI) string) {
 }
 
 // URIs returns the recent items, with the most recently used first.
-func (r *Recents) URIs() []fyne.URI {
-	return append([]fyne.URI(nil), r.uris...)
+func (r *Recents) URIs() []granio.URI {
+	return append([]granio.URI(nil), r.uris...)
 }
 
 func (r *Recents) refresh() {
-	for _, w := range fyne.CurrentApp().Driver().AllWindows() {
+	for _, w := range granio.CurrentApp().Driver().AllWindows() {
 		main := w.MainMenu()
 		if main == nil {
 			continue
@@ -114,9 +114,9 @@ func (r *Recents) refresh() {
 
 func (r *Recents) update() {
 	labels := r.labels()
-	items := make([]*fyne.MenuItem, len(r.uris))
+	items := make([]*granio.MenuItem, len(r.uris))
 	for i, u := range r.uris {
-		items[i] = fyne.NewMenuItem(labels[i], func() {
+		items[i] = granio.NewMenuItem(labels[i], func() {
 			if r.onOpen != nil {
 				r.onOpen(u)
 			}
@@ -139,7 +139,7 @@ func (r *Recents) labels() []string {
 		return labels
 	}
 
-	parents := make([]fyne.URI, len(r.uris))
+	parents := make([]granio.URI, len(r.uris))
 	for i, u := range r.uris {
 		labels[i] = u.Name()
 		parents[i] = u
@@ -174,7 +174,7 @@ func (r *Recents) labels() []string {
 	}
 }
 
-func menuContains(m *fyne.Menu, item *fyne.MenuItem) bool {
+func menuContains(m *granio.Menu, item *granio.MenuItem) bool {
 	for _, i := range m.Items {
 		if i == item {
 			return true

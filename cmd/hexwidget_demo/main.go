@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
-	xwidget "fyne.io/x/fyne/widget"
+	xwidget "github.com/Uzer007-admin/granio-x/widget"
 
 	"image/color"
 	"strconv"

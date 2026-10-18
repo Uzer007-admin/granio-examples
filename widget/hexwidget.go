@@ -3,9 +3,9 @@ package widget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // segmentLookupTable is used by h.Set() - the i-th index into this table
@@ -42,34 +42,34 @@ var defaultHexOffColor color.Color = color.RGBA{25, 15, 15, 64}
 
 type hexRenderer struct {
 	hex            *HexWidget
-	segmentObjects []fyne.CanvasObject
+	segmentObjects []granio.CanvasObject
 }
 
-func (h *hexRenderer) MinSize() fyne.Size {
-	return fyne.NewSize(
+func (h *hexRenderer) MinSize() granio.Size {
+	return granio.NewSize(
 		h.hex.size.Width+h.hex.hexOffset,
 		h.hex.size.Height,
 	)
 }
 
-func (h *hexRenderer) Layout(_ fyne.Size) {
+func (h *hexRenderer) Layout(_ granio.Size) {
 	hexSegmentWidth := 0.2 * h.hex.size.Width
 
 	hexSegmentVLength := (h.hex.size.Height - hexSegmentWidth) / 2
 	hexSegmentHLength := h.hex.size.Width - hexSegmentWidth
-	pos := fyne.NewPos(h.hex.hexOffset, hexSegmentWidth/2)
+	pos := granio.NewPos(h.hex.hexOffset, hexSegmentWidth/2)
 
-	pt0Center := fyne.NewPos(pos.X+h.hex.size.Width/2.0+h.hex.hexOffset, pos.Y)
-	pt05 := fyne.NewPos(float32(pt0Center.X)-(hexSegmentHLength/2), pt0Center.Y)
-	pt01 := fyne.NewPos(float32(pt0Center.X)+(hexSegmentHLength/2), pt0Center.Y)
+	pt0Center := granio.NewPos(pos.X+h.hex.size.Width/2.0+h.hex.hexOffset, pos.Y)
+	pt05 := granio.NewPos(float32(pt0Center.X)-(hexSegmentHLength/2), pt0Center.Y)
+	pt01 := granio.NewPos(float32(pt0Center.X)+(hexSegmentHLength/2), pt0Center.Y)
 
-	pt6Center := fyne.NewPos(pos.X+h.hex.size.Width/2.0, float32(pt0Center.Y)+hexSegmentVLength)
-	pt65 := fyne.NewPos(float32(pt6Center.X)-(hexSegmentHLength/2), pt6Center.Y)
-	pt61 := fyne.NewPos(float32(pt6Center.X)+(hexSegmentHLength/2), pt6Center.Y)
+	pt6Center := granio.NewPos(pos.X+h.hex.size.Width/2.0, float32(pt0Center.Y)+hexSegmentVLength)
+	pt65 := granio.NewPos(float32(pt6Center.X)-(hexSegmentHLength/2), pt6Center.Y)
+	pt61 := granio.NewPos(float32(pt6Center.X)+(hexSegmentHLength/2), pt6Center.Y)
 
-	pt3Center := fyne.NewPos(pos.X+h.hex.size.Width/2.0-h.hex.hexOffset, float32(pt0Center.Y)+2*hexSegmentVLength)
-	pt34 := fyne.NewPos(float32(pt3Center.X)-(hexSegmentHLength/2), pt3Center.Y)
-	pt32 := fyne.NewPos(float32(pt3Center.X)+(hexSegmentHLength/2), pt3Center.Y)
+	pt3Center := granio.NewPos(pos.X+h.hex.size.Width/2.0-h.hex.hexOffset, float32(pt0Center.Y)+2*hexSegmentVLength)
+	pt34 := granio.NewPos(float32(pt3Center.X)-(hexSegmentHLength/2), pt3Center.Y)
+	pt32 := granio.NewPos(float32(pt3Center.X)+(hexSegmentHLength/2), pt3Center.Y)
 
 	setLineEndpoints(h.segmentObjects[0].(*canvas.Line), pt05, pt01)
 	setLineEndpoints(h.segmentObjects[1].(*canvas.Line), pt01, pt61)
@@ -100,7 +100,7 @@ func (h *hexRenderer) Refresh() {
 func (h *hexRenderer) Destroy() {
 }
 
-func (h *hexRenderer) Objects() []fyne.CanvasObject {
+func (h *hexRenderer) Objects() []granio.CanvasObject {
 	return h.segmentObjects
 }
 
@@ -123,7 +123,7 @@ type HexWidget struct {
 	segments uint8
 
 	// size of the hex widget
-	size fyne.Size
+	size granio.Size
 
 	// slant angle
 	hexOffset float32
@@ -150,7 +150,7 @@ func (h *HexWidget) SetOffColor(c color.Color) {
 }
 
 // SetSize changes the size of the hex widget.
-func (h *HexWidget) SetSize(s fyne.Size) {
+func (h *HexWidget) SetSize(s granio.Size) {
 	h.size = s
 	h.Refresh()
 }
@@ -172,8 +172,8 @@ func (h *HexWidget) getSegmentColor(segno int) color.Color {
 	return h.hexOffColor
 }
 
-// CreateRenderer implements fyne.Widget
-func (h *HexWidget) CreateRenderer() fyne.WidgetRenderer {
+// CreateRenderer implements granio.Widget
+func (h *HexWidget) CreateRenderer() granio.WidgetRenderer {
 
 	seg0 := canvas.NewLine(h.hexOffColor)
 	seg1 := canvas.NewLine(h.hexOffColor)
@@ -185,7 +185,7 @@ func (h *HexWidget) CreateRenderer() fyne.WidgetRenderer {
 
 	r := &hexRenderer{
 		hex:            h,
-		segmentObjects: []fyne.CanvasObject{seg0, seg1, seg2, seg3, seg4, seg5, seg6},
+		segmentObjects: []granio.CanvasObject{seg0, seg1, seg2, seg3, seg4, seg5, seg6},
 	}
 
 	r.Refresh()
@@ -198,7 +198,7 @@ func (h *HexWidget) CreateRenderer() fyne.WidgetRenderer {
 func NewHexWidget() *HexWidget {
 	h := &HexWidget{
 		segments:    0xff,
-		size:        fyne.NewSize(defaultHexWidth, defaultHexHeight),
+		size:        granio.NewSize(defaultHexWidth, defaultHexHeight),
 		hexOffset:   defaultHexOffset,
 		hexOnColor:  defaultHexOnColor,
 		hexOffColor: defaultHexOffColor,
@@ -225,7 +225,7 @@ func (h *HexWidget) Set(val uint) {
 	h.UpdateSegments(segmentLookupTable[val])
 }
 
-func setLineEndpoints(l *canvas.Line, pt1, pt2 fyne.Position) {
+func setLineEndpoints(l *canvas.Line, pt1, pt2 granio.Position) {
 	l.Position1 = pt1
 	l.Position2 = pt2
 }

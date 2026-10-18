@@ -3,26 +3,26 @@ package main
 import (
 	"strconv"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
-	"fyne.io/x/fyne/wrapper"
+	"github.com/Uzer007-admin/granio-x/wrapper"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/dialog"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 func main() {
 	app := app.New()
 	win := app.NewWindow("Wrapper example")
-	win.Resize(fyne.NewSize(400, 400))
+	win.Resize(granio.NewSize(400, 400))
 
 	label1 := widget.NewLabel("Label 1, not wrapped")
 	label2 := widget.NewLabel("Label 2, click me")
 	label3 := widget.NewLabel("Label 3, move mouse over me")
 	positionLabel := widget.NewLabel("Informations will be displayed here")
 
-	wrapped := wrapper.MakeTappable(label2, func(e *fyne.PointEvent) {
+	wrapped := wrapper.MakeTappable(label2, func(e *granio.PointEvent) {
 		dialog.ShowInformation("Tapped", "Label 1 was tapped", win)
 	})
 

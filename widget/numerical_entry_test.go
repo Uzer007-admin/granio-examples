@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -271,6 +271,7 @@ func TestNumericalEntry_NegIntMathMinus(t *testing.T) {
 
 func TestNumericalEntry_NegFloat(t *testing.T) {
 	entry := NewNumericalEntry()
+	entry.setupRunes("en-US")
 	entry.AllowNegative = true
 	entry.AllowFloat = true
 
@@ -1030,7 +1031,7 @@ func TestNumericalEntry_ParseFloat(t *testing.T) {
 
 func TestNumericalEntry_OnPaste(t *testing.T) {
 	clipboard := test.NewClipboard()
-	shortcut := &fyne.ShortcutPaste{Clipboard: clipboard}
+	shortcut := &granio.ShortcutPaste{Clipboard: clipboard}
 	entry := NewNumericalEntry()
 	entry.AllowFloat = true
 	entry.AllowNegative = true

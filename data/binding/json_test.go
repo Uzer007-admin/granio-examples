@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/test"
-	xbinding "fyne.io/x/fyne/data/binding"
+	xbinding "github.com/Uzer007-admin/granio-x/data/binding"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )

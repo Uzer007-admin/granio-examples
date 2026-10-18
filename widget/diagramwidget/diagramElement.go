@@ -3,8 +3,8 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // DiagramElementProperties are the rendering properties of a DiagramElement
@@ -24,7 +24,7 @@ type DiagramElementProperties struct {
 // DiagramElement is a widget that can be placed directly in a diagram. The most common
 // elements are Node and Link widgets.
 type DiagramElement interface {
-	fyne.Widget
+	granio.Widget
 	// GetBackgroundColor returns the background color for the widget
 	GetBackgroundColor() color.Color
 	// GetConnectionPads() returns all of the connection pads on the element
@@ -46,7 +46,7 @@ type DiagramElement interface {
 	// GetProperties returns the properties of the DiagramElement
 	GetProperties() DiagramElementProperties
 	// handleDragged responds to drag events
-	handleDragged(handle *Handle, event *fyne.DragEvent)
+	handleDragged(handle *Handle, event *granio.DragEvent)
 	// handleDragEnd responds to the end of a drag
 	handleDragEnd(handle *Handle)
 	// HideHandles hides the handles on the DiagramElement
@@ -56,7 +56,7 @@ type DiagramElement interface {
 	// IsNode returns true of the diagram element is a node
 	IsNode() bool
 	// Position returns the position of the diagram element
-	Position() fyne.Position
+	Position() granio.Position
 	// SetForegroundColor sets the foreground color for the widget
 	SetForegroundColor(color.Color)
 	// SetBackgroundColor sets the background color for the widget
@@ -66,7 +66,7 @@ type DiagramElement interface {
 	// ShowHandles shows the handles on the DiagramElement
 	ShowHandles()
 	// Size returns the size of the diagram element
-	Size() fyne.Size
+	Size() granio.Size
 }
 
 type diagramElement struct {

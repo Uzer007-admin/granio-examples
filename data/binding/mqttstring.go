@@ -1,7 +1,7 @@
 package binding
 
 import (
-	"fyne.io/fyne/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )

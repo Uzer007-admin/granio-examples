@@ -3,11 +3,11 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
 )
 
 // DiagramNode is a rectangular DiagramElement typically containing one or more widgets
@@ -16,15 +16,15 @@ type DiagramNode interface {
 	getBaseDiagramNode() *BaseDiagramNode
 	GetEdgePad() ConnectionPad
 	R2Center() r2.Vec2
-	SetInnerObject(fyne.CanvasObject)
+	SetInnerObject(granio.CanvasObject)
 }
 
 // Validate that BaseDiagramNode implements DiagramElement and Tappable
 var _ DiagramElement = (*BaseDiagramNode)(nil)
-var _ fyne.Tappable = (*BaseDiagramNode)(nil)
+var _ granio.Tappable = (*BaseDiagramNode)(nil)
 
-var _ fyne.Widget = (*BaseDiagramNode)(nil)
-var _ fyne.Widget = (DiagramNode)(nil)
+var _ granio.Widget = (*BaseDiagramNode)(nil)
+var _ granio.Widget = (DiagramNode)(nil)
 
 const (
 	// default inner size
@@ -39,10 +39,10 @@ type BaseDiagramNode struct {
 	diagramElement
 	// InnerSize stores size that the inner object should have, may not
 	// be respected if not large enough for the object.
-	InnerSize fyne.Size
+	InnerSize granio.Size
 	// innerObject is the canvas object that should be drawn inside of
 	// the diagram node.
-	innerObject fyne.CanvasObject
+	innerObject granio.CanvasObject
 	// MovedCallback, if present, is invoked when the node is moved
 	MovedCallback func()
 }
@@ -51,16 +51,16 @@ type BaseDiagramNode struct {
 // nodeID string must be unique across all of the DiagramElements in the diagram. It can be used
 // to retrieve the DiagramNode from the DiagramWidget. It is permissible for the canvas object to
 // be nil when this function is called and then add the canvas object later.
-func NewDiagramNode(diagram *DiagramWidget, obj fyne.CanvasObject, nodeID string) DiagramNode {
+func NewDiagramNode(diagram *DiagramWidget, obj granio.CanvasObject, nodeID string) DiagramNode {
 	var diagramNode DiagramNode = &BaseDiagramNode{}
 	InitializeBaseDiagramNode(diagramNode, diagram, obj, nodeID)
 	return diagramNode
 }
 
 // InitializeBaseDiagramNode is used to initailize the BaseDiagramNode. It must be called by any extensions to the BaseDiagramNode
-func InitializeBaseDiagramNode(diagramNode DiagramNode, diagram *DiagramWidget, obj fyne.CanvasObject, nodeID string) {
+func InitializeBaseDiagramNode(diagramNode DiagramNode, diagram *DiagramWidget, obj granio.CanvasObject, nodeID string) {
 	bdn := diagramNode.getBaseDiagramNode()
-	bdn.InnerSize = fyne.Size{Width: defaultWidth, Height: defaultHeight}
+	bdn.InnerSize = granio.Size{Width: defaultWidth, Height: defaultHeight}
 	bdn.innerObject = obj
 	bdn.diagramElement.initialize(diagram, nodeID)
 	bdn.pads["default"] = NewRectanglePad(bdn)
@@ -76,7 +76,7 @@ func InitializeBaseDiagramNode(diagramNode DiagramNode, diagram *DiagramWidget, 
 }
 
 // CreateRenderer creates the renderer for the diagram node
-func (bdn *BaseDiagramNode) CreateRenderer() fyne.WidgetRenderer {
+func (bdn *BaseDiagramNode) CreateRenderer() granio.WidgetRenderer {
 	dnr := diagramNodeRenderer{
 		node: bdn,
 		box:  canvas.NewRectangle(bdn.diagram.GetForegroundColor()),
@@ -91,8 +91,8 @@ func (bdn *BaseDiagramNode) CreateRenderer() fyne.WidgetRenderer {
 }
 
 // Center reurns the position of the center of the node
-func (bdn *BaseDiagramNode) Center() fyne.Position {
-	return fyne.Position{X: float32(bdn.R2Center().X), Y: float32(bdn.R2Center().Y)}
+func (bdn *BaseDiagramNode) Center() granio.Position {
+	return granio.Position{X: float32(bdn.R2Center().X), Y: float32(bdn.R2Center().Y)}
 }
 
 // Cursor returns the desktop default cursor
@@ -105,11 +105,11 @@ func (bdn *BaseDiagramNode) DragEnd() {
 }
 
 // Dragged passes the DragEvent to the diagram for processing
-func (bdn *BaseDiagramNode) Dragged(event *fyne.DragEvent) {
+func (bdn *BaseDiagramNode) Dragged(event *granio.DragEvent) {
 	bdn.diagram.DiagramNodeDragged(bdn, event)
 }
 
-func (bdn *BaseDiagramNode) effectiveInnerSize() fyne.Size {
+func (bdn *BaseDiagramNode) effectiveInnerSize() granio.Size {
 	if bdn.innerObject == nil {
 		return bdn.InnerSize
 	}
@@ -139,12 +139,12 @@ func (bdn *BaseDiagramNode) GetEdgePad() ConnectionPad {
 	return bdn.pads["default"]
 }
 
-func (bdn *BaseDiagramNode) handleDragged(handle *Handle, event *fyne.DragEvent) {
+func (bdn *BaseDiagramNode) handleDragged(handle *Handle, event *granio.DragEvent) {
 	// determine which handle it is
 	currentInnerSize := bdn.effectiveInnerSize()
 	handleKey := bdn.findKeyForHandle(handle)
-	positionChange := fyne.Position{X: 0, Y: 0}
-	sizeChange := fyne.Size{Height: 0, Width: 0}
+	positionChange := granio.Position{X: 0, Y: 0}
+	sizeChange := granio.Size{Height: 0, Width: 0}
 	switch handleKey {
 	case "upperLeft":
 		positionChange.X = event.Dragged.DX
@@ -196,8 +196,8 @@ func (bdn *BaseDiagramNode) handleDragEnd(handle *Handle) {
 
 }
 
-func (bdn *BaseDiagramNode) innerPos() fyne.Position {
-	return fyne.Position{
+func (bdn *BaseDiagramNode) innerPos() granio.Position {
+	return granio.Position{
 		X: float32(bdn.properties.Padding),
 		Y: float32(bdn.properties.Padding),
 	}
@@ -214,7 +214,7 @@ func (bdn *BaseDiagramNode) IsNode() bool {
 }
 
 // Move moves the node and invokes the callback if present.
-func (bdn *BaseDiagramNode) Move(position fyne.Position) {
+func (bdn *BaseDiagramNode) Move(position granio.Position) {
 	bdn.BaseWidget.Move(position)
 	if bdn.MovedCallback != nil {
 		bdn.MovedCallback()
@@ -244,14 +244,14 @@ func (bdn *BaseDiagramNode) R2Position() r2.Vec2 {
 }
 
 // SetInnerObject makes the skupplied canvas object the center of the node
-func (bdn *BaseDiagramNode) SetInnerObject(obj fyne.CanvasObject) {
+func (bdn *BaseDiagramNode) SetInnerObject(obj granio.CanvasObject) {
 	bdn.innerObject = obj
 	bdn.Refresh()
 	bdn.diagram.refreshDependentLinks(bdn)
 }
 
 // Tapped passes the tapped event on to the Diagram
-func (bdn *BaseDiagramNode) Tapped(event *fyne.PointEvent) {
+func (bdn *BaseDiagramNode) Tapped(event *granio.PointEvent) {
 	bdn.diagram.DiagramElementTapped(bdn)
 }
 
@@ -261,7 +261,7 @@ type diagramNodeRenderer struct {
 	box  *canvas.Rectangle
 }
 
-func (dnr *diagramNodeRenderer) ApplyTheme(size fyne.Size) {
+func (dnr *diagramNodeRenderer) ApplyTheme(size granio.Size) {
 }
 
 func (dnr *diagramNodeRenderer) BackgroundColor() color.Color {
@@ -271,20 +271,20 @@ func (dnr *diagramNodeRenderer) BackgroundColor() color.Color {
 func (dnr *diagramNodeRenderer) Destroy() {
 }
 
-func (dnr *diagramNodeRenderer) MinSize() fyne.Size {
+func (dnr *diagramNodeRenderer) MinSize() granio.Size {
 	// space for the inner widget, plus padding on all sides.
 	inner := dnr.node.effectiveInnerSize()
-	return fyne.Size{
+	return granio.Size{
 		Width:  inner.Width + float32(2*dnr.node.properties.Padding),
 		Height: inner.Height + float32(2*dnr.node.properties.Padding),
 	}
 }
 
-func (dnr *diagramNodeRenderer) Layout(size fyne.Size) {
+func (dnr *diagramNodeRenderer) Layout(size granio.Size) {
 }
 
-func (dnr *diagramNodeRenderer) Objects() []fyne.CanvasObject {
-	obj := make([]fyne.CanvasObject, 0)
+func (dnr *diagramNodeRenderer) Objects() []granio.CanvasObject {
+	obj := make([]granio.CanvasObject, 0)
 	obj = append(obj, dnr.box)
 	obj = append(obj, dnr.node.innerObject)
 	for _, pad := range dnr.node.pads {
@@ -300,7 +300,7 @@ func (dnr *diagramNodeRenderer) Refresh() {
 	nodeSize := dnr.MinSize()
 	dnr.node.Resize(nodeSize)
 	dnr.node.pads["default"].Resize(nodeSize)
-	dnr.node.pads["default"].Move(fyne.NewPos(0, 0))
+	dnr.node.pads["default"].Move(granio.NewPos(0, 0))
 	dnr.node.pads["default"].Refresh()
 
 	if dnr.node.innerObject != nil {
@@ -316,23 +316,23 @@ func (dnr *diagramNodeRenderer) Refresh() {
 	for key, handle := range dnr.node.handles {
 		switch key {
 		case "upperLeft":
-			handle.Move(fyne.NewPos(0, 0))
+			handle.Move(granio.NewPos(0, 0))
 		case "upperMiddle":
-			handle.Move(fyne.Position{X: width / 2, Y: 0})
+			handle.Move(granio.Position{X: width / 2, Y: 0})
 		case "upperRight":
-			handle.Move(fyne.Position{X: width, Y: 0})
+			handle.Move(granio.Position{X: width, Y: 0})
 		case "leftMiddle":
-			handle.Move(fyne.Position{X: 0, Y: height / 2})
+			handle.Move(granio.Position{X: 0, Y: height / 2})
 		case "rightMiddle":
-			handle.Move(fyne.Position{X: width, Y: height / 2})
+			handle.Move(granio.Position{X: width, Y: height / 2})
 		case "lowerLeft":
-			handle.Move(fyne.Position{X: 0, Y: height})
+			handle.Move(granio.Position{X: 0, Y: height})
 		case "lowerMiddle":
-			handle.Move(fyne.Position{X: width / 2, Y: height})
+			handle.Move(granio.Position{X: width / 2, Y: height})
 		case "lowerRight":
-			handle.Move(fyne.Position{X: width, Y: height})
+			handle.Move(granio.Position{X: width, Y: height})
 		}
-		handle.Resize(fyne.NewSize(handle.handleSize, handle.handleSize))
+		handle.Resize(granio.NewSize(handle.handleSize, handle.handleSize))
 		handle.Refresh()
 	}
 

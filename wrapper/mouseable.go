@@ -1,36 +1,36 @@
 package wrapper
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
-var _ fyne.Widget = (*mouseableObject)(nil)
+var _ granio.Widget = (*mouseableObject)(nil)
 var _ desktop.Hoverable = (*mouseableObject)(nil)
 
 // handles the canvas object and mouse events
 type mouseableObject struct {
 	widget.BaseWidget
-	object     fyne.CanvasObject
+	object     granio.CanvasObject
 	mouseIn    func(*desktop.MouseEvent)
 	mouseMoved func(*desktop.MouseEvent)
 	mouseOut   func()
 }
 
 // Content returns the originl object that was set to be hoverable.
-func (m *mouseableObject) Content() fyne.CanvasObject {
+func (m *mouseableObject) Content() granio.CanvasObject {
 	return m.object
 }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
 //
-// Implements: fyne.Widget
-func (m *mouseableObject) CreateRenderer() fyne.WidgetRenderer {
+// Implements: granio.Widget
+func (m *mouseableObject) CreateRenderer() granio.WidgetRenderer {
 	if m.object == nil {
 		return nil
 	}
-	if o, ok := m.object.(fyne.Widget); ok {
+	if o, ok := m.object.(granio.Widget); ok {
 		return o.CreateRenderer()
 	}
 	return widget.NewSimpleRenderer(m.object)
@@ -82,7 +82,7 @@ func (m *mouseableObject) MouseOut() {
 }
 
 // MakeHoverable sets the object to be hoverable.
-func MakeHoverable(object fyne.CanvasObject, mouseIn, mouseMoved func(*desktop.MouseEvent), mouseout func()) fyne.CanvasObject {
+func MakeHoverable(object granio.CanvasObject, mouseIn, mouseMoved func(*desktop.MouseEvent), mouseout func()) granio.CanvasObject {
 	m := &mouseableObject{
 		object:     object,
 		mouseIn:    mouseIn,

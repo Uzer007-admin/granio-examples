@@ -3,11 +3,11 @@ package widget
 import (
 	"sort"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // FileTree extends widget.Tree to display a file system hierarchy.
@@ -15,20 +15,20 @@ type FileTree struct {
 	widget.Tree
 	Filter       storage.FileFilter
 	ShowRootPath bool
-	Sorter       func(fyne.URI, fyne.URI) bool
+	Sorter       func(granio.URI, granio.URI) bool
 
 	listCache     map[widget.TreeNodeID][]widget.TreeNodeID
-	listableCache map[widget.TreeNodeID]fyne.ListableURI
-	uriCache      map[widget.TreeNodeID]fyne.URI
+	listableCache map[widget.TreeNodeID]granio.ListableURI
+	uriCache      map[widget.TreeNodeID]granio.URI
 }
 
 // NewFileTree creates a new FileTree from the given root URI.
-func NewFileTree(root fyne.URI) *FileTree {
+func NewFileTree(root granio.URI) *FileTree {
 	tree := &FileTree{
 		Tree: widget.Tree{
 			Root: root.String(),
-			CreateNode: func(branch bool) fyne.CanvasObject {
-				var icon fyne.CanvasObject
+			CreateNode: func(branch bool) granio.CanvasObject {
+				var icon granio.CanvasObject
 				if branch {
 					icon = widget.NewIcon(nil)
 				} else {
@@ -38,8 +38,8 @@ func NewFileTree(root fyne.URI) *FileTree {
 			},
 		},
 		listCache:     make(map[widget.TreeNodeID][]widget.TreeNodeID),
-		listableCache: make(map[widget.TreeNodeID]fyne.ListableURI),
-		uriCache:      make(map[widget.TreeNodeID]fyne.URI),
+		listableCache: make(map[widget.TreeNodeID]granio.ListableURI),
+		uriCache:      make(map[widget.TreeNodeID]granio.URI),
 	}
 	tree.IsBranch = func(id widget.TreeNodeID) bool {
 		_, err := tree.toListable(id)
@@ -48,7 +48,7 @@ func NewFileTree(root fyne.URI) *FileTree {
 	tree.ChildUIDs = func(id widget.TreeNodeID) (c []string) {
 		listable, err := tree.toListable(id)
 		if err != nil {
-			fyne.LogError("Unable to get lister for "+id, err)
+			granio.LogError("Unable to get lister for "+id, err)
 			return
 		}
 
@@ -59,7 +59,7 @@ func NewFileTree(root fyne.URI) *FileTree {
 
 		uris, err := listable.List()
 		if err != nil {
-			fyne.LogError("Unable to list "+listable.String(), err)
+			granio.LogError("Unable to list "+listable.String(), err)
 			return
 		}
 
@@ -71,16 +71,16 @@ func NewFileTree(root fyne.URI) *FileTree {
 		tree.listCache[id] = c
 		return
 	}
-	tree.UpdateNode = func(id widget.TreeNodeID, branch bool, node fyne.CanvasObject) {
+	tree.UpdateNode = func(id widget.TreeNodeID, branch bool, node granio.CanvasObject) {
 		uri, err := tree.toURI(id)
 		if err != nil {
-			fyne.LogError("Unable to parse URI", err)
+			granio.LogError("Unable to parse URI", err)
 			return
 		}
 
-		c := node.(*fyne.Container)
+		c := node.(*granio.Container)
 		if branch {
-			var r fyne.Resource
+			var r granio.Resource
 			if tree.IsBranchOpen(id) {
 				// Set open folder icon
 				r = theme.FolderOpenIcon()
@@ -116,23 +116,23 @@ func (t *FileTree) Refresh() {
 	t.Tree.Refresh()
 
 	t.listCache = make(map[widget.TreeNodeID][]widget.TreeNodeID)
-	t.listableCache = make(map[widget.TreeNodeID]fyne.ListableURI)
-	t.uriCache = make(map[widget.TreeNodeID]fyne.URI)
+	t.listableCache = make(map[widget.TreeNodeID]granio.ListableURI)
+	t.uriCache = make(map[widget.TreeNodeID]granio.URI)
 }
 
 // MapURI allows an app to return a specific URI for the given uid.
 // This can be helpful to make more custom trees based on file structure/
-func (t *FileTree) MapURI(uid string, target fyne.URI) {
+func (t *FileTree) MapURI(uid string, target granio.URI) {
 	t.uriCache[uid] = target
 	t.Refresh()
 }
 
-func (t *FileTree) filter(uris []fyne.URI) []fyne.URI {
+func (t *FileTree) filter(uris []granio.URI) []granio.URI {
 	filter := t.Filter
 	if filter == nil {
 		return uris
 	}
-	var filtered []fyne.URI
+	var filtered []granio.URI
 	for _, u := range uris {
 		if filter.Matches(u) {
 			filtered = append(filtered, u)
@@ -141,7 +141,7 @@ func (t *FileTree) filter(uris []fyne.URI) []fyne.URI {
 	return filtered
 }
 
-func (t *FileTree) sort(uris []fyne.URI) []fyne.URI {
+func (t *FileTree) sort(uris []granio.URI) []granio.URI {
 	if sorter := t.Sorter; sorter != nil {
 		sort.Slice(uris, func(i, j int) bool {
 			return sorter(uris[i], uris[j])
@@ -150,7 +150,7 @@ func (t *FileTree) sort(uris []fyne.URI) []fyne.URI {
 	return uris
 }
 
-func (t *FileTree) toListable(id widget.TreeNodeID) (fyne.ListableURI, error) {
+func (t *FileTree) toListable(id widget.TreeNodeID) (granio.ListableURI, error) {
 	listable, ok := t.listableCache[id]
 	if ok {
 		return listable, nil
@@ -168,7 +168,7 @@ func (t *FileTree) toListable(id widget.TreeNodeID) (fyne.ListableURI, error) {
 	return listable, nil
 }
 
-func (t *FileTree) toURI(id widget.TreeNodeID) (fyne.URI, error) {
+func (t *FileTree) toURI(id widget.TreeNodeID) (granio.URI, error) {
 	uri, ok := t.uriCache[id]
 	if ok {
 		return uri, nil

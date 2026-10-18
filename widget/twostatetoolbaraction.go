@@ -1,8 +1,8 @@
 package widget
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // TwoStateToolbarAction is a push button style of ToolbarItem that displays a different
@@ -14,8 +14,8 @@ import (
 // Similarly, the two states could be used to indicate that a panel is being hidden or shown.
 type TwoStateToolbarAction struct {
 	on          bool
-	offIcon     fyne.Resource
-	onIcon      fyne.Resource
+	offIcon     granio.Resource
+	onIcon      granio.Resource
 	OnActivated func(bool) `json:"-"`
 
 	button widget.Button
@@ -23,8 +23,8 @@ type TwoStateToolbarAction struct {
 
 // NewTwoStateToolbarAction returns a new push button style of Toolbar item that displays
 // a different icon for each of its two states
-func NewTwoStateToolbarAction(offStateIcon fyne.Resource,
-	onStateIcon fyne.Resource,
+func NewTwoStateToolbarAction(offStateIcon granio.Resource,
+	onStateIcon granio.Resource,
 	onTapped func(bool)) *TwoStateToolbarAction {
 	t := &TwoStateToolbarAction{offIcon: offStateIcon, onIcon: onStateIcon, OnActivated: onTapped}
 	t.button.SetIcon(t.offIcon)
@@ -48,21 +48,21 @@ func (t *TwoStateToolbarAction) SetOn(on bool) {
 }
 
 // SetOffIcon sets the icon that is displayed when the state is false
-func (t *TwoStateToolbarAction) SetOffIcon(icon fyne.Resource) {
+func (t *TwoStateToolbarAction) SetOffIcon(icon granio.Resource) {
 	t.offIcon = icon
 	t.setButtonIcon()
 	t.button.Refresh()
 }
 
 // SetOnIcon sets the icon that is displayed when the state is true
-func (t *TwoStateToolbarAction) SetOnIcon(icon fyne.Resource) {
+func (t *TwoStateToolbarAction) SetOnIcon(icon granio.Resource) {
 	t.onIcon = icon
 	t.setButtonIcon()
 	t.button.Refresh()
 }
 
 // ToolbarObject gets a button to render this ToolbarAction
-func (t *TwoStateToolbarAction) ToolbarObject() fyne.CanvasObject {
+func (t *TwoStateToolbarAction) ToolbarObject() granio.CanvasObject {
 	t.button.Importance = widget.LowImportance
 
 	// synchronize properties

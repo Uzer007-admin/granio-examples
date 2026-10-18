@@ -1,9 +1,9 @@
 package widget
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // CompletionEntry is an Entry with options displayed in a PopUpMenu.
@@ -15,10 +15,10 @@ type CompletionEntry struct {
 	pause         bool
 	itemHeight    float32
 
-	CustomCreate func() fyne.CanvasObject
-	CustomUpdate func(id widget.ListItemID, object fyne.CanvasObject)
+	CustomCreate func() granio.CanvasObject
+	CustomUpdate func(id widget.ListItemID, object granio.CanvasObject)
 
-	impl fyne.Widget
+	impl granio.Widget
 }
 
 // NewCompletionEntry creates a new CompletionEntry which creates a popup menu that responds to keystrokes to navigate through the items without losing the editing ability of the text input.
@@ -29,13 +29,13 @@ func NewCompletionEntry(options []string) *CompletionEntry {
 }
 
 // ExtendBaseWidget is used by an extending widget to make use of CompletionEntry functionality.
-func (c *CompletionEntry) ExtendBaseWidget(wid fyne.Widget) {
+func (c *CompletionEntry) ExtendBaseWidget(wid granio.Widget) {
 	c.impl = wid
 	c.Entry.ExtendBaseWidget(wid)
 }
 
 // super returns the extending widget if set, otherwise the CompletionEntry itself.
-func (c *CompletionEntry) super() fyne.Widget {
+func (c *CompletionEntry) super() granio.Widget {
 	if c.impl != nil {
 		return c.impl
 	}
@@ -51,8 +51,8 @@ func (c *CompletionEntry) HideCompletion() {
 
 // Move changes the relative position of the select entry.
 //
-// Implements: fyne.Widget
-func (c *CompletionEntry) Move(pos fyne.Position) {
+// Implements: granio.Widget
+func (c *CompletionEntry) Move(pos granio.Position) {
 	c.Entry.Move(pos)
 	if c.popupMenu != nil {
 		c.popupMenu.Resize(c.maxSize())
@@ -70,7 +70,7 @@ func (c *CompletionEntry) Refresh() {
 
 // Resize sets a new size for a widget.
 // Note this should not be used if the widget is being managed by a Layout within a Container.
-func (c *CompletionEntry) Resize(size fyne.Size) {
+func (c *CompletionEntry) Resize(size granio.Size) {
 	c.Entry.Resize(size)
 	if c.popupMenu != nil {
 		c.popupMenu.Resize(c.maxSize())
@@ -100,7 +100,7 @@ func (c *CompletionEntry) ShowCompletion() {
 		c.navigableList.UnselectAll()
 		c.navigableList.selected = -1
 	}
-	holder := fyne.CurrentApp().Driver().CanvasForObject(c.super())
+	holder := granio.CurrentApp().Driver().CanvasForObject(c.super())
 
 	if c.popupMenu == nil {
 		c.popupMenu = widget.NewPopUp(c.navigableList, holder)
@@ -111,8 +111,8 @@ func (c *CompletionEntry) ShowCompletion() {
 }
 
 // calculate the max size to make the popup to cover everything below the entry
-func (c *CompletionEntry) maxSize() fyne.Size {
-	cnv := fyne.CurrentApp().Driver().CanvasForObject(c.super())
+func (c *CompletionEntry) maxSize() granio.Size {
+	cnv := granio.CurrentApp().Driver().CanvasForObject(c.super())
 
 	if c.itemHeight == 0 {
 		// set item height to cache
@@ -121,7 +121,7 @@ func (c *CompletionEntry) maxSize() fyne.Size {
 
 	canvasSize := cnv.Size()
 	entrySize := c.Size()
-	entryPos := fyne.CurrentApp().Driver().AbsolutePositionForObject(c.super())
+	entryPos := granio.CurrentApp().Driver().AbsolutePositionForObject(c.super())
 	listHeight := float32(len(c.Options))*(c.itemHeight+2*theme.Padding()+theme.SeparatorThicknessSize()) + 2*theme.Padding()
 	maxHeight := canvasSize.Height - entryPos.Y - entrySize.Height - 2*theme.Padding()
 
@@ -129,13 +129,13 @@ func (c *CompletionEntry) maxSize() fyne.Size {
 		listHeight = maxHeight
 	}
 
-	return fyne.NewSize(entrySize.Width, listHeight)
+	return granio.NewSize(entrySize.Width, listHeight)
 }
 
 // calculate where the popup should appear
-func (c *CompletionEntry) popUpPos() fyne.Position {
-	entryPos := fyne.CurrentApp().Driver().AbsolutePositionForObject(c.super())
-	return entryPos.Add(fyne.NewPos(0, c.Size().Height))
+func (c *CompletionEntry) popUpPos() granio.Position {
+	entryPos := granio.CurrentApp().Driver().AbsolutePositionForObject(c.super())
+	return entryPos.Add(granio.NewPos(0, c.Size().Height))
 }
 
 // Prevent the menu to open when the user validate value from the menu.
@@ -157,12 +157,12 @@ type navigableList struct {
 	navigating      bool
 	items           []string
 
-	customCreate func() fyne.CanvasObject
-	customUpdate func(id widget.ListItemID, object fyne.CanvasObject)
+	customCreate func() granio.CanvasObject
+	customUpdate func(id widget.ListItemID, object granio.CanvasObject)
 }
 
 func newNavigableList(items []string, entry *widget.Entry, setTextFromMenu func(string), hide func(),
-	create func() fyne.CanvasObject, update func(id widget.ListItemID, object fyne.CanvasObject)) *navigableList {
+	create func() granio.CanvasObject, update func(id widget.ListItemID, object granio.CanvasObject)) *navigableList {
 	n := &navigableList{
 		entry:           entry,
 		selected:        -1,
@@ -177,13 +177,13 @@ func newNavigableList(items []string, entry *widget.Entry, setTextFromMenu func(
 		Length: func() int {
 			return len(n.items)
 		},
-		CreateItem: func() fyne.CanvasObject {
+		CreateItem: func() granio.CanvasObject {
 			if fn := n.customCreate; fn != nil {
 				return fn()
 			}
 			return widget.NewLabel("")
 		},
-		UpdateItem: func(i widget.ListItemID, o fyne.CanvasObject) {
+		UpdateItem: func(i widget.ListItemID, o granio.CanvasObject) {
 			if i >= len(n.items) {
 				return
 			}
@@ -204,11 +204,11 @@ func newNavigableList(items []string, entry *widget.Entry, setTextFromMenu func(
 	return n
 }
 
-// Implements: fyne.Focusable
+// Implements: granio.Focusable
 func (n *navigableList) FocusGained() {
 }
 
-// Implements: fyne.Focusable
+// Implements: granio.Focusable
 func (n *navigableList) FocusLost() {
 }
 
@@ -219,9 +219,9 @@ func (n *navigableList) SetOptions(items []string) {
 	n.selected = -1
 }
 
-func (n *navigableList) TypedKey(event *fyne.KeyEvent) {
+func (n *navigableList) TypedKey(event *granio.KeyEvent) {
 	switch event.Name {
-	case fyne.KeyDown:
+	case granio.KeyDown:
 		if n.selected < len(n.items)-1 {
 			n.selected++
 		} else {
@@ -230,7 +230,7 @@ func (n *navigableList) TypedKey(event *fyne.KeyEvent) {
 		n.navigating = true
 		n.Select(n.selected)
 
-	case fyne.KeyUp:
+	case granio.KeyUp:
 		if n.selected > 0 {
 			n.selected--
 		} else {
@@ -238,7 +238,7 @@ func (n *navigableList) TypedKey(event *fyne.KeyEvent) {
 		}
 		n.navigating = true
 		n.Select(n.selected)
-	case fyne.KeyReturn, fyne.KeyEnter:
+	case granio.KeyReturn, granio.KeyEnter:
 		if n.selected == -1 { // so the user want to submit the entry
 			n.hide()
 			n.entry.TypedKey(event)
@@ -246,7 +246,7 @@ func (n *navigableList) TypedKey(event *fyne.KeyEvent) {
 			n.navigating = false
 			n.OnSelected(n.selected)
 		}
-	case fyne.KeyEscape:
+	case granio.KeyEscape:
 		n.hide()
 	default:
 		n.entry.TypedKey(event)

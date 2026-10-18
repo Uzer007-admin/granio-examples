@@ -5,16 +5,16 @@ import (
 	"math"
 	"sync"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/data/binding"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // Declare conformity with Widget interface.
-var _ fyne.Widget = (*GridWrap)(nil)
+var _ granio.Widget = (*GridWrap)(nil)
 
 // GridWrapItemID is the ID of an individual item in the GridWrap widget.
 type GridWrapItemID = int
@@ -27,21 +27,21 @@ type GridWrapItemID = int
 type GridWrap struct {
 	widget.BaseWidget
 
-	Length     func() int                                      `json:"-"`
-	CreateItem func() fyne.CanvasObject                        `json:"-"`
-	UpdateItem func(id GridWrapItemID, item fyne.CanvasObject) `json:"-"`
+	Length     func() int                                        `json:"-"`
+	CreateItem func() granio.CanvasObject                        `json:"-"`
+	UpdateItem func(id GridWrapItemID, item granio.CanvasObject) `json:"-"`
 
 	scroller      *container.Scroll
-	itemMin       fyne.Size
+	itemMin       granio.Size
 	offsetY       float32
-	offsetUpdated func(fyne.Position)
+	offsetUpdated func(granio.Position)
 }
 
 // NewGridWrap creates and returns a GridWrap widget for displaying items in
 // a wrapping grid layout with scrolling and caching for performance.
 //
 // Deprecated: Since Fyne 2.4, GridWrap is available in Fyne core
-func NewGridWrap(length func() int, createItem func() fyne.CanvasObject, updateItem func(GridWrapItemID, fyne.CanvasObject)) *GridWrap {
+func NewGridWrap(length func() int, createItem func() granio.CanvasObject, updateItem func(GridWrapItemID, granio.CanvasObject)) *GridWrap {
 	gwList := &GridWrap{Length: length, CreateItem: createItem, UpdateItem: updateItem}
 	gwList.ExtendBaseWidget(gwList)
 	return gwList
@@ -50,14 +50,14 @@ func NewGridWrap(length func() int, createItem func() fyne.CanvasObject, updateI
 // NewGridWrapWithData creates a new GridWrap widget that will display the contents of the provided data.
 //
 // Deprecated: Since Fyne 2.4, GridWrap is available in Fyne core
-func NewGridWrapWithData(data binding.DataList, createItem func() fyne.CanvasObject, updateItem func(binding.DataItem, fyne.CanvasObject)) *GridWrap {
+func NewGridWrapWithData(data binding.DataList, createItem func() granio.CanvasObject, updateItem func(binding.DataItem, granio.CanvasObject)) *GridWrap {
 	gwList := NewGridWrap(
 		data.Length,
 		createItem,
-		func(i GridWrapItemID, o fyne.CanvasObject) {
+		func(i GridWrapItemID, o granio.CanvasObject) {
 			item, err := data.GetItem(int(i))
 			if err != nil {
-				fyne.LogError(fmt.Sprintf("Error getting data item %d", i), err)
+				granio.LogError(fmt.Sprintf("Error getting data item %d", i), err)
 				return
 			}
 			updateItem(item, o)
@@ -68,22 +68,22 @@ func NewGridWrapWithData(data binding.DataList, createItem func() fyne.CanvasObj
 }
 
 // CreateRenderer is a private method to Fyne which links this widget to its renderer.
-func (l *GridWrap) CreateRenderer() fyne.WidgetRenderer {
+func (l *GridWrap) CreateRenderer() granio.WidgetRenderer {
 	l.ExtendBaseWidget(l)
 
 	if f := l.CreateItem; f != nil && l.itemMin.IsZero() {
 		l.itemMin = f().MinSize()
 	}
 
-	layout := &fyne.Container{Layout: newGridWrapLayout(l)}
+	layout := &granio.Container{Layout: newGridWrapLayout(l)}
 	l.scroller = container.NewVScroll(layout)
 	layout.Resize(layout.MinSize())
 
-	return newGridWrapRenderer([]fyne.CanvasObject{l.scroller}, l, l.scroller, layout)
+	return newGridWrapRenderer([]granio.CanvasObject{l.scroller}, l, l.scroller, layout)
 }
 
 // MinSize returns the size that this widget should not shrink below.
-func (l *GridWrap) MinSize() fyne.Size {
+func (l *GridWrap) MinSize() granio.Size {
 	l.ExtendBaseWidget(l)
 
 	return l.BaseWidget.MinSize()
@@ -104,10 +104,10 @@ func (l *GridWrap) scrollTo(id GridWrapItemID) {
 }
 
 // Resize is called when this GridWrap should change size. We refresh to ensure invisible items are drawn.
-func (l *GridWrap) Resize(s fyne.Size) {
+func (l *GridWrap) Resize(s granio.Size) {
 	l.BaseWidget.Resize(s)
 	l.offsetUpdated(l.scroller.Offset)
-	l.scroller.Content.(*fyne.Container).Layout.(*gridWrapLayout).updateList(true)
+	l.scroller.Content.(*granio.Container).Layout.(*gridWrapLayout).updateList(true)
 }
 
 // ScrollTo scrolls to the item represented by id
@@ -154,27 +154,27 @@ func (l *GridWrap) GetScrollOffset() float32 {
 }
 
 // Declare conformity with WidgetRenderer interface.
-var _ fyne.WidgetRenderer = (*gridWrapRenderer)(nil)
+var _ granio.WidgetRenderer = (*gridWrapRenderer)(nil)
 
 type gridWrapRenderer struct {
-	objects []fyne.CanvasObject
+	objects []granio.CanvasObject
 
 	list     *GridWrap
 	scroller *container.Scroll
-	layout   *fyne.Container
+	layout   *granio.Container
 }
 
-func newGridWrapRenderer(objects []fyne.CanvasObject, l *GridWrap, scroller *container.Scroll, layout *fyne.Container) *gridWrapRenderer {
+func newGridWrapRenderer(objects []granio.CanvasObject, l *GridWrap, scroller *container.Scroll, layout *granio.Container) *gridWrapRenderer {
 	lr := &gridWrapRenderer{objects: objects, list: l, scroller: scroller, layout: layout}
 	lr.scroller.OnScrolled = l.offsetUpdated
 	return lr
 }
 
-func (l *gridWrapRenderer) Layout(size fyne.Size) {
+func (l *gridWrapRenderer) Layout(size granio.Size) {
 	l.scroller.Resize(size)
 }
 
-func (l *gridWrapRenderer) MinSize() fyne.Size {
+func (l *gridWrapRenderer) MinSize() granio.Size {
 	return l.scroller.MinSize().Max(l.list.itemMin)
 }
 
@@ -191,43 +191,43 @@ func (l *gridWrapRenderer) Refresh() {
 func (l *gridWrapRenderer) Destroy() {
 }
 
-func (l *gridWrapRenderer) Objects() []fyne.CanvasObject {
+func (l *gridWrapRenderer) Objects() []granio.CanvasObject {
 	return l.objects
 }
 
 // Declare conformity with Layout interface.
-var _ fyne.Layout = (*gridWrapLayout)(nil)
+var _ granio.Layout = (*gridWrapLayout)(nil)
 
 type gridWrapLayout struct {
 	list     *GridWrap
-	children []fyne.CanvasObject
+	children []granio.CanvasObject
 
 	itemPool   *syncPool
-	visible    map[GridWrapItemID]fyne.CanvasObject
+	visible    map[GridWrapItemID]granio.CanvasObject
 	renderLock sync.Mutex
 }
 
-func newGridWrapLayout(list *GridWrap) fyne.Layout {
-	l := &gridWrapLayout{list: list, itemPool: &syncPool{}, visible: make(map[GridWrapItemID]fyne.CanvasObject)}
+func newGridWrapLayout(list *GridWrap) granio.Layout {
+	l := &gridWrapLayout{list: list, itemPool: &syncPool{}, visible: make(map[GridWrapItemID]granio.CanvasObject)}
 	list.offsetUpdated = l.offsetUpdated
 	return l
 }
 
-func (l *gridWrapLayout) Layout(_ []fyne.CanvasObject, _ fyne.Size) {
+func (l *gridWrapLayout) Layout(_ []granio.CanvasObject, _ granio.Size) {
 	l.updateList(true)
 }
 
-func (l *gridWrapLayout) MinSize(_ []fyne.CanvasObject) fyne.Size {
+func (l *gridWrapLayout) MinSize(_ []granio.CanvasObject) granio.Size {
 	if lenF := l.list.Length; lenF != nil {
 		cols := l.list.getColCount()
 		rows := float32(math.Ceil(float64(lenF()) / float64(cols)))
-		return fyne.NewSize(l.list.itemMin.Width,
+		return granio.NewSize(l.list.itemMin.Width,
 			(l.list.itemMin.Height+theme.Padding())*rows-theme.Padding())
 	}
-	return fyne.NewSize(0, 0)
+	return granio.NewSize(0, 0)
 }
 
-func (l *gridWrapLayout) getItem() fyne.CanvasObject {
+func (l *gridWrapLayout) getItem() granio.CanvasObject {
 	item := l.itemPool.Obtain()
 	if item == nil {
 		if f := l.list.CreateItem; f != nil {
@@ -237,7 +237,7 @@ func (l *gridWrapLayout) getItem() fyne.CanvasObject {
 	return item
 }
 
-func (l *gridWrapLayout) offsetUpdated(pos fyne.Position) {
+func (l *gridWrapLayout) offsetUpdated(pos granio.Position) {
 	if l.list.offsetY == pos.Y {
 		return
 	}
@@ -245,7 +245,7 @@ func (l *gridWrapLayout) offsetUpdated(pos fyne.Position) {
 	l.updateList(false)
 }
 
-func (l *gridWrapLayout) setupListItem(li fyne.CanvasObject, id GridWrapItemID) {
+func (l *gridWrapLayout) setupListItem(li granio.CanvasObject, id GridWrapItemID) {
 	if f := l.list.UpdateItem; f != nil {
 		f(id, li)
 	}
@@ -280,12 +280,12 @@ func (l *gridWrapLayout) updateList(refresh bool) {
 	maxItem := GridWrapItemID(math.Min(float64(maxRow*colCount), float64(length-1)))
 
 	if l.list.UpdateItem == nil {
-		fyne.LogError("Missing UpdateCell callback required for GridWrap", nil)
+		granio.LogError("Missing UpdateCell callback required for GridWrap", nil)
 	}
 
 	wasVisible := l.visible
-	l.visible = make(map[GridWrapItemID]fyne.CanvasObject)
-	var cells []fyne.CanvasObject
+	l.visible = make(map[GridWrapItemID]granio.CanvasObject)
+	var cells []granio.CanvasObject
 	y := offY
 	curItem := minItem
 	for row := minRow; row <= maxRow && curItem <= maxItem; row++ {
@@ -301,7 +301,7 @@ func (l *gridWrapLayout) updateList(refresh bool) {
 				l.setupListItem(c, curItem)
 			}
 
-			c.Move(fyne.NewPos(x, y))
+			c.Move(granio.NewPos(x, y))
 			if refresh {
 				c.Resize(l.list.itemMin)
 				if ok { // refresh visible
@@ -325,12 +325,12 @@ func (l *gridWrapLayout) updateList(refresh bool) {
 	l.children = cells
 
 	objects := l.children
-	l.list.scroller.Content.(*fyne.Container).Objects = objects
+	l.list.scroller.Content.(*granio.Container).Objects = objects
 }
 
 type pool interface {
-	Obtain() fyne.CanvasObject
-	Release(fyne.CanvasObject)
+	Obtain() granio.CanvasObject
+	Release(granio.CanvasObject)
 }
 
 var _ pool = (*syncPool)(nil)
@@ -340,15 +340,15 @@ type syncPool struct {
 }
 
 // Obtain returns an item from the pool for use
-func (p *syncPool) Obtain() (item fyne.CanvasObject) {
+func (p *syncPool) Obtain() (item granio.CanvasObject) {
 	o := p.Get()
 	if o != nil {
-		item = o.(fyne.CanvasObject)
+		item = o.(granio.CanvasObject)
 	}
 	return
 }
 
 // Release adds an item into the pool to be used later
-func (p *syncPool) Release(item fyne.CanvasObject) {
+func (p *syncPool) Release(item granio.CanvasObject) {
 	p.Put(item)
 }

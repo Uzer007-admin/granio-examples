@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/test"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -54,7 +54,7 @@ func TestRecents_Add_Limit(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{"7.txt", "6.txt", "5.txt", "4.txt", "3.txt"}, labels(r))
-	assert.Len(t, fyne.CurrentApp().Preferences().StringList(recentsKey), 5)
+	assert.Len(t, granio.CurrentApp().Preferences().StringList(recentsKey), 5)
 }
 
 func TestRecents_Add_Refresh(t *testing.T) {
@@ -62,8 +62,8 @@ func TestRecents_Add_Refresh(t *testing.T) {
 	w := test.NewTempWindow(t, nil)
 
 	r := NewRecents("Recent", nil)
-	w.SetMainMenu(fyne.NewMainMenu(
-		fyne.NewMenu("File", fyne.NewMenuItem("Open", nil), r.MenuItem())))
+	w.SetMainMenu(granio.NewMainMenu(
+		granio.NewMenu("File", granio.NewMenuItem("Open", nil), r.MenuItem())))
 
 	r.Add(storage.NewFileURI("/tmp/one.txt"))
 	recent := w.MainMenu().Items[0].Items[1]
@@ -74,8 +74,8 @@ func TestRecents_Add_Refresh(t *testing.T) {
 func TestRecents_Open(t *testing.T) {
 	test.NewTempApp(t)
 
-	var opened fyne.URI
-	r := NewRecents("Recent", func(u fyne.URI) {
+	var opened granio.URI
+	r := NewRecents("Recent", func(u granio.URI) {
 		opened = u
 	})
 	r.Add(storage.NewFileURI("/tmp/one.txt"))
@@ -93,7 +93,7 @@ func TestRecents_Persist(t *testing.T) {
 	r.Add(storage.NewFileURI("/tmp/two.txt"))
 
 	assert.Equal(t, []string{"file:///tmp/two.txt", "file:///tmp/one.txt"},
-		fyne.CurrentApp().Preferences().StringList(recentsKey))
+		granio.CurrentApp().Preferences().StringList(recentsKey))
 
 	r = NewRecents("Recent", nil)
 	assert.False(t, r.MenuItem().Disabled)
@@ -124,7 +124,7 @@ func TestRecents_SetItemLabel(t *testing.T) {
 	r.Add(storage.NewFileURI("/tmp/second/pres.md"))
 	assert.Equal(t, []string{filepath.Join("second", "pres.md"), filepath.Join("first", "pres.md")}, labels(r))
 
-	r.SetItemLabel(func(u fyne.URI) string {
+	r.SetItemLabel(func(u granio.URI) string {
 		parent, _ := storage.Parent(u)
 		return parent.Name()
 	})

@@ -8,12 +8,12 @@ import (
 
 	"github.com/nfnt/resize"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
 	"golang.org/x/image/draw"
 )
@@ -32,13 +32,13 @@ type Map struct {
 
 	cl *http.Client
 
-	tileSource       string         // url to download xyz tiles (example: "https://tile.openstreetmap.org/%d/%d/%d.png")
-	hideAttribution  bool           // enable copyright attribution
-	attributionLabel string         // label for attribution (example: "OpenStreetMap")
-	attributionURL   string         // url for attribution (example: "https://openstreetmap.org")
-	hideZoomButtons  bool           // enable zoom buttons
-	hideMoveButtons  bool           // enable move map buttons
-	markers          fyne.Container // list of markers to show when in scope
+	tileSource       string           // url to download xyz tiles (example: "https://tile.openstreetmap.org/%d/%d/%d.png")
+	hideAttribution  bool             // enable copyright attribution
+	attributionLabel string           // label for attribution (example: "OpenStreetMap")
+	attributionURL   string           // url for attribution (example: "https://openstreetmap.org")
+	hideZoomButtons  bool             // enable zoom buttons
+	hideMoveButtons  bool             // enable move map buttons
+	markers          granio.Container // list of markers to show when in scope
 }
 
 // MapOption configures the provided map with different features.
@@ -132,8 +132,8 @@ func NewMapWithOptions(opts ...MapOption) *Map {
 // MinSize returns the smallest possible size for a widget.
 // For our map this is a constant size representing a single tile on a device with
 // the highest known DPI (4x).
-func (m *Map) MinSize() fyne.Size {
-	return fyne.NewSize(64, 64)
+func (m *Map) MinSize() granio.Size {
+	return granio.NewSize(64, 64)
 }
 
 // PanEast will move the map to the East by 1 tile.
@@ -161,7 +161,7 @@ func (m *Map) PanWest() {
 }
 
 // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Mathematics
-func (m *Map) getPosFromLatLon(lat, lon float64) fyne.Position {
+func (m *Map) getPosFromLatLon(lat, lon float64) granio.Position {
 	n := float64(int(1) << m.zoom)
 	xTile := (lon + 180.0) / 360.0 * n
 	latRad := lat * math.Pi / 180.0
@@ -178,7 +178,7 @@ func (m *Map) getPosFromLatLon(lat, lon float64) fyne.Position {
 	dpX := (size.Width+mid)/2 + float32(xTile-float64(mx))*tileSize + m.offsetX
 	dpY := (size.Height+mid)/2 + float32(yTile-float64(my))*tileSize + m.offsetY
 
-	return fyne.NewPos(dpX, dpY)
+	return granio.NewPos(dpX, dpY)
 }
 
 // PanToLatLon moves the center of the map to the requested latitude and longitude.
@@ -229,7 +229,7 @@ func (m *Map) getCenterLatLon() (float64, float64) {
 
 // SetMarkers updates the list of markers to show on the map.
 func (m *Map) SetMarkers(markers []MapMarker) {
-	objs := make([]fyne.CanvasObject, len(markers))
+	objs := make([]granio.CanvasObject, len(markers))
 	for n, marker := range markers {
 		objs[n] = newMapMarker(marker)
 	}
@@ -237,7 +237,7 @@ func (m *Map) SetMarkers(markers []MapMarker) {
 	m.markers.Refresh()
 }
 
-func (m *Map) Resize(s fyne.Size) {
+func (m *Map) Resize(s granio.Size) {
 	m.BaseWidget.Resize(s)
 	if m.pendingLat != 0 || m.pendingLon != 0 {
 		m.PanToLatLon(m.pendingLat, m.pendingLon)
@@ -282,7 +282,7 @@ func (m *Map) ZoomOut() {
 }
 
 // Dragged handles drag events to pan the map smoothly.
-func (m *Map) Dragged(ev *fyne.DragEvent) {
+func (m *Map) Dragged(ev *granio.DragEvent) {
 	m.offsetX += ev.Dragged.DX
 	m.offsetY += ev.Dragged.DY
 
@@ -317,15 +317,15 @@ func (m *Map) DragEnd() {
 
 // CreateRenderer returns the renderer for this widget.
 // A map renderer is simply the map Raster with user interface elements overlaid.
-func (m *Map) CreateRenderer() fyne.WidgetRenderer {
-	var zoom fyne.CanvasObject
+func (m *Map) CreateRenderer() granio.WidgetRenderer {
+	var zoom granio.CanvasObject
 	if !m.hideZoomButtons {
 		zoom = container.NewVBox(
 			newMapButton(theme.ZoomInIcon(), m.ZoomIn),
 			newMapButton(theme.ZoomOutIcon(), m.ZoomOut))
 	}
 
-	var move fyne.CanvasObject
+	var move granio.CanvasObject
 	if !m.hideMoveButtons {
 		buttonLayout := container.NewGridWithColumns(3, layout.NewSpacer(),
 			newMapButton(theme.MoveUpIcon(), m.PanNorth), layout.NewSpacer(),
@@ -335,7 +335,7 @@ func (m *Map) CreateRenderer() fyne.WidgetRenderer {
 		move = container.NewVBox(buttonLayout)
 	}
 
-	var copyright fyne.CanvasObject
+	var copyright granio.CanvasObject
 	if !m.hideAttribution {
 		license, _ := url.Parse(m.attributionURL)
 		link := widget.NewHyperlink(m.attributionLabel, license)
@@ -386,7 +386,7 @@ func (m *Map) draw(w, h int) image.Image {
 
 			src, err := getTile(m.tileSource, x, y, m.zoom, m.cl)
 			if err != nil {
-				fyne.LogError("tile fetch error", err)
+				granio.LogError("tile fetch error", err)
 				continue
 			}
 

@@ -9,17 +9,17 @@ import (
 	"sync"
 	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // AnimatedGif widget shows a Gif image with many frames.
 type AnimatedGif struct {
 	widget.BaseWidget
-	min fyne.Size
+	min granio.Size
 
 	src               *gif.GIF
 	dst               *canvas.Image
@@ -31,7 +31,7 @@ type AnimatedGif struct {
 
 // NewAnimatedGif creates a new widget loaded to show the specified image.
 // If there is an error loading the image it will be returned in the error value.
-func NewAnimatedGif(u fyne.URI) (*AnimatedGif, error) {
+func NewAnimatedGif(u granio.URI) (*AnimatedGif, error) {
 	ret := newGif()
 
 	return ret, ret.Load(u)
@@ -39,20 +39,20 @@ func NewAnimatedGif(u fyne.URI) (*AnimatedGif, error) {
 
 // NewAnimatedGifFromResource creates a new widget loaded to show the specified image resource.
 // If there is an error loading the image it will be returned in the error value.
-func NewAnimatedGifFromResource(r fyne.Resource) (*AnimatedGif, error) {
+func NewAnimatedGifFromResource(r granio.Resource) (*AnimatedGif, error) {
 	ret := newGif()
 
 	return ret, ret.LoadResource(r)
 }
 
 // CreateRenderer loads the widget renderer for this widget. This is an internal requirement for Fyne.
-func (g *AnimatedGif) CreateRenderer() fyne.WidgetRenderer {
+func (g *AnimatedGif) CreateRenderer() granio.WidgetRenderer {
 	return &gifRenderer{gif: g}
 }
 
 // Load is used to change the gif file shown.
 // It will change the loaded content and prepare the new frames for animation.
-func (g *AnimatedGif) Load(u fyne.URI) error {
+func (g *AnimatedGif) Load(u granio.URI) error {
 	g.dst.Image = nil
 	g.dst.Refresh()
 
@@ -70,7 +70,7 @@ func (g *AnimatedGif) Load(u fyne.URI) error {
 
 // LoadResource is used to change the gif resource shown.
 // It will change the loaded content and prepare the new frames for animation.
-func (g *AnimatedGif) LoadResource(r fyne.Resource) error {
+func (g *AnimatedGif) LoadResource(r granio.Resource) error {
 	g.dst.Image = nil
 	g.dst.Refresh()
 
@@ -95,13 +95,13 @@ func (g *AnimatedGif) load(read io.Reader) error {
 // MinSize returns the minimum size that this GIF can occupy.
 // Because gif images are measured in pixels we cannot use the dimensions, so this defaults to 0x0.
 // You can set a minimum size if required using SetMinSize.
-func (g *AnimatedGif) MinSize() fyne.Size {
+func (g *AnimatedGif) MinSize() granio.Size {
 	return g.min
 }
 
 // SetMinSize sets the smallest possible size that this AnimatedGif should be drawn at.
 // Be careful not to set this based on pixel sizes as that will vary based on output device.
-func (g *AnimatedGif) SetMinSize(min fyne.Size) {
+func (g *AnimatedGif) SetMinSize(min granio.Size) {
 	g.min = min
 }
 
@@ -169,7 +169,7 @@ func (g *AnimatedGif) Start() {
 				if g.isStopping() {
 					break loop
 				}
-				fyne.Do(func() {
+				granio.Do(func() {
 					g.draw(buffer, frame, dispose, c)
 				})
 
@@ -224,16 +224,16 @@ func (g *gifRenderer) Destroy() {
 	g.gif.Stop()
 }
 
-func (g *gifRenderer) Layout(size fyne.Size) {
+func (g *gifRenderer) Layout(size granio.Size) {
 	g.gif.dst.Resize(size)
 }
 
-func (g *gifRenderer) MinSize() fyne.Size {
+func (g *gifRenderer) MinSize() granio.Size {
 	return g.gif.MinSize()
 }
 
-func (g *gifRenderer) Objects() []fyne.CanvasObject {
-	return []fyne.CanvasObject{g.gif.dst}
+func (g *gifRenderer) Objects() []granio.CanvasObject {
+	return []granio.CanvasObject{g.gif.dst}
 }
 
 func (g *gifRenderer) Refresh() {

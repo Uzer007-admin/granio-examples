@@ -3,7 +3,7 @@ package validation_test
 import (
 	"testing"
 
-	"fyne.io/x/fyne/data/validation"
+	"github.com/Uzer007-admin/granio-x/data/validation"
 
 	"github.com/stretchr/testify/assert"
 )

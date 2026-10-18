@@ -4,10 +4,10 @@ import (
 	"math"
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +22,7 @@ func TestResponsive_SimpleLayout(t *testing.T) {
 
 	win := test.NewWindow(layout)
 	defer win.Close()
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 
 	size := layout.Size()
 
@@ -47,7 +47,7 @@ func TestResponsive_Responsive(t *testing.T) {
 
 	// First, we are at w < SMALL so the labels should be sized to 100% of the layout
 	w, h := float32(SMALL), float32(300)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	size1 := label1.Size()
 	size2 := label2.Size()
 	assert.Equal(t, w-padding*2, size1.Width)
@@ -55,7 +55,7 @@ func TestResponsive_Responsive(t *testing.T) {
 
 	// Then resize to w > SMALL so the labels should be sized to 50% of the layout
 	w = float32(MEDIUM)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	size1 = label1.Size()
 	size2 = label2.Size()
 	// remove 2 * padding as there is 2 objects in a line
@@ -76,7 +76,7 @@ func TestResponsive_GoToNextLine(t *testing.T) {
 	win := test.NewWindow(layout)
 	defer win.Close()
 	w = float32(MEDIUM)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 
 	// label 1 and 2 are on the same line
 	assert.Equal(t, label1.Position().Y, label2.Position().Y)
@@ -94,7 +94,7 @@ func TestResponsive_GoToNextLine(t *testing.T) {
 func TestResponsive_SwitchAllSizes(t *testing.T) {
 	// build
 	n := 4
-	labels := make([]fyne.CanvasObject, n)
+	labels := make([]granio.CanvasObject, n)
 	for i := 0; i < n; i++ {
 		labels[i] = Responsive(widget.NewLabel("Hello World"), 1, 1/float32(2), 1/float32(3), 1/float32(4))
 	}
@@ -106,7 +106,7 @@ func TestResponsive_SwitchAllSizes(t *testing.T) {
 	p := theme.Padding()
 	// First, we are at w < SMALL so the labels should be sized to 100% of the layout
 	w := float32(SMALL)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	win.Content().Refresh()
 	w = w - 2*p
 	for i := 0; i < n; i++ {
@@ -116,7 +116,7 @@ func TestResponsive_SwitchAllSizes(t *testing.T) {
 
 	// Then resize to w > SMALL so the labels should be sized to 50% of the layout
 	w = float32(MEDIUM)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	w = w - 2*p
 	for i := 0; i < n; i++ {
 		size := labels[i].Size()
@@ -125,7 +125,7 @@ func TestResponsive_SwitchAllSizes(t *testing.T) {
 
 	// Then resize to w > MEDIUM so the labels should be sized to 33% of the layout
 	w = float32(LARGE)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	w = w - 2*p
 	for i := 0; i < n-1; i++ { // note: n-1 because the last element seems to be resized
 		size := labels[i].Size()
@@ -135,7 +135,7 @@ func TestResponsive_SwitchAllSizes(t *testing.T) {
 
 	// Then resize to w > LARGE so the labels should be sized to 25% of the layout
 	w = float32(XLARGE)
-	win.Resize(fyne.NewSize(w, h))
+	win.Resize(granio.NewSize(w, h))
 	w = w - 2*p
 	for i := 0; i < n; i++ {
 		size := labels[i].Size()

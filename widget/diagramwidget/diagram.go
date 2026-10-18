@@ -5,15 +5,15 @@ import (
 	"image/color"
 	"math"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // Verify that interfaces are fully implemented
-var _ fyne.Tappable = (*drawingArea)(nil)
+var _ granio.Tappable = (*drawingArea)(nil)
 
 type linkPadPair struct {
 	link *BaseDiagramLink
@@ -33,10 +33,10 @@ type DiagramWidget struct {
 	// ID is expected to be unique across all DiagramWidgets in the application.
 	ID string
 
-	Offset fyne.Position
+	Offset granio.Position
 
 	// DesiredSize specifies the size of the displayed diagram. Defaults to 800 x 600
-	DesiredSize fyne.Size
+	DesiredSize granio.Size
 
 	DefaultDiagramElementProperties DiagramElementProperties
 	DiagramElements                 *list.List
@@ -69,7 +69,7 @@ type DiagramWidget struct {
 	MouseUpCallback func(*desktop.MouseEvent)
 	// OnTappedCallback is called when the diagram background is tapped. If present, it overrides the default
 	// diagram behavior for Tapped()
-	OnTappedCallback func(*DiagramWidget, *fyne.PointEvent)
+	OnTappedCallback func(*DiagramWidget, *granio.PointEvent)
 	// PrimaryDiagramElementSelectionChangedCallback is called when the primary element selection changes
 	PrimaryDiagramElementSelectionChangedCallback func(string)
 	// ElementTappedExtendsSelection determines the behavior when one or more elements are already selected and
@@ -83,8 +83,8 @@ type DiagramWidget struct {
 func NewDiagramWidget(id string) *DiagramWidget {
 	dw := &DiagramWidget{
 		ID:              id,
-		DesiredSize:     fyne.Size{Width: 800, Height: 600},
-		Offset:          fyne.Position{X: 0, Y: 0},
+		DesiredSize:     granio.Size{Width: 800, Height: 600},
+		Offset:          granio.Position{X: 0, Y: 0},
 		DiagramElements: list.New(),
 		// Nodes:                          map[string]DiagramNode{},
 		// Links:                          map[string]DiagramLink{},
@@ -94,8 +94,8 @@ func NewDiagramWidget(id string) *DiagramWidget {
 	dw.drawingArea = newDrawingArea(dw)
 	dw.drawingArea.Resize(dw.DesiredSize)
 	dw.scrollingContainer = container.NewScroll(dw.drawingArea)
-	appTheme := fyne.CurrentApp().Settings().Theme()
-	appVariant := fyne.CurrentApp().Settings().ThemeVariant()
+	appTheme := granio.CurrentApp().Settings().Theme()
+	appVariant := granio.CurrentApp().Settings().ThemeVariant()
 	dw.DefaultDiagramElementProperties.ForegroundColor = appTheme.Color(theme.ColorNameForeground, appVariant)
 	dw.DefaultDiagramElementProperties.HandleColor = appTheme.Color(theme.ColorNameForeground, appVariant)
 	dw.DefaultDiagramElementProperties.BackgroundColor = appTheme.Color(theme.ColorNameBackground, appVariant)
@@ -172,7 +172,7 @@ func (dw *DiagramWidget) adjustBounds() {
 		top = float32(math.Min(float64(top), float64(position.Y)))
 		bottom = float32(math.Max(float64(bottom), float64(position.Y+size.Height)))
 	}
-	moveDelta := fyne.NewPos(0, 0)
+	moveDelta := granio.NewPos(0, 0)
 	moveDeltaChanged := false
 	if left < dw.drawingArea.Position().X {
 		moveDelta.X = -left
@@ -201,7 +201,7 @@ func (dw *DiagramWidget) adjustBounds() {
 			bottom = float32(math.Max(float64(bottom), float64(position.Y+size.Height)))
 		}
 	}
-	dw.DesiredSize = fyne.NewSize(right-left, bottom-top)
+	dw.DesiredSize = granio.NewSize(right-left, bottom-top)
 	dw.drawingArea.Resize(dw.DesiredSize)
 	dw.scrollingContainer.Refresh()
 }
@@ -231,7 +231,7 @@ func (dw *DiagramWidget) BringForward(elementID string) {
 }
 
 // CreateRenderer creates the renderer for the diagram
-func (dw *DiagramWidget) CreateRenderer() fyne.WidgetRenderer {
+func (dw *DiagramWidget) CreateRenderer() granio.WidgetRenderer {
 	r := diagramWidgetRenderer{
 		diagramWidget: dw,
 	}
@@ -272,14 +272,14 @@ func (dw *DiagramWidget) DiagramElementTapped(de DiagramElement) {
 
 // DiagramNodeDragged moves the indicated node and refreshes any links that may be attached
 // to it
-func (dw *DiagramWidget) DiagramNodeDragged(node *BaseDiagramNode, event *fyne.DragEvent) {
-	delta := fyne.Position{X: event.Dragged.DX, Y: event.Dragged.DY}
+func (dw *DiagramWidget) DiagramNodeDragged(node *BaseDiagramNode, event *granio.DragEvent) {
+	delta := granio.Position{X: event.Dragged.DX, Y: event.Dragged.DY}
 	dw.DisplaceNode(node, delta)
 }
 
 // DisplaceNode moves the indicated node, refreshes any links that may be attached
 // to it, and adjusts the bounds of the drawing area
-func (dw *DiagramWidget) DisplaceNode(node DiagramNode, delta fyne.Position) {
+func (dw *DiagramWidget) DisplaceNode(node DiagramNode, delta granio.Position) {
 	node.Move(node.Position().Add(delta))
 	dw.refreshDependentLinks(node)
 	dw.adjustBounds()
@@ -389,7 +389,7 @@ func (dw *DiagramWidget) IsSelected(de DiagramElement) bool {
 }
 
 // moveDiagramElements moves all of the diagram elements
-func (dw *DiagramWidget) moveDiagramElements(delta fyne.Position) {
+func (dw *DiagramWidget) moveDiagramElements(delta granio.Position) {
 	for _, diagramElement := range dw.GetDiagramElements() {
 		diagramElement.Move(diagramElement.Position().Add(delta))
 	}
@@ -529,7 +529,7 @@ func (dw *DiagramWidget) showAllPads() {
 
 // StartNewLinkConnectionTransaction starts the process of adding a link, setting up for the source connection
 func (dw *DiagramWidget) StartNewLinkConnectionTransaction(link DiagramLink) {
-	dw.ConnectionTransaction = NewConnectionTransaction(link.getBaseDiagramLink().linkPoints[0], link, nil, fyne.NewPos(0, 0))
+	dw.ConnectionTransaction = NewConnectionTransaction(link.getBaseDiagramLink().linkPoints[0], link, nil, granio.NewPos(0, 0))
 	dw.showAllPads()
 }
 
@@ -541,16 +541,16 @@ type diagramWidgetRenderer struct {
 func (r *diagramWidgetRenderer) Destroy() {
 }
 
-func (r *diagramWidgetRenderer) Layout(size fyne.Size) {
+func (r *diagramWidgetRenderer) Layout(size granio.Size) {
 	r.diagramWidget.scrollingContainer.Resize(r.diagramWidget.Size())
 }
 
-func (r *diagramWidgetRenderer) MinSize() fyne.Size {
+func (r *diagramWidgetRenderer) MinSize() granio.Size {
 	return r.diagramWidget.DesiredSize
 }
 
-func (r *diagramWidgetRenderer) Objects() []fyne.CanvasObject {
-	obj := make([]fyne.CanvasObject, 0)
+func (r *diagramWidgetRenderer) Objects() []granio.CanvasObject {
+	obj := make([]granio.CanvasObject, 0)
 	obj = append(obj, r.diagramWidget.scrollingContainer)
 	return obj
 }
@@ -575,7 +575,7 @@ func newDrawingArea(diagram *DiagramWidget) *drawingArea {
 }
 
 // CreateRenderer is the required method for widget extensions
-func (da *drawingArea) CreateRenderer() fyne.WidgetRenderer {
+func (da *drawingArea) CreateRenderer() granio.WidgetRenderer {
 	dar := &drawingAreaRenderer{}
 	dar.da = da
 	return dar
@@ -587,8 +587,8 @@ func (da *drawingArea) DragEnd() {
 }
 
 // Dragged responds to a drag movement in the background of the diagram. It moves the widget itself.
-func (da *drawingArea) Dragged(event *fyne.DragEvent) {
-	delta := fyne.NewPos(event.Dragged.DX, event.Dragged.DY)
+func (da *drawingArea) Dragged(event *granio.DragEvent) {
+	delta := granio.NewPos(event.Dragged.DX, event.Dragged.DY)
 	da.diagram.moveDiagramElements(delta)
 	da.diagram.adjustBounds()
 }
@@ -630,7 +630,7 @@ func (da *drawingArea) MouseUp(event *desktop.MouseEvent) {
 
 // Tapped  respondss to taps in the diagram background. It removes all diagram elements
 // from the selection
-func (da *drawingArea) Tapped(event *fyne.PointEvent) {
+func (da *drawingArea) Tapped(event *granio.PointEvent) {
 	if da.diagram.OnTappedCallback != nil {
 		da.diagram.OnTappedCallback(da.diagram, event)
 	} else {
@@ -646,16 +646,16 @@ func (dar *drawingAreaRenderer) Destroy() {
 
 }
 
-func (dar *drawingAreaRenderer) Layout(fyne.Size) {
+func (dar *drawingAreaRenderer) Layout(granio.Size) {
 
 }
 
-func (dar *drawingAreaRenderer) MinSize() fyne.Size {
+func (dar *drawingAreaRenderer) MinSize() granio.Size {
 	return dar.da.diagram.DesiredSize
 }
 
-func (dar *drawingAreaRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{}
+func (dar *drawingAreaRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{}
 	for _, n := range dar.da.diagram.GetDiagramElements() {
 		obj = append(obj, n)
 	}

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/app"
 
-	xwidget "fyne.io/x/fyne/widget"
+	xwidget "github.com/Uzer007-admin/granio-x/widget"
 )
 
 func main() {
@@ -23,6 +23,6 @@ func main() {
 	w.SetContent(m)
 
 	w.SetPadded(false)
-	w.Resize(fyne.NewSize(512, 320))
+	w.Resize(granio.NewSize(512, 320))
 	w.ShowAndRun()
 }

@@ -1,17 +1,17 @@
 package widget
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type mapButton struct {
 	widget.Button
 }
 
-func newMapButton(icon fyne.Resource, f func()) *mapButton {
+func newMapButton(icon granio.Resource, f func()) *mapButton {
 	b := &mapButton{}
 	b.ExtendBaseWidget(b)
 
@@ -20,27 +20,27 @@ func newMapButton(icon fyne.Resource, f func()) *mapButton {
 	return b
 }
 
-func (b *mapButton) CreateRenderer() fyne.WidgetRenderer {
+func (b *mapButton) CreateRenderer() granio.WidgetRenderer {
 	return &mapButtonRenderer{WidgetRenderer: b.Button.CreateRenderer(),
 		bg: canvas.NewRectangle(theme.Color(theme.ColorNameShadow))}
 }
 
 type mapButtonRenderer struct {
-	fyne.WidgetRenderer
+	granio.WidgetRenderer
 
 	bg *canvas.Rectangle
 }
 
-func (r *mapButtonRenderer) Layout(s fyne.Size) {
+func (r *mapButtonRenderer) Layout(s granio.Size) {
 	halfPad := theme.Padding() / 2
-	r.bg.Move(fyne.NewPos(halfPad, halfPad))
-	r.bg.Resize(s.Subtract(fyne.NewSize(theme.Padding(), theme.Padding())))
+	r.bg.Move(granio.NewPos(halfPad, halfPad))
+	r.bg.Resize(s.Subtract(granio.NewSize(theme.Padding(), theme.Padding())))
 
 	r.WidgetRenderer.Layout(s)
 }
 
-func (r *mapButtonRenderer) Objects() []fyne.CanvasObject {
-	return append([]fyne.CanvasObject{r.bg}, r.WidgetRenderer.Objects()...)
+func (r *mapButtonRenderer) Objects() []granio.CanvasObject {
+	return append([]granio.CanvasObject{r.bg}, r.WidgetRenderer.Objects()...)
 }
 
 func (r *mapButtonRenderer) Refresh() {

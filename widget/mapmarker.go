@@ -3,12 +3,12 @@ package widget
 import (
 	_ "embed"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/layout"
+	"github.com/Uzer007-admin/granio/v2/theme"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 type MapMarker interface {
@@ -41,7 +41,7 @@ func (m *genericMapMarker) Title() string {
 
 type mapMarker struct {
 	widget.BaseWidget
-	container *fyne.Container
+	container *granio.Container
 	title     *canvas.Text
 	obj       MapMarker
 	item      *mapMarkerItem
@@ -50,7 +50,7 @@ type mapMarker struct {
 //go:embed mapmarker.svg
 var resourceMapmarkerSvgData []byte
 
-var resourceMapmarkerSvg = &fyne.StaticResource{
+var resourceMapmarkerSvg = &granio.StaticResource{
 	StaticName:    "mapmarker.svg",
 	StaticContent: resourceMapmarkerSvgData,
 }
@@ -86,22 +86,22 @@ func (m *mapMarker) setup() {
 	)
 }
 
-func (m *mapMarker) pinOffset() fyne.Position {
+func (m *mapMarker) pinOffset() granio.Position {
 	m.setup()
 	imgSize := m.item.Size()
 	if m.title.Hidden {
-		return fyne.NewPos(imgSize.Width/2, imgSize.Height+(imgSize.Height*.05))
+		return granio.NewPos(imgSize.Width/2, imgSize.Height+(imgSize.Height*.05))
 	}
 	conSize := m.container.Size()
-	return fyne.NewPos(conSize.Width/2, conSize.Height+(imgSize.Height*.05))
+	return granio.NewPos(conSize.Width/2, conSize.Height+(imgSize.Height*.05))
 }
 
-func (m *mapMarker) MinSize() fyne.Size {
+func (m *mapMarker) MinSize() granio.Size {
 	m.setup()
 	return m.container.MinSize()
 }
 
-func (m *mapMarker) CreateRenderer() fyne.WidgetRenderer {
+func (m *mapMarker) CreateRenderer() granio.WidgetRenderer {
 	m.setup()
 	return widget.NewSimpleRenderer(m.container)
 }

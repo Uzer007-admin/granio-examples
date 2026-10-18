@@ -3,12 +3,12 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/x/fyne/widget/diagramwidget/geometry/r2"
+	"github.com/Uzer007-admin/granio-x/widget/diagramwidget/geometry/r2"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/driver/desktop"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 const (
@@ -17,11 +17,11 @@ const (
 
 // ConnectionPad is an interface to a connection shape on a DiagramElement.
 type ConnectionPad interface {
-	fyne.Widget
+	granio.Widget
 	desktop.Hoverable
 	GetPadOwner() DiagramElement
-	GetCenterInDiagramCoordinates() fyne.Position
-	getConnectionPointInDiagramCoordinates(referencePoint fyne.Position) fyne.Position
+	GetCenterInDiagramCoordinates() granio.Position
+	getConnectionPointInDiagramCoordinates(referencePoint granio.Position) granio.Position
 	MouseDown(*desktop.MouseEvent)
 	MouseUp(*desktop.MouseEvent)
 	SetPadColor(color.Color)
@@ -44,9 +44,9 @@ func (pp *PointPad) MouseDown(event *desktop.MouseEvent) {
 		link := connectionTransaction.Link
 		if link.isConnectionAllowed(connectionTransaction.LinkPoint, pp) {
 			padOwnerPosition := pp.padOwner.Position()
-			pseudoEvent := &fyne.DragEvent{
-				PointEvent: fyne.PointEvent{},
-				Dragged:    fyne.NewDelta(event.Position.X+padOwnerPosition.X+10, event.Position.Y+padOwnerPosition.Y-10),
+			pseudoEvent := &granio.DragEvent{
+				PointEvent: granio.PointEvent{},
+				Dragged:    granio.NewDelta(event.Position.X+padOwnerPosition.X+10, event.Position.Y+padOwnerPosition.Y-10),
 			}
 			// the link point has to be changed before the handle is dragged
 			connectionTransaction.LinkPoint = connectionTransaction.Link.GetLinkPoints()[1]
@@ -67,8 +67,8 @@ func (rp *RectanglePad) MouseDown(event *desktop.MouseEvent) {
 		link := connectionTransaction.Link
 		if link.isConnectionAllowed(connectionTransaction.LinkPoint, rp) {
 			padOwnerPosition := rp.padOwner.Position()
-			pseudoEvent := &fyne.DragEvent{
-				Dragged: fyne.NewDelta(event.Position.X+padOwnerPosition.X, event.Position.Y+padOwnerPosition.Y),
+			pseudoEvent := &granio.DragEvent{
+				Dragged: granio.NewDelta(event.Position.X+padOwnerPosition.X, event.Position.Y+padOwnerPosition.Y),
 			}
 			// the link point has to be changed before the handle is dragged
 			connectionTransaction.LinkPoint = connectionTransaction.Link.GetLinkPoints()[1]
@@ -115,7 +115,7 @@ func NewPointPad(padOwner DiagramElement) *PointPad {
 }
 
 // CreateRenderer creates the WidgetRenderer for a PointPad
-func (pp *PointPad) CreateRenderer() fyne.WidgetRenderer {
+func (pp *PointPad) CreateRenderer() granio.WidgetRenderer {
 	ppr := &pointPadRenderer{
 		pp: pp,
 		l1: canvas.NewLine(pp.padColor),
@@ -127,13 +127,13 @@ func (pp *PointPad) CreateRenderer() fyne.WidgetRenderer {
 }
 
 // GetCenterInDiagramCoordinates returns the position in diagram coordinates
-func (pp *PointPad) GetCenterInDiagramCoordinates() fyne.Position {
-	return pp.padOwner.Position().Add(pp.Position().Add(fyne.NewPos(pointPadSize/2, pointPadSize/2)))
+func (pp *PointPad) GetCenterInDiagramCoordinates() granio.Position {
+	return pp.padOwner.Position().Add(pp.Position().Add(granio.NewPos(pointPadSize/2, pointPadSize/2)))
 }
 
 // getConnectionPointInDiagramCoordinates returns the point on the pad to which a connection will be made from the referencePoint.
 // For a point pad, this is always the center.
-func (pp *PointPad) getConnectionPointInDiagramCoordinates(referencePoint fyne.Position) fyne.Position {
+func (pp *PointPad) getConnectionPointInDiagramCoordinates(referencePoint granio.Position) granio.Position {
 	return pp.GetCenterInDiagramCoordinates()
 }
 
@@ -180,19 +180,19 @@ func (ppr *pointPadRenderer) Destroy() {
 
 }
 
-func (ppr *pointPadRenderer) Layout(size fyne.Size) {
-	ppr.l1.Position1 = fyne.NewPos(0, 0)
-	ppr.l1.Position2 = fyne.NewPos(pointPadSize, pointPadSize)
-	ppr.l2.Position1 = fyne.NewPos(pointPadSize, 0)
-	ppr.l2.Position2 = fyne.NewPos(0, pointPadSize)
+func (ppr *pointPadRenderer) Layout(size granio.Size) {
+	ppr.l1.Position1 = granio.NewPos(0, 0)
+	ppr.l1.Position2 = granio.NewPos(pointPadSize, pointPadSize)
+	ppr.l2.Position1 = granio.NewPos(pointPadSize, 0)
+	ppr.l2.Position2 = granio.NewPos(0, pointPadSize)
 }
 
-func (ppr *pointPadRenderer) MinSize() fyne.Size {
-	return fyne.Size{Height: pointPadSize, Width: pointPadSize}
+func (ppr *pointPadRenderer) MinSize() granio.Size {
+	return granio.Size{Height: pointPadSize, Width: pointPadSize}
 }
 
-func (ppr *pointPadRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (ppr *pointPadRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		ppr.l1,
 		ppr.l2,
 	}
@@ -233,7 +233,7 @@ func NewRectanglePad(padOwner DiagramElement) *RectanglePad {
 }
 
 // CreateRenderer creates the WidgetRenderer for the RectanglePad
-func (rp *RectanglePad) CreateRenderer() fyne.WidgetRenderer {
+func (rp *RectanglePad) CreateRenderer() granio.WidgetRenderer {
 	rpr := &rectanglePadRenderer{
 		rp:   rp,
 		rect: *canvas.NewRectangle(rp.padColor),
@@ -243,10 +243,10 @@ func (rp *RectanglePad) CreateRenderer() fyne.WidgetRenderer {
 }
 
 // GetCenterInDiagramCoordinates returns the center of the pad in the diagram's coordinate system
-func (rp *RectanglePad) GetCenterInDiagramCoordinates() fyne.Position {
+func (rp *RectanglePad) GetCenterInDiagramCoordinates() granio.Position {
 	box := rp.makeBox()
 	r2Center := box.Center()
-	return fyne.NewPos(float32(r2Center.X), float32(r2Center.Y))
+	return granio.NewPos(float32(r2Center.X), float32(r2Center.Y))
 }
 
 // getConnectionPointInDiagramCoordinates returns the point at which the connection should be made from a reference point.
@@ -254,7 +254,7 @@ func (rp *RectanglePad) GetCenterInDiagramCoordinates() fyne.Position {
 // For a RectanglePad this point is the intersection of a line segment from the reference point to the center
 // of the rectangle pad and the rectangle bounding the pad. If the reference point is within the bounds of the rectangle,
 // the returned point is the point on the perimeter that is nearest the reference point.
-func (rp *RectanglePad) getConnectionPointInDiagramCoordinates(referencePoint fyne.Position) fyne.Position {
+func (rp *RectanglePad) getConnectionPointInDiagramCoordinates(referencePoint granio.Position) granio.Position {
 	var connectionPoint r2.Vec2
 	box := rp.makeBox()
 	r2ReferencePoint := r2.MakeVec2(float64(referencePoint.X), float64(referencePoint.Y))
@@ -264,7 +264,7 @@ func (rp *RectanglePad) getConnectionPointInDiagramCoordinates(referencePoint fy
 		linkLine := r2.MakeLineFromEndpoints(box.Center(), r2ReferencePoint)
 		connectionPoint, _ = box.Intersect(linkLine)
 	}
-	return fyne.NewPos(float32(connectionPoint.X), float32(connectionPoint.Y))
+	return granio.NewPos(float32(connectionPoint.X), float32(connectionPoint.Y))
 }
 
 // makeBox returns an r2 box representing the rectangle pad's position and size in the
@@ -322,18 +322,18 @@ func (rpr *rectanglePadRenderer) Destroy() {
 
 }
 
-func (rpr *rectanglePadRenderer) Layout(size fyne.Size) {
+func (rpr *rectanglePadRenderer) Layout(size granio.Size) {
 	padOwnerSize := rpr.rp.padOwner.Size()
 	rpr.rp.Resize(padOwnerSize)
 	rpr.rect.Resize(padOwnerSize)
 }
 
-func (rpr *rectanglePadRenderer) MinSize() fyne.Size {
+func (rpr *rectanglePadRenderer) MinSize() granio.Size {
 	return rpr.rp.padOwner.Size()
 }
 
-func (rpr *rectanglePadRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (rpr *rectanglePadRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		&rpr.rect,
 	}
 	return obj

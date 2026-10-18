@@ -3,13 +3,13 @@ package diagramwidget
 import (
 	"image/color"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/canvas"
+	"github.com/Uzer007-admin/granio/v2/widget"
 )
 
 // Validate implementation of Draggable
-var _ fyne.Draggable = (*Handle)(nil)
+var _ granio.Draggable = (*Handle)(nil)
 
 var defaultHandleSize float32 = 10.0
 
@@ -31,7 +31,7 @@ func NewHandle(diagramElement DiagramElement) *Handle {
 }
 
 // CreateRenderer is the required method for the Handle widget
-func (h *Handle) CreateRenderer() fyne.WidgetRenderer {
+func (h *Handle) CreateRenderer() granio.WidgetRenderer {
 	hr := &handleRenderer{
 		handle: h,
 		rect:   canvas.NewRectangle(h.getStrokeColor()),
@@ -43,7 +43,7 @@ func (h *Handle) CreateRenderer() fyne.WidgetRenderer {
 
 // Dragged respondss to drag events, passing them on to the owning DiagramElement. It is the
 // DiagramElement that determines what to do as a result of the drag.
-func (h *Handle) Dragged(event *fyne.DragEvent) {
+func (h *Handle) Dragged(event *granio.DragEvent) {
 	h.de.handleDragged(h, event)
 }
 
@@ -61,8 +61,8 @@ func (h *Handle) getStrokeWidth() float32 {
 }
 
 // Move changes the position of the handle
-func (h *Handle) Move(position fyne.Position) {
-	delta := fyne.Position{X: -h.handleSize / 2, Y: -h.handleSize / 2}
+func (h *Handle) Move(position granio.Position) {
+	delta := granio.Position{X: -h.handleSize / 2, Y: -h.handleSize / 2}
 	h.BaseWidget.Move(position.Add(delta))
 }
 
@@ -77,19 +77,19 @@ func (hr *handleRenderer) Destroy() {
 }
 
 // Layout sets both the handle and its rectangle to the minimum size
-func (hr *handleRenderer) Layout(size fyne.Size) {
+func (hr *handleRenderer) Layout(size granio.Size) {
 	hr.rect.Resize(hr.MinSize())
 	hr.handle.Resize(hr.MinSize())
 }
 
 // MinSize returns the minimum size of the Handle widget
-func (hr *handleRenderer) MinSize() fyne.Size {
-	return fyne.Size{Height: hr.handle.handleSize, Width: hr.handle.handleSize}
+func (hr *handleRenderer) MinSize() granio.Size {
+	return granio.Size{Height: hr.handle.handleSize, Width: hr.handle.handleSize}
 }
 
 // Objects returns the objects that comprise the Handel
-func (hr *handleRenderer) Objects() []fyne.CanvasObject {
-	obj := []fyne.CanvasObject{
+func (hr *handleRenderer) Objects() []granio.CanvasObject {
+	obj := []granio.CanvasObject{
 		hr.rect,
 	}
 	return obj

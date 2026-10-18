@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/storage"
-	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/storage"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/widget"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +33,7 @@ func TestFileTree_Layout(t *testing.T) {
 
 	window := test.NewWindow(tree)
 	defer window.Close()
-	window.Resize(fyne.NewSize(300, 100))
+	window.Resize(granio.NewSize(300, 100))
 
 	branch, err := storage.Child(root, "B")
 	assert.NoError(t, err)
@@ -62,14 +62,14 @@ func TestFileTree_filter(t *testing.T) {
 	leaf2, err := storage.Child(branch2, "D.txt")
 	assert.NoError(t, err)
 
-	given := []fyne.URI{
+	given := []granio.URI{
 		branch1,
 		branch2,
 		leaf1,
 		leaf2,
 	}
 
-	expected := []fyne.URI{
+	expected := []granio.URI{
 		leaf1,
 		leaf2,
 	}
@@ -86,11 +86,11 @@ func TestFileTree_ShowRootPath(t *testing.T) {
 	firstNodeContent := func() *widget.Label {
 		renderer := tree.CreateRenderer()
 		assert.Equal(t, 1, len(renderer.Objects()))
-		content := renderer.Objects()[0].(*container.Scroll).Content.(fyne.Widget).CreateRenderer()
-		content.Layout(fyne.NewSize(100, 100))
+		content := renderer.Objects()[0].(*container.Scroll).Content.(granio.Widget).CreateRenderer()
+		content.Layout(granio.NewSize(100, 100))
 
-		node := content.Objects()[0].(fyne.Widget).CreateRenderer()
-		return node.Objects()[1].(*fyne.Container).Objects[0].(*widget.Label)
+		node := content.Objects()[0].(granio.Widget).CreateRenderer()
+		return node.Objects()[1].(*granio.Container).Objects[0].(*widget.Label)
 	}
 
 	assert.Equal(t, "testdata", firstNodeContent().Text)
@@ -107,7 +107,7 @@ func TestFileTree_sort(t *testing.T) {
 	root, err := storage.ParseURI("file://" + tempDir)
 	assert.NoError(t, err)
 	tree := NewFileTree(root)
-	tree.Sorter = func(u1, u2 fyne.URI) bool {
+	tree.Sorter = func(u1, u2 granio.URI) bool {
 		return u2.String() < u1.String() // Reverse alphabetical
 	}
 
@@ -120,14 +120,14 @@ func TestFileTree_sort(t *testing.T) {
 	leaf2, err := storage.Child(branch2, "D.txt")
 	assert.NoError(t, err)
 
-	given := []fyne.URI{
+	given := []granio.URI{
 		branch1,
 		branch2,
 		leaf1,
 		leaf2,
 	}
 
-	expected := []fyne.URI{
+	expected := []granio.URI{
 		leaf2,
 		leaf1,
 		branch2,

@@ -3,10 +3,10 @@ package widget
 import (
 	"testing"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/widget"
+	"github.com/Uzer007-admin/granio/v2"
+	"github.com/Uzer007-admin/granio/v2/container"
+	"github.com/Uzer007-admin/granio/v2/test"
+	"github.com/Uzer007-admin/granio/v2/widget"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +26,7 @@ func createEntry() *CompletionEntry {
 func TestCompletionEntry(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("init")
@@ -36,20 +36,20 @@ func TestCompletionEntry(t *testing.T) {
 // Check if custom create/update is called
 func TestCompletionEntry_Custom(t *testing.T) {
 	entry := createEntry()
-	entry.CustomCreate = func() fyne.CanvasObject {
+	entry.CustomCreate = func() granio.CanvasObject {
 		return widget.NewCheck("thing", func(bool) {})
 	}
-	entry.CustomUpdate = func(id widget.ListItemID, o fyne.CanvasObject) {
+	entry.CustomUpdate = func(id widget.ListItemID, o granio.CanvasObject) {
 		o.(*widget.Check).Text = entryData[id]
 		o.Refresh()
 	}
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("init")
-	scroll := test.WidgetRenderer(entry.navigableList).Objects()[0].(fyne.Widget)
-	list := test.WidgetRenderer(scroll).Objects()[0].(*fyne.Container).Objects[0].(fyne.Widget)
+	scroll := test.WidgetRenderer(entry.navigableList).Objects()[0].(granio.Widget)
+	list := test.WidgetRenderer(scroll).Objects()[0].(*granio.Container).Objects[0].(granio.Widget)
 	item1 := test.WidgetRenderer(list).Objects()[1]
 	assert.Equal(t, "foo", item1.(*widget.Check).Text) // ensure the item is a Check not Label
 }
@@ -58,7 +58,7 @@ func TestCompletionEntry_Custom(t *testing.T) {
 func TestCompletionEntry_ShowMenu(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("init")
@@ -69,16 +69,16 @@ func TestCompletionEntry_ShowMenu(t *testing.T) {
 func TestCompletionEntry_Navigate(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("init")
 
 	// navigate to "bar" and press enter, the entry should contain
 	// "bar" in value
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyReturn})
 
 	assert.Equal(t, "bar", entry.Text)
 	assert.False(t, entry.popupMenu.Visible())
@@ -88,7 +88,7 @@ func TestCompletionEntry_Navigate(t *testing.T) {
 func TestCompletionEntry_CursorPosition(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.OnChanged = func(s string) {
@@ -99,9 +99,9 @@ func TestCompletionEntry_CursorPosition(t *testing.T) {
 
 	// navigate to "bar" and press enter, the entry should contain
 	// "bar" in value
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyReturn})
 
 	assert.Equal(t, 6, entry.CursorColumn)
 }
@@ -110,13 +110,13 @@ func TestCompletionEntry_CursorPosition(t *testing.T) {
 func TestCompletionEntry_Escape(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("init")
 
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyEscape})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyEscape})
 
 	assert.False(t, entry.popupMenu.Visible())
 }
@@ -125,7 +125,7 @@ func TestCompletionEntry_Escape(t *testing.T) {
 func TestCompletionEntry_Rune(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("foobar")
@@ -137,7 +137,7 @@ func TestCompletionEntry_Rune(t *testing.T) {
 	assert.Equal(t, "foobarxy", entry.Text)
 
 	// make a move and type other char
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
 	win.Canvas().Focused().TypedRune('z')
 	assert.Equal(t, "foobarxyz", entry.Text)
 
@@ -148,7 +148,7 @@ func TestCompletionEntry_Rune(t *testing.T) {
 func TestCompletionEntry_Rotation(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.SetText("foobar")
@@ -156,13 +156,13 @@ func TestCompletionEntry_Rotation(t *testing.T) {
 
 	// loop one time (nb items + 1) to go back to the first element
 	for i := 0; i <= len(entry.Options); i++ {
-		win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown})
+		win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown})
 	}
 
 	assert.Equal(t, 0, entry.navigableList.selected)
 
 	// Do the same in reverse order, here, onlh one time to go on the last item
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyUp})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyUp})
 	assert.Equal(t, len(entry.Options)-1, entry.navigableList.selected)
 }
 
@@ -170,7 +170,7 @@ func TestCompletionEntry_Rotation(t *testing.T) {
 func TestCompletionEntry_WithEmptyOptions(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	entry.OnChanged = func(s string) {
@@ -186,7 +186,7 @@ func TestCompletionEntry_WithEmptyOptions(t *testing.T) {
 func TestCompletionEntry_OnSubmit(t *testing.T) {
 	entry := createEntry()
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	submitted := false
@@ -200,7 +200,7 @@ func TestCompletionEntry_OnSubmit(t *testing.T) {
 	}
 
 	entry.SetText("foo")
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn})
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyReturn})
 	assert.True(t, submitted)
 }
 
@@ -211,7 +211,7 @@ func TestCompletionEntry_DoubleSubmissionIssue(t *testing.T) {
 	entry := createEntry()
 	entry.SetOptions([]string{"foofoo", "bar", "baz"})
 	win := test.NewWindow(entry)
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	submitted := false
@@ -221,12 +221,12 @@ func TestCompletionEntry_DoubleSubmissionIssue(t *testing.T) {
 
 	win.Canvas().Focus(entry)
 	entry.SetText("foo")
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyDown}) // select foofoo
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyDown}) // select foofoo
 	assert.False(t, submitted)
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn}) // OnSubmitted should NOT be called
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyReturn}) // OnSubmitted should NOT be called
 	assert.False(t, submitted)
 	assert.False(t, entry.popupMenu.Visible())
-	win.Canvas().Focused().TypedKey(&fyne.KeyEvent{Name: fyne.KeyReturn}) // OnSubmitted should be called
+	win.Canvas().Focused().TypedKey(&granio.KeyEvent{Name: granio.KeyReturn}) // OnSubmitted should be called
 	assert.True(t, submitted)
 }
 
@@ -249,14 +249,14 @@ func TestCompletionEntry_SubclassFocusGained(t *testing.T) {
 
 	// Nest below a label so the entry's absolute position is non-zero.
 	win := test.NewWindow(container.NewVBox(widget.NewLabel("top"), entry))
-	win.Resize(fyne.NewSize(500, 300))
+	win.Resize(granio.NewSize(500, 300))
 	defer win.Close()
 
 	win.Canvas().Focus(entry)
 	assert.NotNil(t, entry.popupMenu)
 	assert.True(t, entry.popupMenu.Visible())
 
-	entryPos := fyne.CurrentApp().Driver().AbsolutePositionForObject(entry)
+	entryPos := granio.CurrentApp().Driver().AbsolutePositionForObject(entry)
 	assert.Greater(t, entryPos.Y, float32(0))
-	assert.Equal(t, entryPos.Add(fyne.NewPos(0, entry.Size().Height)), entry.popUpPos())
+	assert.Equal(t, entryPos.Add(granio.NewPos(0, entry.Size().Height)), entry.popUpPos())
 }
