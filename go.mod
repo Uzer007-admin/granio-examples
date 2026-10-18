@@ -3,7 +3,7 @@ module github.com/Uzer007-admin/granio-examples
 go 1.27.1
 
 require (
-	github.com/Uzer007-admin/granio-x v0.0.0-20261018064453-22a6db2b4c9a
+	github.com/Uzer007-admin/granio-x v0.0.0-20261018072629-9836f4ca6d00
 	github.com/Uzer007-admin/granio/v2 v2.8.2-0.20261018062539-44c3df9361e7
 	github.com/alecthomas/chroma/v2 v2.15.0
 	github.com/casbin/govaluate v1.10.0

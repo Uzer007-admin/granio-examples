@@ -105,7 +105,7 @@
       "path": "terminal",
       "history_merged": true,
       "previous_repository": "https://github.com/Uzer007-admin/granio-terminal",
-      "previous_repository_deleted": false,
+      "previous_repository_deleted": true,
       "library_repository": "granio-x",
       "license_files": [
         "LICENSE"
@@ -117,7 +117,7 @@
       "path": "cloud",
       "history_merged": true,
       "previous_repository": "https://github.com/Uzer007-admin/granio-cloud",
-      "previous_repository_deleted": false,
+      "previous_repository_deleted": true,
       "library_repository": "granio-x",
       "license_files": [
         "LICENSE"
@@ -129,7 +129,7 @@
       "path": "localization",
       "history_merged": true,
       "previous_repository": "https://github.com/Uzer007-admin/granio-locale",
-      "previous_repository_deleted": false,
+      "previous_repository_deleted": true,
       "library_repository": "granio-x",
       "license_files": [
         "LICENSE"

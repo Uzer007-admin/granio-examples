@@ -12,8 +12,8 @@ github.com/Uzer007-admin/glfw/v3.4/glfw v0.1.0-pre.2.0.20261017234256-57a5925f81
 github.com/Uzer007-admin/glfw/v3.4/glfw v0.1.0-pre.2.0.20261017234256-57a5925f8166/go.mod h1:awU63+JR8VyweAirNHK6xWX3GBBlLCW4ceFHQspDksQ=
 github.com/Uzer007-admin/glfw/v3.5/glfw v0.0.0-20261017234256-57a5925f8166 h1:6Or1va3ItbR6EsledqNpwX04LaZd/4JTKBbtyVAqrsA=
 github.com/Uzer007-admin/glfw/v3.5/glfw v0.0.0-20261017234256-57a5925f8166/go.mod h1:am1tM51xPEOG5OA21IoiQ5mQoMt7mcXNtOW2AZi8Kc8=
-github.com/Uzer007-admin/granio-x v0.0.0-20261018064453-22a6db2b4c9a h1:BmB6lEzagfxQaVpyukDHD0SJyb97zdSKnofU8GIf1Dg=
-github.com/Uzer007-admin/granio-x v0.0.0-20261018064453-22a6db2b4c9a/go.mod h1:Qn8ZyfTLsitOcRy2RRkfqBQZN82cHNGEX8was8M2yWA=
+github.com/Uzer007-admin/granio-x v0.0.0-20261018072629-9836f4ca6d00 h1:FgQFUp9XSqlK6MI1CENazSY0ETGScGzl8BxKrvtxyZ4=
+github.com/Uzer007-admin/granio-x v0.0.0-20261018072629-9836f4ca6d00/go.mod h1:Qn8ZyfTLsitOcRy2RRkfqBQZN82cHNGEX8was8M2yWA=
 github.com/Uzer007-admin/granio/deps/gl-js v0.0.0-20261018062049-d56bde3dff7f h1:LZE+xDNFDc4TMIpePmgBoqg7zHcJICiArk+lQ6Hof50=
 github.com/Uzer007-admin/granio/deps/gl-js v0.0.0-20261018062049-d56bde3dff7f/go.mod h1:sDbs0KHv9OIj2Gn/x91M/Obx35YMkEbuLvaJwjG8NYU=
 github.com/Uzer007-admin/granio/deps/glfw-js v0.0.0-20261018062049-d56bde3dff7f h1:BZz48Ep2XbsKcUheZ3hSdBT/7E2gv+LpYaMN9v1/D48=
